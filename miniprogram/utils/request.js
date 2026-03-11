@@ -120,6 +120,38 @@ const handleUserMock = (action, data) => {
 // 活动相关 Mock API
 let activityIdCounter = 100; // 用于生成新活动 ID
 
+// 报名记录：key=activityId_userId, value=registration 对象
+const registrations = {};
+
+// 检查是否已报名
+const isRegistered = (activityId, userId) => {
+  const key = `${activityId}_${userId}`;
+  return registrations[key] || null;
+};
+
+// 添加报名记录
+const addRegistration = (activityId, userId) => {
+  const key = `${activityId}_${userId}`;
+  registrations[key] = {
+    _id: `reg_${Date.now()}`,
+    activity_id: activityId,
+    user_id: userId,
+    status: 'registered',
+    created_at: new Date().toISOString()
+  };
+  return registrations[key];
+};
+
+// 取消报名记录
+const removeRegistration = (activityId, userId) => {
+  const key = `${activityId}_${userId}`;
+  if (registrations[key]) {
+    delete registrations[key];
+    return true;
+  }
+  return false;
+};
+
 const handleActivityMock = (action, data) => {
   switch (action) {
     case 'getList': {
@@ -160,6 +192,10 @@ const handleActivityMock = (action, data) => {
     }
     case 'getDetail':
       const activity = mockData.activities.find(a => a._id === data.id);
+      const userId = mockData.currentUser._id;
+
+      // 检查当前用户是否已报名
+      const userRegistration = isRegistered(data.id, userId);
 
       // 生成模拟参与者数据（从成员列表中选取）
       const registeredCount = activity?.registered_count || 0;
@@ -178,8 +214,8 @@ const handleActivityMock = (action, data) => {
         code: 0,
         data: activity ? {
           activity,
-          isRegistered: false,
-          registration: null,
+          isRegistered: !!userRegistration,
+          registration: userRegistration,
           participants: mockParticipants
         } : {
           activity: mockData.activities[0],
@@ -227,18 +263,59 @@ const handleActivityMock = (action, data) => {
         mockData.activities[cancelIndex].status = 'cancelled';
       }
       return Promise.resolve({ code: 0, data: { success: true } });
-    case 'register':
-      const regIndex = mockData.activities.findIndex(a => a._id === data.activityId);
+    case 'register': {
+      const userId = mockData.currentUser._id;
+      const activityId = data.activityId;
+
+      // 检查是否已报名
+      const existingReg = isRegistered(activityId, userId);
+      if (existingReg) {
+        return Promise.resolve({ code: 1, message: '您已报名过此活动', data: null });
+      }
+
+      // 检查活动是否存在和名额
+      const activity = mockData.activities.find(a => a._id === activityId);
+      if (!activity) {
+        return Promise.resolve({ code: 1, message: '活动不存在', data: null });
+      }
+      if (activity.registered_count >= activity.quota) {
+        return Promise.resolve({ code: 1, message: '名额已满', data: null });
+      }
+
+      // 添加报名记录
+      addRegistration(activityId, userId);
+
+      // 增加报名人数
+      const regIndex = mockData.activities.findIndex(a => a._id === activityId);
       if (regIndex !== -1) {
         mockData.activities[regIndex].registered_count = (mockData.activities[regIndex].registered_count || 0) + 1;
       }
+
+      console.log('[Mock] 用户报名:', { activityId, userId });
       return Promise.resolve({ code: 0, data: { success: true } });
-    case 'cancelRegistration':
-      const cancelRegIndex = mockData.activities.findIndex(a => a._id === data.activityId);
+    }
+    case 'cancelRegistration': {
+      const userId = mockData.currentUser._id;
+      const activityId = data.activityId;
+
+      // 检查是否已报名
+      const existingReg = isRegistered(activityId, userId);
+      if (!existingReg) {
+        return Promise.resolve({ code: 1, message: '您未报名此活动', data: null });
+      }
+
+      // 取消报名记录
+      removeRegistration(activityId, userId);
+
+      // 减少报名人数
+      const cancelRegIndex = mockData.activities.findIndex(a => a._id === activityId);
       if (cancelRegIndex !== -1 && mockData.activities[cancelRegIndex].registered_count > 0) {
         mockData.activities[cancelRegIndex].registered_count--;
       }
+
+      console.log('[Mock] 用户取消报名:', { activityId, userId });
       return Promise.resolve({ code: 0, data: { success: true } });
+    }
     case 'checkIn':
       return Promise.resolve({ code: 0, data: { success: true, points: 20 } });
     default:
