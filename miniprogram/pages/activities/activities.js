@@ -14,12 +14,22 @@ Page({
     currentTab: 'all', // all | registered | created
     tabs: [
       { key: 'all', title: '全部活动' },
-      { key: 'registered', title: '我报名的' },
-      { key: 'created', title: '我创建的' }
-    ]
+      { key: 'registered', title: '我报名的' }
+    ],
+    isAdminOrLeader: false
   },
 
   onLoad: function () {
+    // 检查是否是管理员或团长
+    const app = getApp();
+    const isAdminOrLeader = app.globalData.isAdmin || app.globalData.isLeader;
+
+    // 只有管理员/团长才显示"我创建的"选项卡
+    if (isAdminOrLeader) {
+      this.data.tabs.push({ key: 'created', title: '我创建的' });
+    }
+
+    this.setData({ isAdminOrLeader });
     this.loadActivities();
   },
 
