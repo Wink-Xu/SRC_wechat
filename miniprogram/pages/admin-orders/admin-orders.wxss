@@ -1,0 +1,177 @@
+/* pages/admin-orders/admin-orders.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* 状态选项卡 */
+.status-tabs {
+  display: flex;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #9C27B0;
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background: #9C27B0;
+  border-radius: 2rpx;
+}
+
+/* 订单列表 */
+.order-list {
+  padding: 20rpx 30rpx;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.order-no {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.order-user {
+  margin-bottom: 12rpx;
+}
+
+.user-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.user-phone {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.order-product {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-top: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.product-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.product-quantity {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 20rpx;
+}
+
+.product-price {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FF9800;
+}
+
+.order-address {
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.status-tag {
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+}
+
+.status-paid {
+  background: #FFF8E1;
+  color: #F57C00;
+}
+
+.status-shipped {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.status-completed {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-cancelled {
+  background: #f5f5f5;
+  color: #666;
+}
+
+/* 加载状态 */
+.loading-box,
+.loading-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+.no-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+.empty-box {
+  text-align: center;
+  padding: 60rpx;
+}
+
+.empty-text {
+  color: #999;
+}

@@ -1,0 +1,60 @@
+<!--pages/admin-activities/admin-activities.wxml-->
+<view class="container">
+  <!-- 活动列表 -->
+  <view class="activity-list">
+    <view wx:if="{{loading && activities.length === 0}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{activities.length === 0}}" class="empty-box">
+      <text class="empty-text">暂无活动</text>
+    </view>
+
+    <view
+      class="activity-card"
+      wx:for="{{activities}}"
+      wx:key="_id"
+    >
+      <view class="activity-header">
+        <text class="activity-title">{{item.title}}</text>
+        <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+      </view>
+      <view class="activity-info">
+        <text class="info-text">{{item.formattedTime}} | {{item.location}}</text>
+        <text class="info-text">报名: {{item.registered_count || 0}}/{{item.quota}}人</text>
+      </view>
+      <view class="activity-actions">
+        <button
+          class="btn btn-secondary btn-small"
+          data-id="{{item._id}}"
+          bindtap="editActivity"
+        >编辑</button>
+        <button
+          wx:if="{{item.status === 'draft'}}"
+          class="btn btn-primary btn-small"
+          data-id="{{item._id}}"
+          bindtap="publishActivity"
+        >发布</button>
+        <button
+          wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
+          class="btn btn-error btn-small"
+          data-id="{{item._id}}"
+          bindtap="cancelActivity"
+        >取消</button>
+      </view>
+    </view>
+
+    <view wx:if="{{loadingMore}}" class="loading-more">
+      <text>加载更多...</text>
+    </view>
+
+    <view wx:if="{{!hasMore && activities.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 创建按钮 -->
+  <view class="fab-btn" bindtap="createActivity">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

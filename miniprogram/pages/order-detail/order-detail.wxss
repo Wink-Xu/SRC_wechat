@@ -1,0 +1,181 @@
+/* pages/order-detail/order-detail.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 160rpx;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+/* 状态卡片 */
+.status-card {
+  padding: 40rpx 30rpx;
+  color: #fff;
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+}
+
+.status-paid,
+.status-shipped {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+}
+
+.status-completed {
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+.status-cancelled {
+  background: linear-gradient(135deg, #9E9E9E, #757575);
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+/* 收货地址 */
+.address-card {
+  display: flex;
+  background: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.address-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+}
+
+.address-icon image {
+  width: 100%;
+  height: 100%;
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-name {
+  font-size: 30rpx;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.address-detail {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 商品卡片 */
+.product-card {
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.product-header {
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.header-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.product-content {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+}
+
+.product-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.product-meta {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.product-price {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FF9800;
+}
+
+/* 信息卡片 */
+.info-card {
+  background: #fff;
+  padding: 24rpx 30rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.copy-btn {
+  margin-left: 16rpx;
+  padding: 4rpx 16rpx;
+  background: #f5f5f5;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  color: #666;
+}
+
+/* 底部操作 */
+.footer-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-actions .btn {
+  width: 200rpx;
+}

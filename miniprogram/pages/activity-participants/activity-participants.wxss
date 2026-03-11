@@ -1,0 +1,120 @@
+/* pages/activity-participants/activity-participants.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 30rpx;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+/* 活动头部 */
+.activity-header {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  padding: 30rpx;
+  color: #fff;
+}
+
+.activity-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.activity-stats {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 报名名单列表 */
+.participants-list {
+  padding: 20rpx 30rpx;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.participant-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+}
+
+.participant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.participant-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.participant-phone {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.participant-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.btn-small {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  border-radius: 20rpx;
+}
+
+.btn-checkin {
+  background: #9C27B0;
+  color: #fff;
+}
+
+.btn-cancel-checkin {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-box {
+  text-align: center;
+  padding: 100rpx 30rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+
+.tag-success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4CAF50;
+}
+
+.tag-primary {
+  background: rgba(156, 39, 176, 0.1);
+  color: #9C27B0;
+}

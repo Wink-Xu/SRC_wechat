@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/activities/activities",
+    "pages/activity-detail/activity-detail",
+    "pages/activity-participants/activity-participants",
+    "pages/activity-create/activity-create",
+    "pages/points/points",
+    "pages/points-rank/points-rank",
+    "pages/shop/shop",
+    "pages/product-detail/product-detail",
+    "pages/orders/orders",
+    "pages/order-detail/order-detail",
+    "pages/profile/profile",
+    "pages/address-edit/address-edit",
+    "pages/admin/admin",
+    "pages/admin-members/admin-members",
+    "pages/admin-activities/admin-activities",
+    "pages/admin-products/admin-products",
+    "pages/admin-orders/admin-orders",
+    "pages/debug/debug"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#9C27B0",
+    "navigationBarTitleText": "Sunday Running",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#9C27B0",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/activities/activities",
+        "text": "活动",
+        "iconPath": "images/activity.png",
+        "selectedIconPath": "images/activity-active.png"
+      },
+      {
+        "pagePath": "pages/shop/shop",
+        "text": "周边",
+        "iconPath": "images/shop.png",
+        "selectedIconPath": "images/shop-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "cloud": true
+}

@@ -1,0 +1,81 @@
+<!--pages/order-detail/order-detail.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:elif="{{order}}">
+    <!-- 订单状态 -->
+    <view class="status-card status-{{order.status}}">
+      <text class="status-text">{{order.statusText}}</text>
+    </view>
+
+    <!-- 收货地址 -->
+    <view class="address-card">
+      <view class="address-icon">
+        <image src="/images/location.png"></image>
+      </view>
+      <view class="address-info">
+        <text class="address-name">{{order.address.name}} {{order.address.phone}}</text>
+        <text class="address-detail">{{order.address.province}}{{order.address.city}}{{order.address.district}}{{order.address.detail}}</text>
+      </view>
+    </view>
+
+    <!-- 商品信息 -->
+    <view class="product-card">
+      <view class="product-header">
+        <text class="header-title">商品信息</text>
+      </view>
+      <view class="product-content">
+        <image class="product-image" src="{{order.product_image || '/images/default-product.png'}}"></image>
+        <view class="product-info">
+          <text class="product-name">{{order.product_name}}</text>
+          <view class="product-meta">
+            <text>x{{order.quantity}}</text>
+          </view>
+        </view>
+        <view class="product-price">
+          <text wx:if="{{order.pay_method === 'points'}}">{{order.total_points}} 积分</text>
+          <text wx:else>¥{{order.cashPriceYuan}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单信息 -->
+    <view class="info-card">
+      <view class="info-item">
+        <text class="info-label">订单编号</text>
+        <view class="info-value">
+          <text>{{order.order_no}}</text>
+          <text class="copy-btn" bindtap="copyOrderNo">复制</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="info-label">支付方式</text>
+        <text class="info-value">{{order.pay_method === 'points' ? '积分支付' : '微信支付'}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">创建时间</text>
+        <text class="info-value">{{order.formattedTime}}</text>
+      </view>
+      <view class="info-item" wx:if="{{order.formattedPaidTime}}">
+        <text class="info-label">支付时间</text>
+        <text class="info-value">{{order.formattedPaidTime}}</text>
+      </view>
+      <view class="info-item" wx:if="{{order.formattedShippedTime}}">
+        <text class="info-label">发货时间</text>
+        <text class="info-value">{{order.formattedShippedTime}}</text>
+      </view>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="footer-actions" wx:if="{{order.status === 'pending' || order.status === 'shipped'}}">
+      <button wx:if="{{order.status === 'pending'}}" class="btn btn-secondary" bindtap="handleCancel">
+        取消订单
+      </button>
+      <button wx:if="{{order.status === 'shipped'}}" class="btn btn-primary" bindtap="handleConfirmReceipt">
+        确认收货
+      </button>
+    </view>
+  </block>
+</view>

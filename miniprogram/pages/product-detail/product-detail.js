@@ -1,0 +1,206 @@
+// pages/product-detail/product-detail.js
+const { shopApi, pointsApi } = require('../../utils/request');
+const { formatMoney, showSuccess, showInfo, showConfirm } = require('../../utils/util');
+const { isMember, requireMember } = require('../../utils/auth');
+
+Page({
+  data: {
+    id: '',
+    product: null,
+    loading: true,
+    quantity: 1,
+    myPoints: 0,
+    address: null,
+    payMethod: 'points' // points | wechat
+  },
+
+  onLoad: function (options) {
+    if (options.id) {
+      this.setData({ id: options.id });
+      this.loadProduct();
+      this.loadMyPoints();
+    }
+  },
+
+  onShow: function () {
+    // 加载默认地址
+    this.loadDefaultAddress();
+  },
+
+  // 加载商品详情
+  loadProduct: async function () {
+    try {
+      const result = await shopApi.getProductDetail({ id: this.data.id });
+      const product = result.product;
+      product.cashPriceYuan = product.cash_price ? formatMoney(product.cash_price) : null;
+
+      this.setData({
+        product,
+        loading: false
+      });
+
+      wx.setNavigationBarTitle({
+        title: product.name
+      });
+    } catch (error) {
+      console.error('加载商品详情失败', error);
+      this.setData({ loading: false });
+    }
+  },
+
+  // 加载我的积分
+  loadMyPoints: async function () {
+    if (!isMember()) return;
+
+    try {
+      const result = await pointsApi.getBalance();
+      this.setData({ myPoints: result.points || 0 });
+    } catch (error) {
+      console.error('加载积分失败', error);
+    }
+  },
+
+  // 加载默认地址
+  loadDefaultAddress: function () {
+    const address = wx.getStorageSync('defaultAddress');
+    if (address) {
+      this.setData({ address });
+    }
+  },
+
+  // 减少数量
+  decreaseQuantity: function () {
+    if (this.data.quantity > 1) {
+      this.setData({ quantity: this.data.quantity - 1 });
+    }
+  },
+
+  // 增加数量
+  increaseQuantity: function () {
+    const { product, quantity } = this.data;
+    if (quantity < product.stock) {
+      this.setData({ quantity: quantity + 1 });
+    }
+  },
+
+  // 切换支付方式
+  onPayMethodChange: function (e) {
+    this.setData({ payMethod: e.currentTarget.dataset.method });
+  },
+
+  // 选择地址
+  selectAddress: function () {
+    wx.chooseAddress({
+      success: (res) => {
+        const address = {
+          name: res.userName,
+          phone: res.telNumber,
+          province: res.provinceName,
+          city: res.cityName,
+          district: res.countyName,
+          detail: res.detailInfo
+        };
+        this.setData({ address });
+        wx.setStorageSync('defaultAddress', address);
+      }
+    });
+  },
+
+  // 提交订单
+  handleSubmit: async function () {
+    if (!requireMember()) return;
+
+    const { product, quantity, address, payMethod, myPoints } = this.data;
+
+    // 检查库存
+    if (product.stock < quantity) {
+      showInfo('库存不足');
+      return;
+    }
+
+    // 检查地址
+    if (!address) {
+      showInfo('请选择收货地址');
+      return;
+    }
+
+    // 检查积分支付
+    if (payMethod === 'points') {
+      const totalPoints = product.points_price * quantity;
+      if (myPoints < totalPoints) {
+        showInfo('积分不足');
+        return;
+      }
+    }
+
+    const confirm = await showConfirm(
+      '确认购买',
+      payMethod === 'points'
+        ? `将使用 ${product.points_price * quantity} 积分兑换`
+        : `将支付 ¥${(product.cash_price * quantity / 100).toFixed(2)}`
+    );
+
+    if (!confirm) return;
+
+    try {
+      // 创建订单
+      const orderResult = await shopApi.createOrder({
+        productId: product._id,
+        quantity,
+        payMethod,
+        address
+      });
+
+      const orderId = orderResult.orderId;
+
+      if (payMethod === 'points') {
+        // 积分支付
+        await shopApi.payOrderByPoints({ orderId });
+        showSuccess('兑换成功');
+        this.goToOrderDetail(orderId);
+      } else {
+        // 微信支付
+        const payResult = await shopApi.payOrderByWechat({ orderId });
+        this.doWechatPay(payResult, orderId);
+      }
+    } catch (error) {
+      console.error('下单失败', error);
+    }
+  },
+
+  // 执行微信支付
+  doWechatPay: function (payResult, orderId) {
+    wx.requestPayment({
+      timeStamp: payResult.timeStamp,
+      nonceStr: payResult.nonceStr,
+      package: payResult.package,
+      signType: payResult.signType,
+      paySign: payResult.paySign,
+      success: () => {
+        showSuccess('支付成功');
+        this.goToOrderDetail(orderId);
+      },
+      fail: (err) => {
+        console.error('支付失败', err);
+        showInfo('支付已取消');
+      }
+    });
+  },
+
+  // 跳转到订单详情
+  goToOrderDetail: function (orderId) {
+    setTimeout(() => {
+      wx.redirectTo({
+        url: `/pages/order-detail/order-detail?id=${orderId}`
+      });
+    }, 1500);
+  },
+
+  // 分享
+  onShareAppMessage: function () {
+    return {
+      title: this.data.product?.name || '商品推荐',
+      path: `/pages/product-detail/product-detail?id=${this.data.id}`
+    };
+  }
+});

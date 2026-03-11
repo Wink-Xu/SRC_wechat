@@ -1,0 +1,83 @@
+// app.js
+const mockData = require('./utils/mock-data');
+
+App({
+  // Mock 模式开关：true=使用本地模拟数据，false=使用云开发
+  USE_MOCK: true,
+
+  // 当前角色（仅 Mock 模式有效）
+  CURRENT_ROLE: 'admin', // 'member' | 'leader' | 'admin'
+
+  globalData: {
+    userInfo: null,
+    isLoggedIn: false,
+    isMember: false,
+    isAdmin: false,
+    isLeader: false
+  },
+
+  onLaunch: function () {
+    // Mock 模式下不初始化云开发
+    if (this.USE_MOCK) {
+      console.log('[Mock Mode] 使用本地模拟数据，不初始化云开发');
+      // Mock 模式下直接设置模拟用户，忽略缓存
+      this.setMockRole(this.CURRENT_ROLE);
+      console.log('[Mock Mode] 已设置模拟用户数据，角色：' + this.CURRENT_ROLE);
+    } else {
+      // 初始化云开发
+      if (!wx.cloud) {
+        console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+      } else {
+        wx.cloud.init({
+          env: 'your-env-id', // 替换为你的云开发环境 ID
+          traceUser: true
+        });
+      }
+
+      // 检查登录状态（仅非 Mock 模式使用缓存）
+      this.checkLoginStatus();
+    }
+  },
+
+  // Mock 模式切换角色
+  setMockRole: function(role) {
+    if (!this.USE_MOCK) return;
+
+    const users = mockData.users;
+    const user = users[role] || users.member;
+    this.updateUserInfo(user);
+    console.log('[Mock Mode] 切换角色为：' + role, user);
+  },
+
+  // 检查登录状态
+  checkLoginStatus: function () {
+    const userInfo = wx.getStorageSync('userInfo');
+    if (userInfo) {
+      this.globalData.userInfo = userInfo;
+      this.globalData.isLoggedIn = true;
+      this.globalData.isMember = userInfo.status === 'approved';
+      this.globalData.isAdmin = userInfo.role === 'admin' || userInfo.role === 'leader';
+      this.globalData.isLeader = userInfo.role === 'leader';
+    }
+  },
+
+  // 更新用户状态
+  updateUserInfo: function (userInfo) {
+    this.globalData.userInfo = userInfo;
+    this.globalData.isLoggedIn = !!userInfo;
+    this.globalData.isMember = userInfo && userInfo.status === 'approved';
+    this.globalData.isAdmin = userInfo && (userInfo.role === 'admin' || userInfo.role === 'leader');
+    this.globalData.isLeader = userInfo && userInfo.role === 'leader';
+    wx.setStorageSync('userInfo', userInfo);
+  },
+
+  // 清除登录状态
+  clearUserInfo: function () {
+    this.globalData.userInfo = null;
+    this.globalData.isLoggedIn = false;
+    this.globalData.isMember = false;
+    this.globalData.isAdmin = false;
+    this.globalData.isLeader = false;
+    wx.removeStorageSync('userInfo');
+  }
+});

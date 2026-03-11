@@ -1,0 +1,73 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 用户状态区域 -->
+  <view class="header">
+    <view class="user-info" wx:if="{{isLoggedIn}}">
+      <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="user-text">
+        <text class="nickname">{{userInfo.nickname}}</text>
+        <text class="status-tag {{isMember ? 'member' : 'pending'}}">
+          {{isMember ? '团员' : '待审批'}}
+        </text>
+      </view>
+      <view class="points-box" wx:if="{{isMember}}">
+        <text class="points-label">积分</text>
+        <text class="points-value">{{points}}</text>
+      </view>
+    </view>
+    <view class="login-prompt" wx:else>
+      <text class="prompt-text">登录后查看更多信息</text>
+      <button class="btn btn-primary btn-small" bindtap="goToLogin">立即登录</button>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-actions card" wx:if="{{isMember}}">
+    <view class="action-item" bindtap="goToPointsRank">
+      <image class="action-icon" src="/images/rank.png"></image>
+      <text class="action-text">积分榜</text>
+    </view>
+    <view class="action-item" bindtap="goToActivities">
+      <image class="action-icon" src="/images/activity.png"></image>
+      <text class="action-text">全部活动</text>
+    </view>
+  </view>
+
+  <!-- 最新活动 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">最新活动</text>
+      <text class="section-more" bindtap="goToActivities">查看全部 ></text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{latestActivities.length === 0}}" class="empty-state">
+      <text class="empty-text">暂无活动</text>
+    </view>
+
+    <view wx:else class="activity-list">
+      <view
+        class="activity-item"
+        wx:for="{{latestActivities}}"
+        wx:key="_id"
+        bindtap="goToActivity"
+        data-id="{{item._id}}"
+      >
+        <view class="activity-info">
+          <text class="activity-title">{{item.title}}</text>
+          <view class="activity-meta">
+            <text class="activity-time">{{item.start_time}}</text>
+            <text class="activity-location">{{item.location}}</text>
+          </view>
+        </view>
+        <view class="activity-points">
+          <text class="points-num">+{{item.points}}</text>
+          <text class="points-label">积分</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,40 @@
+<!--pages/debug/debug.wxml-->
+<!-- 调试页面：用于 Mock 模式下切换角色 -->
+<view class="container">
+  <view class="debug-section">
+    <text class="debug-title">Mock 角色切换</text>
+    <text class="debug-desc">当前角色：{{currentRole}}</text>
+  </view>
+
+  <view class="role-list">
+    <view
+      class="role-item {{currentRole === item.role ? 'active' : ''}}"
+      wx:for="{{roles}}"
+      wx:key="role"
+      bindtap="switchRole"
+      data-role="{{item.role}}"
+    >
+      <view class="role-info">
+        <text class="role-name">{{item.name}}</text>
+        <text class="role-desc">{{item.desc}}</text>
+      </view>
+      <view class="role-action">
+        <text class="switch-btn">切换</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="debug-section">
+    <text class="debug-title">当前用户信息</text>
+    <view class="user-info">
+      <text>昵称：{{userInfo.nickname}}</text>
+      <text>角色：{{userInfo.role}}</text>
+      <text>积分：{{userInfo.points}}</text>
+      <text>手机：{{userInfo.phone}}</text>
+    </view>
+  </view>
+
+  <view class="debug-section">
+    <button class="clear-btn" bindtap="clearCache">清除缓存并重启</button>
+  </view>
+</view>

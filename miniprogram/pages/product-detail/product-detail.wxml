@@ -1,0 +1,94 @@
+<!--pages/product-detail/product-detail.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:elif="{{product}}">
+    <!-- 商品图片 -->
+    <image class="product-image" src="{{product.image || '/images/default-product.png'}}" mode="aspectFill"></image>
+
+    <!-- 商品信息 -->
+    <view class="product-info">
+      <text class="product-name">{{product.name}}</text>
+      <view class="product-price-row">
+        <view wx:if="{{product.points_price}}" class="points-price">
+          <text class="price-value">{{product.points_price}}</text>
+          <text class="price-unit">积分</text>
+        </view>
+        <view wx:if="{{product.cash_price}}" class="cash-price">
+          <text class="price-label">或</text>
+          <text class="price-value">¥{{product.cashPriceYuan}}</text>
+        </view>
+      </view>
+      <text class="product-stock">库存: {{product.stock}}件</text>
+    </view>
+
+    <!-- 商品描述 -->
+    <view class="product-desc" wx:if="{{product.description}}">
+      <text class="section-title">商品描述</text>
+      <text class="desc-text">{{product.description}}</text>
+    </view>
+
+    <!-- 数量选择 -->
+    <view class="quantity-section">
+      <text class="section-title">购买数量</text>
+      <view class="quantity-control">
+        <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
+        <text class="quantity-value">{{quantity}}</text>
+        <view class="quantity-btn {{quantity >= product.stock ? 'disabled' : ''}}" bindtap="increaseQuantity">+</view>
+      </view>
+    </view>
+
+    <!-- 支付方式 -->
+    <view class="pay-method-section">
+      <text class="section-title">支付方式</text>
+      <view class="pay-methods">
+        <view
+          class="pay-method {{payMethod === 'points' ? 'active' : ''}}"
+          data-method="points"
+          bindtap="onPayMethodChange"
+          wx:if="{{product.points_price}}"
+        >
+          <text class="method-name">积分兑换</text>
+          <text class="method-value">{{product.points_price * quantity}} 积分</text>
+          <text class="method-tip" wx:if="{{myPoints < product.points_price * quantity}}">积分不足</text>
+        </view>
+        <view
+          class="pay-method {{payMethod === 'wechat' ? 'active' : ''}}"
+          data-method="wechat"
+          bindtap="onPayMethodChange"
+          wx:if="{{product.cash_price}}"
+        >
+          <text class="method-name">微信支付</text>
+          <text class="method-value">¥{{product.cashPriceYuan * quantity}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 收货地址 -->
+    <view class="address-section" bindtap="selectAddress">
+      <text class="section-title">收货地址</text>
+      <view wx:if="{{address}}" class="address-info">
+        <text class="address-name">{{address.name}} {{address.phone}}</text>
+        <text class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
+      </view>
+      <view wx:else class="address-empty">
+        <text>请选择收货地址</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="footer-actions">
+      <view class="total-info">
+        <text class="total-label">合计:</text>
+        <text class="total-value" wx:if="{{payMethod === 'points'}}">{{product.points_price * quantity}} 积分</text>
+        <text class="total-value" wx:else>¥{{product.cashPriceYuan * quantity}}</text>
+      </view>
+      <button class="btn btn-primary buy-btn" bindtap="handleSubmit">
+        {{payMethod === 'points' ? '立即兑换' : '立即购买'}}
+      </button>
+    </view>
+  </block>
+</view>

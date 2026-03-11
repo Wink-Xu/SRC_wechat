@@ -1,0 +1,55 @@
+<!--pages/activity-participants/activity-participants.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:elif="{{activity}}">
+    <!-- 活动信息 -->
+    <view class="activity-header">
+      <text class="activity-title">{{activity.title}}</text>
+      <view class="activity-stats">
+        <text class="stat-item">已报名：{{activity.registered_count || 0}}/{{activity.quota}}人</text>
+      </view>
+    </view>
+
+    <!-- 报名名单列表 -->
+    <view class="participants-list">
+      <view wx:if="{{participants.length === 0}}" class="empty-box">
+        <text class="empty-text">暂无团员报名</text>
+      </view>
+
+      <view
+        class="participant-item"
+        wx:for="{{participants}}"
+        wx:key="_id"
+      >
+        <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+        <view class="participant-info">
+          <text class="participant-name">{{item.nickname}}</text>
+          <text class="participant-phone">{{item.phone}}</text>
+        </view>
+        <view class="participant-status">
+          <text wx:if="{{item.status === 'checked_in'}}" class="tag tag-success">已签到</text>
+          <text wx:elif="{{item.status === 'registered'}}" class="tag tag-primary">已报名</text>
+
+          <!-- 管理员签到操作 -->
+          <button
+            wx:if="{{item.status !== 'checked_in'}}"
+            class="btn-checkin btn-small"
+            data-user-id="{{item._id}}"
+            data-nickname="{{item.nickname}}"
+            bindtap="handleCheckIn"
+          >签到</button>
+          <button
+            wx:if="{{item.status === 'checked_in'}}"
+            class="btn-cancel-checkin btn-small"
+            data-user-id="{{item._id}}"
+            data-nickname="{{item.nickname}}"
+            bindtap="handleCancelCheckIn"
+          >取消签到</button>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

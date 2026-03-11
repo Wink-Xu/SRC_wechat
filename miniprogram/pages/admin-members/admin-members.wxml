@@ -1,0 +1,71 @@
+<!--pages/admin-members/admin-members.wxml-->
+<view class="container">
+  <!-- 状态选项卡 -->
+  <view class="status-tabs">
+    <view
+      class="tab-item {{currentStatus === item.key ? 'active' : ''}}"
+      wx:for="{{statusTabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      <text>{{item.title}}</text>
+    </view>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="member-list">
+    <view wx:if="{{loading && members.length === 0}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{members.length === 0}}" class="empty-box">
+      <text class="empty-text">暂无成员</text>
+    </view>
+
+    <view
+      class="member-card"
+      wx:for="{{members}}"
+      wx:key="_id"
+    >
+      <view class="member-info">
+        <image class="member-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+        <view class="member-text">
+          <view class="member-header">
+            <text class="member-name">{{item.nickname}}</text>
+            <text class="role-tag" wx:if="{{item.role === 'leader'}}">团长</text>
+            <text class="role-tag admin" wx:elif="{{item.role === 'admin'}}">管理员</text>
+          </view>
+          <text class="member-phone">{{item.formattedPhone}}</text>
+          <text class="member-time">申请时间: {{item.formattedTime}}</text>
+        </view>
+      </view>
+
+      <!-- 待审批操作 -->
+      <view class="member-actions" wx:if="{{item.status === 'pending'}}">
+        <button class="btn btn-primary btn-small" data-id="{{item._id}}" bindtap="handleApprove">批准</button>
+        <button class="btn btn-secondary btn-small" data-id="{{item._id}}" bindtap="handleReject">拒绝</button>
+      </view>
+
+      <!-- 已批准操作 -->
+      <view class="member-actions" wx:if="{{item.status === 'approved' && isLeader && item.role !== 'leader'}}">
+        <button
+          class="btn btn-secondary btn-small"
+          data-id="{{item._id}}"
+          data-role="{{item.role}}"
+          bindtap="handleSetAdmin"
+        >
+          {{item.role === 'admin' ? '取消管理员' : '设为管理员'}}
+        </button>
+      </view>
+    </view>
+
+    <view wx:if="{{loadingMore}}" class="loading-more">
+      <text>加载更多...</text>
+    </view>
+
+    <view wx:if="{{!hasMore && members.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+</view>

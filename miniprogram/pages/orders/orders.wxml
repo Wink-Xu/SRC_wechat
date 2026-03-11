@@ -1,0 +1,65 @@
+<!--pages/orders/orders.wxml-->
+<view class="container">
+  <!-- 状态选项卡 -->
+  <view class="status-tabs">
+    <view
+      class="tab-item {{currentStatus === item.key ? 'active' : ''}}"
+      wx:for="{{statusTabs}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      <text>{{item.title}}</text>
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="order-list">
+    <view wx:if="{{loading && orders.length === 0}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{orders.length === 0}}" class="empty-box">
+      <image class="empty-icon" src="/images/empty.png"></image>
+      <text class="empty-text">暂无订单</text>
+    </view>
+
+    <view
+      class="order-card"
+      wx:for="{{orders}}"
+      wx:key="_id"
+      bindtap="goToDetail"
+      data-id="{{item._id}}"
+    >
+      <view class="order-header">
+        <text class="order-no">订单号: {{item.order_no}}</text>
+        <text class="order-status status-{{item.status}}">{{item.statusText}}</text>
+      </view>
+
+      <view class="order-product">
+        <image class="product-image" src="{{item.product_image || '/images/default-product.png'}}"></image>
+        <view class="product-info">
+          <text class="product-name">{{item.product_name}}</text>
+          <text class="product-quantity">x{{item.quantity}}</text>
+        </view>
+      </view>
+
+      <view class="order-footer">
+        <text class="order-time">{{item.formattedTime}}</text>
+        <view class="order-total">
+          <text class="total-label">合计:</text>
+          <text class="total-value" wx:if="{{item.pay_method === 'points'}}">{{item.total_points}} 积分</text>
+          <text class="total-value" wx:else>¥{{item.total_cash / 100}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{loadingMore}}" class="loading-more">
+      <text>加载更多...</text>
+    </view>
+
+    <view wx:if="{{!hasMore && orders.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+</view>

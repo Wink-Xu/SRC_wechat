@@ -1,0 +1,132 @@
+/* pages/admin-activities/admin-activities.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 120rpx;
+}
+
+.activity-list {
+  padding: 20rpx 30rpx;
+}
+
+.activity-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.activity-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.status-tag {
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+}
+
+.status-draft {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.status-published {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-ongoing {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.status-ended {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.status-cancelled {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.activity-info {
+  margin-bottom: 16rpx;
+}
+
+.info-text {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.activity-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.btn-error {
+  background: #f44336;
+  color: #fff;
+}
+
+/* 加载状态 */
+.loading-box,
+.loading-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+.no-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+.empty-box {
+  text-align: center;
+  padding: 60rpx;
+}
+
+.empty-text {
+  color: #999;
+}
+
+/* 悬浮按钮 */
+.fab-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: #9C27B0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(76, 175, 80, 0.4);
+}
+
+.fab-icon {
+  font-size: 48rpx;
+  color: #fff;
+}

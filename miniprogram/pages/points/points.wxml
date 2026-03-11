@@ -1,0 +1,45 @@
+<!--pages/points/points.wxml-->
+<view class="container">
+  <!-- 积分卡片 -->
+  <view class="points-card">
+    <view class="points-header">
+      <text class="points-label">我的积分</text>
+      <text class="rank-link" bindtap="goToRank">积分榜 ></text>
+    </view>
+    <text class="points-value">{{points}}</text>
+    <text class="points-tip">参加活动签到可获得积分，积分可兑换周边商品</text>
+  </view>
+
+  <!-- 积分记录 -->
+  <view class="logs-section">
+    <text class="section-title">积分记录</text>
+
+    <view wx:if="{{loading && logs.length === 0}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{logs.length === 0}}" class="empty-box">
+      <text class="empty-text">暂无积分记录</text>
+    </view>
+
+    <view wx:else class="logs-list">
+      <view class="log-item" wx:for="{{logs}}" wx:key="_id">
+        <view class="log-info">
+          <text class="log-type">{{item.typeText}}</text>
+          <text class="log-time">{{item.formattedTime}}</text>
+        </view>
+        <text class="log-points {{item.points > 0 ? 'positive' : 'negative'}}">
+          {{item.points > 0 ? '+' : ''}}{{item.points}}
+        </text>
+      </view>
+    </view>
+
+    <view wx:if="{{loadingMore}}" class="loading-more">
+      <text>加载更多...</text>
+    </view>
+
+    <view wx:if="{{!hasMore && logs.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+</view>
