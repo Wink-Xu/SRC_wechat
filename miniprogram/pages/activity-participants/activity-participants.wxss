@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #F8F9FA;
   padding-bottom: 30rpx;
 }
 
@@ -15,13 +15,13 @@
 /* 活动头部 */
 .activity-header {
   background: linear-gradient(135deg, #9C27B0, #7B1FA2);
-  padding: 30rpx;
+  padding: 40rpx 30rpx;
   color: #fff;
 }
 
 .activity-title {
-  font-size: 32rpx;
-  font-weight: 600;
+  font-size: 36rpx;
+  font-weight: 700;
   display: block;
   margin-bottom: 12rpx;
 }
@@ -40,57 +40,55 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  padding: 24rpx 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+
+.participant-index {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #9C27B0;
+  width: 48rpx;
+  text-align: center;
 }
 
 .participant-avatar {
-  width: 80rpx;
-  height: 80rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
-  margin-right: 24rpx;
-}
-
-.participant-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  margin: 0 24rpx 0 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
 }
 
 .participant-name {
+  flex: 1;
   font-size: 30rpx;
   font-weight: 500;
   color: #333;
 }
 
-.participant-phone {
-  font-size: 24rpx;
-  color: #999;
-}
-
 .participant-status {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12rpx;
 }
 
-.btn-small {
-  padding: 12rpx 24rpx;
+.status-badge {
+  padding: 10rpx 24rpx;
+  border-radius: 24rpx;
   font-size: 24rpx;
-  border-radius: 20rpx;
+  font-weight: 600;
 }
 
-.btn-checkin {
-  background: #9C27B0;
-  color: #fff;
+.status-badge.checked-in {
+  background: linear-gradient(135deg, #C8E6C9, #A5D6A7);
+  color: #2E7D32;
 }
 
-.btn-cancel-checkin {
-  background: #f5f5f5;
-  color: #999;
+.status-badge.registered {
+  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+  color: #1565C0;
 }
 
 /* 空状态 */
@@ -99,22 +97,4 @@
   padding: 100rpx 30rpx;
   color: #999;
   font-size: 28rpx;
-}
-
-/* 标签 */
-.tag {
-  display: inline-block;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-}
-
-.tag-success {
-  background: rgba(76, 175, 80, 0.1);
-  color: #4CAF50;
-}
-
-.tag-primary {
-  background: rgba(156, 39, 176, 0.1);
-  color: #9C27B0;
 }

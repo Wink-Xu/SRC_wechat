@@ -24,30 +24,12 @@
         wx:for="{{participants}}"
         wx:key="_id"
       >
+        <text class="participant-index">{{index + 1}}</text>
         <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
-        <view class="participant-info">
-          <text class="participant-name">{{item.nickname}}</text>
-          <text class="participant-phone">{{item.phone}}</text>
-        </view>
+        <text class="participant-name">{{item.nickname}}</text>
         <view class="participant-status">
-          <text wx:if="{{item.status === 'checked_in'}}" class="tag tag-success">已签到</text>
-          <text wx:elif="{{item.status === 'registered'}}" class="tag tag-primary">已报名</text>
-
-          <!-- 管理员签到操作 -->
-          <button
-            wx:if="{{item.status !== 'checked_in'}}"
-            class="btn-checkin btn-small"
-            data-user-id="{{item._id}}"
-            data-nickname="{{item.nickname}}"
-            bindtap="handleCheckIn"
-          >签到</button>
-          <button
-            wx:if="{{item.status === 'checked_in'}}"
-            class="btn-cancel-checkin btn-small"
-            data-user-id="{{item._id}}"
-            data-nickname="{{item.nickname}}"
-            bindtap="handleCancelCheckIn"
-          >取消签到</button>
+          <text wx:if="{{item.status === 'checked_in'}}" class="status-badge checked-in">已签到</text>
+          <text wx:elif="{{item.status === 'registered'}}" class="status-badge registered">已报名</text>
         </view>
       </view>
     </view>

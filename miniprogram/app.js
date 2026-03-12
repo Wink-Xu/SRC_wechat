@@ -6,14 +6,15 @@ App({
   USE_MOCK: true,
 
   // 当前角色（仅 Mock 模式有效）
-  CURRENT_ROLE: 'admin', // 'member' | 'leader' | 'admin'
+  CURRENT_ROLE: 'admin', // 'guest' | 'member' | 'leader' | 'admin' | 'pending'
 
   globalData: {
     userInfo: null,
     isLoggedIn: false,
-    isMember: false,
-    isAdmin: false,
-    isLeader: false
+    isMember: false,      // 是否是团员（已批准）
+    isAdmin: false,       // 是否是管理员
+    isLeader: false,      // 是否是团长
+    isGuest: false        // 是否是游客（已登录但未申请入团）
   },
 
   onLaunch: function () {
@@ -65,9 +66,12 @@ App({
   updateUserInfo: function (userInfo) {
     this.globalData.userInfo = userInfo;
     this.globalData.isLoggedIn = !!userInfo;
+    // 只有 status === 'approved' 才是团员
     this.globalData.isMember = userInfo && userInfo.status === 'approved';
     this.globalData.isAdmin = userInfo && (userInfo.role === 'admin' || userInfo.role === 'leader');
     this.globalData.isLeader = userInfo && userInfo.role === 'leader';
+    // status === 'guest' 是游客
+    this.globalData.isGuest = userInfo && userInfo.status === 'guest';
     wx.setStorageSync('userInfo', userInfo);
   },
 

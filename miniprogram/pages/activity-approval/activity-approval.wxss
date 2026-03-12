@@ -1,0 +1,255 @@
+/* pages/activity-approval/activity-approval.wxss */
+
+page {
+  background: #F8F9FA;
+}
+
+.container {
+  min-height: 100vh;
+  padding-bottom: 180rpx;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+/* 活动头部 */
+.activity-header {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  padding: 40rpx 30rpx;
+  color: #fff;
+}
+
+.activity-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  opacity: 0.9;
+}
+
+.info-text {
+  font-size: 24rpx;
+}
+
+/* 提示卡片 */
+.tips-card {
+  background: #fff;
+  margin: 24rpx 30rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.06);
+}
+
+.tips-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.tips-text {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* 参加人员区域 */
+.participants-section {
+  background: #fff;
+  margin: 24rpx 30rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.06);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.batch-btn {
+  font-size: 24rpx;
+  color: #9C27B0;
+  padding: 8rpx 16rpx;
+  background: rgba(156,39,176,0.1);
+  border-radius: 20rpx;
+}
+
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: #F8F9FA;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.participant-item.selected {
+  background: linear-gradient(135deg, rgba(156,39,176,0.1), rgba(123,31,162,0.1));
+  border: 2rpx solid #9C27B0;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.checkbox.checked {
+  background: #9C27B0;
+  border-color: #9C27B0;
+}
+
+.check-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.participant-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.participant-name {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.participant-points {
+  font-size: 24rpx;
+  color: #9C27B0;
+  font-weight: 600;
+}
+
+/* 照片上传区域 */
+.photos-section {
+  background: #fff;
+  margin: 24rpx 30rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.06);
+}
+
+.photo-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 30rpx;
+  background: #F8F9FA;
+  border-radius: 16rpx;
+  border: 2rpx dashed #ddd;
+}
+
+.add-icon {
+  width: 64rpx;
+  height: 64rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.5;
+}
+
+.add-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.photos-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.photo-item {
+  aspect-ratio: 1;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 底部操作 */
+.footer-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.08);
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(156,39,176,0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+}

@@ -1,32 +1,23 @@
 <!--pages/activities/activities.wxml-->
 <view class="container">
-  <!-- 选项卡 -->
-  <view class="tabs">
-    <view
-      class="tab-item {{currentTab === item.key ? 'active' : ''}}"
-      wx:for="{{tabs}}"
-      wx:key="key"
-      data-key="{{item.key}}"
-      bindtap="onTabChange"
-    >
-      <text>{{item.title}}</text>
-    </view>
+  <view wx:if="{{loading && ongoingActivities.length === 0 && pastActivities.length === 0}}" class="loading-box">
+    <text>加载中...</text>
   </view>
 
-  <!-- 活动列表 -->
-  <view class="activity-list">
-    <view wx:if="{{loading && activities.length === 0}}" class="loading-box">
-      <text>加载中...</text>
-    </view>
+  <view wx:elif="{{ongoingActivities.length === 0 && pastActivities.length === 0}}" class="empty-box">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit"></image>
+    <text class="empty-text">暂无活动</text>
+  </view>
 
-    <view wx:elif="{{activities.length === 0}}" class="empty-box">
-      <image class="empty-icon" src="/images/empty.png" mode="aspectFit"></image>
-      <text class="empty-text">暂无活动</text>
+  <!-- 正在报名的活动 -->
+  <view wx:if="{{ongoingActivities.length > 0}}" class="section">
+    <view class="section-header">
+      <text class="section-title">正在报名</text>
+      <text class="section-count">{{ongoingActivities.length}}个活动</text>
     </view>
-
     <view
       class="activity-card"
-      wx:for="{{activities}}"
+      wx:for="{{ongoingActivities}}"
       wx:key="_id"
       bindtap="goToDetail"
       data-id="{{item._id}}"
@@ -66,13 +57,39 @@
         </view>
       </view>
     </view>
+  </view>
 
-    <view wx:if="{{loadingMore}}" class="loading-more">
-      <text>加载更多...</text>
+  <!-- 往期活动 -->
+  <view wx:if="{{pastActivities.length > 0}}" class="section">
+    <view class="section-header">
+      <text class="section-title">往期活动</text>
+      <text class="section-count">{{pastActivities.length}}个活动</text>
     </view>
+    <view
+      class="past-card"
+      wx:for="{{pastActivities}}"
+      wx:key="_id"
+      bindtap="goToDetail"
+      data-id="{{item._id}}"
+    >
+      <view class="cover-image">
+        <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+        <view class="cover-overlay">
+          <text class="cover-status tag {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+      </view>
+      <view class="past-info">
+        <text class="past-title">{{item.title}}</text>
+        <text class="past-date">{{item.formattedTime}}</text>
+      </view>
+    </view>
+  </view>
 
-    <view wx:if="{{!hasMore && activities.length > 0}}" class="no-more">
-      <text>没有更多了</text>
-    </view>
+  <view wx:if="{{loadingMore}}" class="loading-more">
+    <text>加载更多...</text>
+  </view>
+
+  <view wx:if="{{!hasMore && (ongoingActivities.length > 0 || pastActivities.length > 0)}}" class="no-more">
+    <text>没有更多了</text>
   </view>
 </view>

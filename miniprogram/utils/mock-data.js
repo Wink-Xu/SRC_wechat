@@ -3,14 +3,27 @@
 // ============================================
 // 角色切换配置
 // 修改 CURRENT_ROLE 来切换登录用户身份：
+// 'guest'   - 游客（已登录但未申请入团）
 // 'member' - 普通团员
 // 'leader' - 团长
 // 'admin'  - 管理员
+// 'pending' - 待审批用户
 // ============================================
-const CURRENT_ROLE = 'member';
+const CURRENT_ROLE = 'admin';
 
 // 模拟用户数据
 const users = {
+  // 游客（已登录但未申请入团）
+  guest: {
+    _id: 'mock_user_001',
+    openid: 'mock_openid',
+    nickname: '游客用户',
+    avatar: '/images/default-avatar.png',
+    phone: '',
+    role: 'member',
+    status: 'guest',  // 游客状态
+    points: 0
+  },
   // 团员
   member: {
     _id: 'mock_user_001',
@@ -43,6 +56,17 @@ const users = {
     role: 'admin',
     status: 'approved',
     points: 800
+  },
+  // 待审批用户
+  pending: {
+    _id: 'mock_user_pending',
+    openid: 'mock_pending_openid',
+    nickname: '待审批用户',
+    avatar: '/images/default-avatar.png',
+    phone: '13800138000',
+    role: 'member',
+    status: 'pending',
+    points: 0
   }
 };
 
@@ -51,6 +75,7 @@ const currentUser = users[CURRENT_ROLE] || users.member;
 
 // 模拟活动列表
 const activities = [
+  // 正在报名的活动（1 个）
   {
     _id: 'activity_001',
     title: '周末晨跑 - 奥森公园',
@@ -67,53 +92,136 @@ const activities = [
     registered_count: 15,
     created_by: 'leader_001'
   },
+  // 往期活动（5 个）
   {
-    _id: 'activity_002',
-    title: '夜跑活动 - 三里屯',
-    description: '周三晚上 7 点半，三里屯太古里集合，夜跑路线约 8 公里。',
-    location: '三里屯太古里',
+    _id: 'activity_past_001',
+    title: '新春第一跑 - 圆明园',
+    description: '新年首次活动，圆明园冰雪主题跑，感受历史与自然的融合。',
+    location: '圆明园南门',
     run_type: 'road',
-    dress_code: '穿着带反光条的运动装备',
-    start_time: '2024-03-20 19:30:00',
-    end_time: '2024-03-20 21:00:00',
-    registration_deadline: '2024-03-20',
-    quota: 20,
-    points: 15,
-    status: 'published',
-    registered_count: 8,
-    created_by: 'admin_001'
+    dress_code: '统一穿红色队服',
+    start_time: '2024-02-18 09:00:00',
+    end_time: '2024-02-18 11:00:00',
+    registration_deadline: '2024-02-17',
+    quota: 40,
+    points: 25,
+    status: 'ended',
+    registered_count: 38,
+    created_by: 'leader_001',
+    cover_image: '/images/cover-1.svg',
+    photos: [
+      '/images/activity-1-1.svg', '/images/activity-1-2.svg', '/images/activity-1-3.svg',
+      '/images/activity-1-4.svg', '/images/activity-1-5.svg', '/images/activity-1-6.svg',
+      '/images/activity-1-7.svg', '/images/activity-1-8.svg', '/images/activity-1-9.svg',
+      '/images/activity-1-10.svg', '/images/activity-1-11.svg', '/images/activity-1-12.svg',
+      '/images/activity-1-13.svg', '/images/activity-1-14.svg', '/images/activity-1-15.svg',
+      '/images/activity-1-16.svg', '/images/activity-1-17.svg', '/images/activity-1-18.svg',
+      '/images/activity-1-19.svg', '/images/activity-1-20.svg'
+    ]
   },
   {
-    _id: 'activity_003',
-    title: 'PB 挑战 - 半马配速跑',
-    description: '周六下午 4 点，天坛公园集合，半马配速挑战活动。',
-    location: '天坛公园东门',
+    _id: 'activity_past_002',
+    title: '元宵夜跑 - 前门大街',
+    description: '元宵节特别活动，夜跑前门大街，欣赏花灯夜景。',
+    location: '前门大街',
     run_type: 'road',
-    dress_code: '',
-    start_time: '2024-03-23 16:00:00',
-    end_time: '2024-03-23 18:00:00',
-    registration_deadline: '2024-03-22',
+    dress_code: '穿着带反光条装备',
+    start_time: '2024-02-24 19:00:00',
+    end_time: '2024-02-24 20:30:00',
+    registration_deadline: '2024-02-24',
+    quota: 25,
+    points: 20,
+    status: 'ended',
+    registered_count: 22,
+    created_by: 'admin_001',
+    cover_image: '/images/cover-2.svg',
+    photos: [
+      '/images/activity-2-1.svg', '/images/activity-2-2.svg', '/images/activity-2-3.svg',
+      '/images/activity-2-4.svg', '/images/activity-2-5.svg', '/images/activity-2-6.svg',
+      '/images/activity-2-7.svg', '/images/activity-2-8.svg', '/images/activity-2-9.svg',
+      '/images/activity-2-10.svg', '/images/activity-2-11.svg', '/images/activity-2-12.svg',
+      '/images/activity-2-13.svg', '/images/activity-2-14.svg', '/images/activity-2-15.svg',
+      '/images/activity-2-16.svg', '/images/activity-2-17.svg', '/images/activity-2-18.svg',
+      '/images/activity-2-19.svg', '/images/activity-2-20.svg'
+    ]
+  },
+  {
+    _id: 'activity_past_003',
+    title: '春日越野 - 慕田峪长城',
+    description: '春季越野跑，慕田峪长城脚下，挑战山地路线。',
+    location: '慕田峪长城景区',
+    run_type: 'trail',
+    dress_code: '穿越野跑鞋',
+    start_time: '2024-03-02 08:00:00',
+    end_time: '2024-03-02 12:00:00',
+    registration_deadline: '2024-03-01',
+    quota: 20,
+    points: 40,
+    status: 'ended',
+    registered_count: 20,
+    created_by: 'leader_001',
+    cover_image: '/images/cover-3.svg',
+    photos: [
+      '/images/activity-3-1.svg', '/images/activity-3-2.svg', '/images/activity-3-3.svg',
+      '/images/activity-3-4.svg', '/images/activity-3-5.svg', '/images/activity-3-6.svg',
+      '/images/activity-3-7.svg', '/images/activity-3-8.svg', '/images/activity-3-9.svg',
+      '/images/activity-3-10.svg', '/images/activity-3-11.svg', '/images/activity-3-12.svg',
+      '/images/activity-3-13.svg', '/images/activity-3-14.svg', '/images/activity-3-15.svg',
+      '/images/activity-3-16.svg', '/images/activity-3-17.svg', '/images/activity-3-18.svg',
+      '/images/activity-3-19.svg', '/images/activity-3-20.svg'
+    ]
+  },
+  {
+    _id: 'activity_past_004',
+    title: '女子专属跑 - 三八节特别活动',
+    description: '三八妇女节女子专属跑步活动，展现女性力量。',
+    location: '朝阳公园',
+    run_type: 'road',
+    dress_code: '粉色系运动装',
+    start_time: '2024-03-08 10:00:00',
+    end_time: '2024-03-08 11:30:00',
+    registration_deadline: '2024-03-07',
+    quota: 30,
+    points: 25,
+    status: 'ended',
+    registered_count: 28,
+    created_by: 'admin_001',
+    cover_image: '/images/cover-4.svg',
+    photos: [
+      '/images/activity-4-1.svg', '/images/activity-4-2.svg', '/images/activity-4-3.svg',
+      '/images/activity-4-4.svg', '/images/activity-4-5.svg', '/images/activity-4-6.svg',
+      '/images/activity-4-7.svg', '/images/activity-4-8.svg', '/images/activity-4-9.svg',
+      '/images/activity-4-10.svg', '/images/activity-4-11.svg', '/images/activity-4-12.svg',
+      '/images/activity-4-13.svg', '/images/activity-4-14.svg', '/images/activity-4-15.svg',
+      '/images/activity-4-16.svg', '/images/activity-4-17.svg', '/images/activity-4-18.svg',
+      '/images/activity-4-19.svg', '/images/activity-4-20.svg'
+    ]
+  },
+  {
+    _id: 'activity_past_005',
+    title: '春季训练营 - 间歇跑训练',
+    description: '春季间歇跑训练，提升配速能力，专业教练指导。',
+    location: '国家体育场鸟巢',
+    run_type: 'road',
+    dress_code: '专业跑鞋',
+    start_time: '2024-03-10 07:00:00',
+    end_time: '2024-03-10 09:00:00',
+    registration_deadline: '2024-03-09',
     quota: 15,
     points: 30,
-    status: 'published',
-    registered_count: 12,
-    created_by: 'leader_001'
-  },
-  {
-    _id: 'activity_004',
-    title: '越野跑体验 - 香山',
-    description: '周日上午 7 点，香山公园集合，越野跑体验活动。',
-    location: '香山公园东门',
-    run_type: 'trail',
-    dress_code: '建议穿越野跑鞋',
-    start_time: '2024-03-24 07:00:00',
-    end_time: '2024-03-24 10:00:00',
-    registration_deadline: '2024-03-23',
-    quota: 20,
-    points: 35,
-    status: 'published',
-    registered_count: 18,
-    created_by: 'admin_002'
+    status: 'ended',
+    registered_count: 15,
+    created_by: 'admin_002',
+    cover_image: '/images/cover-5.svg',
+    photos: [
+      '/images/activity-5-1.svg', '/images/activity-5-2.svg', '/images/activity-5-3.svg',
+      '/images/activity-5-4.svg', '/images/activity-5-5.svg', '/images/activity-5-6.svg',
+      '/images/activity-5-7.svg', '/images/activity-5-8.svg', '/images/activity-5-9.svg',
+      '/images/activity-5-10.svg', '/images/activity-5-11.svg', '/images/activity-5-12.svg',
+      '/images/activity-5-13.svg', '/images/activity-5-14.svg', '/images/activity-5-15.svg',
+      '/images/activity-5-16.svg', '/images/activity-5-17.svg', '/images/activity-5-18.svg',
+      '/images/activity-5-19.svg', '/images/activity-5-20.svg'
+    ]
   }
 ];
 

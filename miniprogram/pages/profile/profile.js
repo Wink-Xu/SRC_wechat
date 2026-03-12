@@ -10,6 +10,8 @@ Page({
     isLoggedIn: false,
     isAdmin: false,
     isLeader: false,
+    isMember: false,    // 是否是团员（已批准）
+    isPending: false,   // 是否待审批
     useMock: false,
     points: 0,
     menuItems: [
@@ -43,6 +45,8 @@ Page({
       userInfo,
       isAdmin: app.globalData.isAdmin,
       isLeader: app.globalData.isLeader,
+      isMember: app.globalData.isMember,
+      isPending: userInfo && userInfo.status === 'pending',
       useMock: app.USE_MOCK,
       points: 0
     });
@@ -69,6 +73,13 @@ Page({
   goToLogin: function () {
     wx.navigateTo({
       url: '/pages/login/login'
+    });
+  },
+
+  // 跳转到申请入团页面
+  goToApply: function () {
+    wx.navigateTo({
+      url: '/pages/apply-membership/apply-membership'
     });
   },
 

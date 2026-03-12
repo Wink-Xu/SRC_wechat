@@ -1,94 +1,12 @@
 <!--pages/login/login.wxml-->
 <view class="container">
-  <!-- 登录步骤 -->
-  <view class="login-section" wx:if="{{step === 'login'}}">
-    <view class="logo-section">
-      <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
-      <text class="app-name">Sunday Run</text>
-      <text class="app-slogan">SundayRunningClub 跑团小程序</text>
-    </view>
+  <!-- 背景图片 -->
+  <image class="bg-image" src="/images/登陆页.png" mode="aspectFit"></image>
 
-    <view class="welcome-text">
-      <text class="welcome-title">欢迎加入我们</text>
-      <text class="welcome-desc">登录后即可参与跑团活动，赚取积分，兑换周边</text>
-    </view>
-
-    <!-- 使用微信头像昵称选择组件 -->
-    <view class="wx-profile-form">
-      <view class="form-item">
-        <text class="form-label">头像</text>
-        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-          <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill"></image>
-          <text wx:else>选择头像</text>
-        </button>
-      </view>
-      <view class="form-item">
-        <text class="form-label">昵称</text>
-        <input class="form-input" type="text" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{nickname}}" />
-      </view>
-    </view>
-
-    <button
-      class="btn btn-primary btn-full login-btn"
-      bindtap="handleGetUserProfile"
-      loading="{{loading}}"
-      disabled="{{loading}}"
-    >
-      微信一键登录
+  <!-- 登录按钮 -->
+  <view class="btn-section">
+    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}">
+      微信登录
     </button>
-
-    <view class="guest-entry" bindtap="goBack">
-      <text>暂不登录，先逛逛</text>
-    </view>
-  </view>
-
-  <!-- 申请入团步骤 -->
-  <view class="apply-section" wx:if="{{step === 'apply'}}">
-    <view class="apply-header">
-      <text class="apply-title">申请入团</text>
-      <text class="apply-desc">请填写以下信息完成入团申请</text>
-    </view>
-
-    <view class="form-card">
-      <view class="form-item">
-        <text class="form-label">昵称</text>
-        <input
-          class="form-input"
-          type="text"
-          placeholder="请输入您的昵称"
-          value="{{nickname}}"
-          bindinput="onNicknameInput"
-          maxlength="20"
-        />
-      </view>
-
-      <view class="form-item">
-        <text class="form-label">手机号</text>
-        <input
-          class="form-input"
-          type="number"
-          placeholder="请输入手机号"
-          value="{{phone}}"
-          bindinput="onPhoneInput"
-          maxlength="11"
-        />
-      </view>
-    </view>
-
-    <button
-      class="btn btn-primary btn-full submit-btn"
-      bindtap="submitApply"
-      loading="{{loading}}"
-      disabled="{{loading}}"
-    >
-      提交申请
-    </button>
-
-    <view class="privacy-tips">
-      <text>提交即表示同意</text>
-      <text class="privacy-link">《用户协议》</text>
-      <text>和</text>
-      <text class="privacy-link">《隐私政策》</text>
-    </view>
   </view>
 </view>

@@ -1,7 +1,7 @@
 // pages/activity-detail/activity-detail.js
 const { activityApi } = require('../../utils/request');
 const { formatDate, showConfirm, showSuccess, showInfo } = require('../../utils/util');
-const { isMember, isAdmin } = require('../../utils/auth');
+const { isAdmin } = require('../../utils/auth');
 
 Page({
   data: {
@@ -11,7 +11,8 @@ Page({
     isRegistered: false,
     registration: null,
     participants: [],
-    runTypeText: ''
+    runTypeText: '',
+    canUploadPhotos: false
   },
 
   onLoad: function (options) {
@@ -27,9 +28,10 @@ Page({
 
     try {
       const result = await activityApi.getDetail({ id: this.data.id });
-
       const activity = result.activity;
-      activity.formattedTime = formatDate(activity.start_time, 'YYYY年MM月DD日 HH:mm');
+
+      // 格式化时间
+      activity.formattedTime = formatDate(activity.start_time, 'MM 月 DD 日 HH:mm');
       activity.formattedEndTime = formatDate(activity.end_time, 'HH:mm');
       activity.statusText = this.getStatusText(activity.status);
       activity.statusClass = this.getStatusClass(activity.status);
@@ -48,12 +50,18 @@ Page({
       };
       const runTypeText = runTypeMap[activity.run_type] || '路跑';
 
+      // 检查是否可以上传照片（管理员或团长）
+      const app = getApp();
+      const canUploadPhotos = app.globalData.userInfo &&
+        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
+
       this.setData({
         activity,
         isRegistered: result.isRegistered,
         registration: result.registration,
         participants: result.participants || [],
         runTypeText,
+        canUploadPhotos,
         loading: false
       });
 
@@ -68,8 +76,33 @@ Page({
 
   // 报名活动
   handleRegister: async function () {
-    if (!isMember()) {
-      showInfo('请先登录并成为团员');
+    const app = getApp();
+
+    // 检查是否登录
+    if (!app.globalData.isLoggedIn) {
+      wx.navigateTo({ url: '/pages/login/login' });
+      return;
+    }
+
+    // 检查是否是团员（已批准）
+    if (app.globalData.userInfo.status !== 'approved') {
+      if (app.globalData.userInfo.status === 'pending') {
+        wx.showToast({
+          title: '您的申请正在审核中，请耐心等待',
+          icon: 'none'
+        });
+      } else {
+        // 游客状态，引导去申请
+        wx.showModal({
+          title: '提示',
+          content: '您还不是团员，是否立即申请入团？',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/apply-membership/apply-membership' });
+            }
+          }
+        });
+      }
       return;
     }
 
@@ -99,32 +132,50 @@ Page({
     }
   },
 
-  // 签到
-  handleCheckIn: async function () {
-    if (!isAdmin()) {
-      showInfo('您没有签到权限');
-      return;
-    }
+  // 上传照片
+  uploadPhotos: function () {
+    const self = this;
+    wx.chooseMedia({
+      count: 9,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
+      success: function (res) {
+        const tempFiles = res.tempFiles;
+        if (tempFiles && tempFiles.length > 0) {
+          wx.showLoading({ title: '上传中...' });
 
-    const confirm = await showConfirm('确认签到', '确定要为该用户签到吗？');
-    if (!confirm) return;
+          // 模拟上传成功
+          setTimeout(function () {
+            wx.hideLoading();
+            const newPhotos = tempFiles.map(function (file) {
+              return file.tempFilePath;
+            });
+            const currentPhotos = self.data.activity.photos || [];
+            const updatedPhotos = currentPhotos.concat(newPhotos);
 
-    try {
-      await activityApi.checkIn({
-        activityId: this.data.id,
-        userId: this.data.registration.user_id
-      });
-      showSuccess('签到成功');
-      this.loadActivity();
-    } catch (error) {
-      console.error('签到失败', error);
-    }
+            self.setData({
+              'activity.photos': updatedPhotos
+            });
+
+            wx.showToast({ title: '上传成功', icon: 'success' });
+          }, 1000);
+        }
+      },
+      fail: function (err) {
+        console.error('选择照片失败', err);
+      }
+    });
   },
 
-  // 编辑活动
-  handleEdit: function () {
-    wx.navigateTo({
-      url: `/pages/activity-create/activity-create?id=${this.data.id}`
+  // 预览照片
+  previewImage: function (e) {
+    const index = e.currentTarget.dataset.index;
+    const photos = this.data.activity.photos || [];
+
+    wx.previewImage({
+      current: photos[index],
+      urls: photos
     });
   },
 
@@ -133,34 +184,6 @@ Page({
     wx.navigateTo({
       url: `/pages/activity-participants/activity-participants?id=${this.data.id}`
     });
-  },
-
-  // 发布活动
-  handlePublish: async function () {
-    const confirm = await showConfirm('发布活动', '确定要发布此活动吗？发布后团员可以报名。');
-    if (!confirm) return;
-
-    try {
-      await activityApi.publish({ id: this.data.id });
-      showSuccess('发布成功');
-      this.loadActivity();
-    } catch (error) {
-      console.error('发布失败', error);
-    }
-  },
-
-  // 取消活动
-  handleCancel: async function () {
-    const confirm = await showConfirm('取消活动', '确定要取消此活动吗？取消后将通知已报名的团员。');
-    if (!confirm) return;
-
-    try {
-      await activityApi.cancel({ id: this.data.id });
-      showSuccess('活动已取消');
-      this.loadActivity();
-    } catch (error) {
-      console.error('取消活动失败', error);
-    }
   },
 
   // 获取状态文本
@@ -185,13 +208,5 @@ Page({
       cancelled: 'tag-error'
     };
     return classMap[status] || '';
-  },
-
-  // 分享
-  onShareAppMessage: function () {
-    return {
-      title: this.data.activity?.title || '活动邀请',
-      path: `/pages/activity-detail/activity-detail?id=${this.data.id}`
-    };
   }
 });

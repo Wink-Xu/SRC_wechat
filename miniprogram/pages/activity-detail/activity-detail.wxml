@@ -5,55 +5,41 @@
   </view>
 
   <block wx:elif="{{activity}}">
-    <!-- 活动头部 -->
-    <view class="activity-header">
-      <view class="status-row">
-        <text class="tag {{activity.statusClass}}">{{activity.statusText}}</text>
-        <text class="points-badge">+{{activity.points}} 积分</text>
-      </view>
-      <text class="activity-title">{{activity.title}}</text>
-    </view>
-
-    <!-- 活动信息 -->
-    <view class="info-card">
-      <view class="info-row">
-        <image class="info-icon" src="/images/time.png"></image>
-        <view class="info-content">
-          <text class="info-label">活动时间</text>
-          <text class="info-value">{{activity.formattedTime}} - {{activity.formattedEndTime}}</text>
+    <!-- 正在报名的活动：显示完整信息 -->
+    <block wx:if="{{activity.status === 'published' || activity.status === 'ongoing'}}">
+      <!-- 封面图头部 -->
+      <view class="cover-header">
+        <image class="cover-image" src="/images/default-product.png" mode="aspectFill"></image>
+        <view class="cover-overlay"></view>
+        <view class="cover-content">
+          <view class="status-tag {{activity.statusClass}}">{{activity.statusText}}</view>
+          <text class="activity-title">{{activity.title}}</text>
+          <view class="points-tag">
+            <text class="points-value">+{{activity.points}}</text>
+            <text class="points-label">积分</text>
+          </view>
         </view>
       </view>
-      <view class="info-row">
-        <image class="info-icon" src="/images/location.png"></image>
-        <view class="info-content">
+
+      <!-- 活动信息网格 -->
+      <view class="info-grid">
+        <view class="info-cell">
+          <image class="info-icon" src="/images/time.png"></image>
+          <text class="info-label">活动时间</text>
+          <text class="info-value">{{activity.formattedTime}}</text>
+        </view>
+        <view class="info-cell">
+          <image class="info-icon" src="/images/location.png"></image>
           <text class="info-label">集合地点</text>
           <text class="info-value">{{activity.location}}</text>
         </view>
-      </view>
-      <view class="info-row" wx:if="{{activity.run_type}}">
-        <image class="info-icon" src="/images/user.png"></image>
-        <view class="info-content">
+        <view class="info-cell">
+          <image class="info-icon" src="/images/user.png"></image>
           <text class="info-label">跑步类型</text>
           <text class="info-value">{{runTypeText}}</text>
         </view>
-      </view>
-      <view class="info-row" wx:if="{{activity.dress_code}}">
-        <image class="info-icon" src="/images/user.png"></image>
-        <view class="info-content">
-          <text class="info-label">Dress Code</text>
-          <text class="info-value">{{activity.dress_code}}</text>
-        </view>
-      </view>
-      <view class="info-row" wx:if="{{activity.registration_deadline}}">
-        <image class="info-icon" src="/images/time.png"></image>
-        <view class="info-content">
-          <text class="info-label">报名截止</text>
-          <text class="info-value">{{activity.registration_deadline}}</text>
-        </view>
-      </view>
-      <view class="info-row">
-        <image class="info-icon" src="/images/user.png"></image>
-        <view class="info-content">
+        <view class="info-cell">
+          <image class="info-icon" src="/images/user.png"></image>
           <text class="info-label">报名人数</text>
           <text class="info-value">
             <text class="highlight">{{activity.registered_count || 0}}</text>
@@ -61,75 +47,122 @@
           </text>
         </view>
       </view>
-    </view>
 
-    <!-- 活动描述 -->
-    <view class="desc-card" wx:if="{{activity.description}}">
-      <text class="card-title">活动详情</text>
-      <text class="desc-text">{{activity.description}}</text>
-    </view>
+      <!-- 活动详情 -->
+      <view class="section-card">
+        <view class="card-header-simple">
+          <text class="card-title">活动详情</text>
+        </view>
+        <text class="desc-text">{{activity.description}}</text>
+      </view>
 
-    <!-- 已报名团员 -->
-    <view class="participants-card">
-      <view class="card-header">
-        <text class="card-title">已报名团员 ({{activity.registered_count || 0}}人)</text>
-        <view class="view-all-btn" bindtap="viewParticipants">
-          <text>查看全部</text>
-          <image class="arrow-icon" src="/images/arrow-right.png"></image>
+      <!-- 补充信息 -->
+      <view class="section-card" wx:if="{{activity.dress_code}}">
+        <view class="card-header-simple">
+          <text class="card-title">Dress Code</text>
+        </view>
+        <text class="desc-text">{{activity.dress_code}}</text>
+      </view>
+
+      <view class="section-card" wx:if="{{activity.registration_deadline}}">
+        <view class="card-header-simple">
+          <text class="card-title">报名截止</text>
+        </view>
+        <text class="desc-text highlight-text">{{activity.registration_deadline}}</text>
+      </view>
+
+      <!-- 已报名团员 -->
+      <view class="section-card">
+        <view class="card-header-simple">
+          <text class="card-title">已报名团员</text>
+          <view class="view-all-btn" bindtap="viewParticipants">
+            <text>查看全部 {{activity.registered_count || 0}}人</text>
+            <image class="arrow-icon" src="/images/arrow-right.png"></image>
+          </view>
+        </view>
+        <view class="participants-list" wx:if="{{participants.length > 0}}">
+          <view class="participant-item" wx:for="{{participants}}" wx:for-limit="5" wx:key="_id">
+            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+            <text class="participant-name">{{item.nickname}}</text>
+            <text class="status-dot {{item.status === 'checked_in' ? 'checked-in' : ''}}" wx:if="{{item.status}}"></text>
+          </view>
+        </view>
+        <view class="no-participants" wx:else>
+          <text>暂无团员报名</text>
         </view>
       </view>
-      <view class="participants-list" wx:if="{{participants.length > 0}}">
-        <view class="participant-item" wx:for="{{participants}}" wx:for-limit="5" wx:key="_id">
-          <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
-          <text class="participant-name">{{item.nickname}}</text>
-          <text class="tag tag-success" wx:if="{{item.status === 'checked_in'}}">已签到</text>
+
+      <!-- 底部操作区 -->
+      <view class="footer-actions">
+        <block wx:if="{{!isRegistered && activity.status === 'published'}}">
+          <button
+            class="btn btn-primary btn-full"
+            bindtap="handleRegister"
+            disabled="{{activity.registered_count >= activity.quota}}"
+          >
+            {{activity.registered_count >= activity.quota ? '名额已满' : '立即报名'}}
+          </button>
+        </block>
+
+        <block wx:elif="{{isRegistered && activity.status === 'published'}}">
+          <button class="btn btn-secondary btn-full" bindtap="handleCancelRegistration">
+            取消报名
+          </button>
+        </block>
+
+        <block wx:elif="{{isRegistered && registration.status === 'checked_in'}}">
+          <view class="checked-in-badge">
+            <image class="badge-icon" src="/images/check.png"></image>
+            <text>已签到</text>
+          </view>
+        </block>
+      </view>
+    </block>
+
+    <!-- 往期活动：只显示详情和照片 -->
+    <block wx:else>
+      <!-- 封面图头部 -->
+      <view class="cover-header">
+        <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+        <view class="cover-overlay"></view>
+        <view class="cover-content">
+          <view class="status-tag {{activity.statusClass}}">{{activity.statusText}}</view>
+          <text class="activity-title">{{activity.title}}</text>
         </view>
       </view>
-      <view class="empty-participants" wx:else>
-        <text>暂无团员报名</text>
+
+      <!-- 活动详情 -->
+      <view class="section-card">
+        <view class="card-header-simple">
+          <text class="card-title">活动详情</text>
+        </view>
+        <text class="desc-text">{{activity.description}}</text>
       </view>
-    </view>
 
-    <!-- 底部操作区 -->
-    <view class="footer-actions">
-      <!-- 报名状态 -->
-      <block wx:if="{{!isRegistered && activity.status === 'published'}}">
-        <button
-          class="btn btn-primary btn-full"
-          bindtap="handleRegister"
-          disabled="{{activity.registered_count >= activity.quota}}"
-        >
-          {{activity.registered_count >= activity.quota ? '名额已满' : '立即报名'}}
-        </button>
-      </block>
-
-      <block wx:elif="{{isRegistered && activity.status === 'published'}}">
-        <button class="btn btn-secondary btn-full" bindtap="handleCancelRegistration">
-          取消报名
-        </button>
-      </block>
-
-      <block wx:elif="{{isRegistered && registration.status === 'checked_in'}}">
-        <view class="checked-in-badge">
-          <image class="badge-icon" src="/images/check.png"></image>
-          <text>已签到</text>
+      <!-- 活动照片 -->
+      <view class="section-card">
+        <view class="card-header-simple">
+          <text class="card-title">活动照片</text>
+          <view class="upload-btn" wx:if="{{canUploadPhotos}}" bindtap="uploadPhotos">
+            <image class="upload-icon" src="/images/add.png"></image>
+            <text>上传</text>
+          </view>
         </view>
-      </block>
-
-      <!-- 管理员操作 -->
-      <block wx:if="{{activity.status === 'draft'}}">
-        <view class="admin-actions">
-          <button class="btn btn-secondary" bindtap="handleEdit">编辑</button>
-          <button class="btn btn-primary" bindtap="handlePublish">发布</button>
+        <view class="photos-grid" wx:if="{{activity.photos && activity.photos.length > 0}}">
+          <view
+            class="photo-item"
+            wx:for="{{activity.photos}}"
+            wx:key="*this"
+            bindtap="previewImage"
+            data-index="{{index}}"
+          >
+            <image class="photo-img" src="{{item}}" mode="aspectFill"></image>
+          </view>
         </view>
-      </block>
-
-      <block wx:if="{{activity.status === 'published' || activity.status === 'ongoing'}}">
-        <view class="admin-actions" wx:if="{{isAdmin()}}">
-          <button class="btn btn-secondary" bindtap="handleEdit">编辑</button>
-          <button class="btn btn-error" bindtap="handleCancel">取消活动</button>
+        <view class="no-photos" wx:else>
+          <text>暂无照片</text>
         </view>
-      </block>
-    </view>
+      </view>
+    </block>
   </block>
 </view>

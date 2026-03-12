@@ -263,6 +263,13 @@ const handleActivityMock = (action, data) => {
         mockData.activities[cancelIndex].status = 'cancelled';
       }
       return Promise.resolve({ code: 0, data: { success: true } });
+    case 'delete':
+      const deleteIndex = mockData.activities.findIndex(a => a._id === data.id);
+      if (deleteIndex !== -1) {
+        mockData.activities.splice(deleteIndex, 1);
+        console.log('[Mock] 删除了活动:', data.id);
+      }
+      return Promise.resolve({ code: 0, data: { success: true } });
     case 'register': {
       const userId = mockData.currentUser._id;
       const activityId = data.activityId;
@@ -416,6 +423,7 @@ const activityApi = {
   update: (data) => callFunction('activity', 'update', data),
   publish: (data) => callFunction('activity', 'publish', data),
   cancel: (data) => callFunction('activity', 'cancel', data),
+  delete: (data) => callFunction('activity', 'delete', data),
   getList: (data) => callFunction('activity', 'getList', data, { showLoad: false }),
   getDetail: (data) => callFunction('activity', 'getDetail', data),
   register: (data) => callFunction('activity', 'register', data),

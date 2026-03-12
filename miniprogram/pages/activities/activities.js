@@ -5,36 +5,20 @@ const { ACTIVITY_STATUS } = require('../../utils/constants');
 
 Page({
   data: {
-    activities: [],
+    ongoingActivities: [],  // 正在报名的活动
+    pastActivities: [],     // 往期活动
     loading: true,
     loadingMore: false,
     hasMore: true,
     page: 1,
-    pageSize: 10,
-    currentTab: 'all', // all | registered | created
-    tabs: [
-      { key: 'all', title: '全部活动' },
-      { key: 'registered', title: '我报名的' }
-    ],
-    isAdminOrLeader: false
+    pageSize: 10
   },
 
   onLoad: function () {
-    // 检查是否是管理员或团长
-    const app = getApp();
-    const isAdminOrLeader = app.globalData.isAdmin || app.globalData.isLeader;
-
-    // 只有管理员/团长才显示"我创建的"选项卡
-    if (isAdminOrLeader) {
-      this.data.tabs.push({ key: 'created', title: '我创建的' });
-    }
-
-    this.setData({ isAdminOrLeader });
     this.loadActivities();
   },
 
   onShow: function () {
-    // 每次显示时刷新列表（确保创建的活动能立即显示）
     this.refreshActivities();
   },
 
@@ -65,26 +49,21 @@ Page({
     this.setData({ loading: true });
 
     try {
-      const { currentTab, page, pageSize } = this.data;
-      const params = {
+      const { page, pageSize } = this.data;
+
+      // 加载正在报名的活动
+      const ongoingResult = await activityApi.getList({
         page,
-        limit: pageSize
-      };
+        limit: pageSize,
+        status: 'published'
+      }, { showLoad: false });
 
-      // 根据当前选项卡设置过滤条件
-      if (currentTab === 'registered') {
-        params.registered = true;
-      } else if (currentTab === 'created') {
-        params.createdByMe = true;
-      } else {
-        params.status = 'published';
-      }
-
-      console.log('[Activities] 加载活动，currentTab:', currentTab, 'params:', params);
-
-      const result = await activityApi.getList(params, { showLoad: false });
-
-      console.log('[Activities] API 返回结果:', result);
+      // 加载往期活动
+      const pastResult = await activityApi.getList({
+        page,
+        limit: pageSize,
+        status: 'ended'
+      }, { showLoad: false });
 
       // 跑步类型映射
       const runTypeMap = {
@@ -95,37 +74,46 @@ Page({
       };
 
       const self = this;
-      const activities = (result.list || []).map(function(item) {
-        var formatted = {
-          ...item,
-          formattedTime: formatDate(item.start_time, 'MM 月 DD 日 HH:mm'),
-          statusText: self.getStatusText(item.status),
-          statusClass: self.getStatusClass(item.status),
-          runTypeText: runTypeMap[item.run_type] || ''
-        };
 
-        // 格式化报名截止时间
-        if (item.registration_deadline) {
-          var deadlineDate = item.registration_deadline instanceof Date ? item.registration_deadline : new Date(item.registration_deadline);
-          formatted.registration_deadline = formatDate(deadlineDate, 'MM-DD HH:mm');
-        }
-
-        return formatted;
+      // 处理正在报名的活动
+      const ongoingActivities = (ongoingResult.list || []).map(function(item) {
+        return self.formatActivity(item, runTypeMap);
       });
 
-      console.log('[Activities] 格式化后的活动数量:', activities.length);
+      // 处理往期活动
+      const pastActivities = (pastResult.list || []).map(function(item) {
+        return self.formatActivity(item, runTypeMap);
+      });
 
       this.setData({
-        activities: page === 1 ? activities : [...this.data.activities, ...activities],
-        hasMore: activities.length >= pageSize,
+        ongoingActivities: page === 1 ? ongoingActivities : [...this.data.ongoingActivities, ...ongoingActivities],
+        pastActivities: page === 1 ? pastActivities : [...this.data.pastActivities, ...pastActivities],
+        hasMore: ongoingActivities.length >= pageSize || pastActivities.length >= pageSize,
         loading: false
       });
-
-      console.log('[Activities] setData 完成，currentTab:', currentTab, '活动数量:', this.data.activities.length);
     } catch (error) {
       console.error('加载活动列表失败', error);
       this.setData({ loading: false });
     }
+  },
+
+  // 格式化活动数据
+  formatActivity: function(item, runTypeMap) {
+    const formatted = {
+      ...item,
+      formattedTime: formatDate(item.start_time, 'MM 月 DD 日 HH:mm'),
+      statusText: this.getStatusText(item.status),
+      statusClass: this.getStatusClass(item.status),
+      runTypeText: runTypeMap[item.run_type] || ''
+    };
+
+    // 格式化报名截止时间
+    if (item.registration_deadline) {
+      var deadlineDate = item.registration_deadline instanceof Date ? item.registration_deadline : new Date(item.registration_deadline);
+      formatted.registration_deadline = formatDate(deadlineDate, 'MM-DD HH:mm');
+    }
+
+    return formatted;
   },
 
   // 加载更多

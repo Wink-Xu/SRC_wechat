@@ -10,13 +10,24 @@
           <text class="role-tag" wx:if="{{isLeader}}">团长</text>
           <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
           <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
-          <text class="role-tag pending" wx:else>待审批</text>
+          <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
+          <text class="role-tag guest" wx:else>游客</text>
         </view>
       </view>
       <view class="points-box">
         <text class="points-value">{{points}}</text>
         <text class="points-label">积分</text>
       </view>
+    </view>
+    <!-- 申请入团提示 -->
+    <view class="apply-prompt" wx:if="{{isLoggedIn && !isMember && !isPending}}">
+      <text class="apply-text">您还不是团员，申请后可参与活动报名</text>
+      <button class="btn-apply" bindtap="goToApply">申请入团</button>
+    </view>
+    <!-- 待审批提示 -->
+    <view class="pending-prompt" wx:if="{{isPending}}">
+      <text class="pending-text">您的入团申请正在审核中</text>
+      <text class="pending-sub">请等待管理员审批</text>
     </view>
     <view class="login-prompt" wx:else>
       <image class="default-avatar" src="/images/default-avatar.png"></image>

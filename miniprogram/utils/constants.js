@@ -2,17 +2,17 @@
 
 // 用户角色
 const ROLES = {
-  GUEST: 'guest',
-  PENDING: 'pending',
-  MEMBER: 'member',
-  ADMIN: 'admin',
-  LEADER: 'leader'
+  GUEST: 'guest',     // 游客（已登录但未申请入团）
+  PENDING: 'pending', // 待审批
+  MEMBER: 'member',   // 团员
+  ADMIN: 'admin',     // 管理员
+  LEADER: 'leader'    // 团长
 };
 
 // 用户状态
 const USER_STATUS = {
-  GUEST: 'guest',       // 游客
-  PENDING: 'pending',   // 待审批
+  GUEST: 'guest',     // 游客（已登录但未申请入团）
+  PENDING: 'pending', // 待审批
   APPROVED: 'approved', // 已批准
   REJECTED: 'rejected'  // 已拒绝
 };

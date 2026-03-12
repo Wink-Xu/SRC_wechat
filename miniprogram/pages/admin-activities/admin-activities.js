@@ -140,6 +140,66 @@ Page({
     }
   },
 
+  // 结束活动
+  finishActivity: function (e) {
+    const { id } = e.currentTarget.dataset;
+
+    wx.showModal({
+      title: '结束活动',
+      content: '活动结束后将进入审批流程，确认参加人员并发放积分。是否继续？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.navigateTo({
+            url: `/pages/activity-approval/activity-approval?id=${id}`
+          });
+        }
+      }
+    });
+  },
+
+  // 删除活动
+  deleteActivity: function (e) {
+    const { id } = e.currentTarget.dataset;
+    const self = this;
+
+    // 第一次确认
+    wx.showModal({
+      title: '警告',
+      content: '确定要删除此活动吗？删除后无法恢复！',
+      confirmText: '继续',
+      confirmColor: '#f44336',
+      success: function (res) {
+        if (res.confirm) {
+          // 第二次确认
+          wx.showModal({
+            title: '再次确认',
+            content: '此操作不可逆，确定要删除吗？',
+            confirmText: '确定删除',
+            confirmColor: '#f44336',
+            success: function (res2) {
+              if (res2.confirm) {
+                // 调用删除 API
+                activityApi.delete({ id }).then(() => {
+                  wx.showToast({
+                    title: '删除成功',
+                    icon: 'success'
+                  });
+                  self.refreshActivities();
+                }).catch((error) => {
+                  console.error('删除失败', error);
+                  wx.showToast({
+                    title: '删除失败',
+                    icon: 'none'
+                  });
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
   // 获取状态文本
   getStatusText: function (status) {
     const statusMap = {

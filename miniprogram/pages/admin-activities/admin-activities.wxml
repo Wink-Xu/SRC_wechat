@@ -25,6 +25,7 @@
       </view>
       <view class="activity-actions">
         <button
+          wx:if="{{item.status === 'draft' || item.status === 'published' || item.status === 'ongoing'}}"
           class="btn btn-secondary btn-small"
           data-id="{{item._id}}"
           bindtap="editActivity"
@@ -37,10 +38,22 @@
         >发布</button>
         <button
           wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
+          class="btn btn-warning btn-small"
+          data-id="{{item._id}}"
+          bindtap="finishActivity"
+        >结束活动</button>
+        <button
+          wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
           class="btn btn-error btn-small"
           data-id="{{item._id}}"
           bindtap="cancelActivity"
         >取消</button>
+        <button
+          wx:if="{{item.status === 'ended'}}"
+          class="btn btn-danger btn-small"
+          data-id="{{item._id}}"
+          bindtap="deleteActivity"
+        >删除</button>
       </view>
     </view>
 

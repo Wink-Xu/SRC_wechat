@@ -11,7 +11,11 @@
       "Bash(ls -la cloudfunctions/*/index.js 2>/dev/null | wc -l)",
       "Bash(cd /Users/xu/Documents/SRC_wechat/miniprogram && \\\\\nfind . -name \"*.wxss\" -o -name \"*.wxml\" -o -name \"*.js\" -o -name \"*.json\" | \\\\\nxargs sed -i '' 's/#4CAF50/#9C27B0/g' && \\\\\nfind . -name \"*.wxss\" -o -name \"*.wxml\" -o -name \"*.js\" -o -name \"*.json\" | \\\\\nxargs sed -i '' 's/#45a049/#7B1FA2/g' && \\\\\nfind . -name \"*.wxss\" -o -name \"*.wxml\" -o -name \"*.js\" -o -name \"*.json\" | \\\\\nxargs sed -i '' 's/#C8E6C9/#E1BEE7/g' && \\\\\necho \"颜色替换完成\")",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git config:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)"
     ]
   }
 }

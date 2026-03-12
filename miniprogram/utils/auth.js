@@ -21,6 +21,15 @@ const isMember = () => {
 };
 
 /**
+ * 检查是否是游客（已登录但未申请入团）
+ * @returns {boolean}
+ */
+const isGuest = () => {
+  const app = getApp();
+  return app.globalData.isGuest;
+};
+
+/**
  * 检查是否是管理员
  * @returns {boolean}
  */
@@ -147,6 +156,7 @@ const requireLeader = () => {
 module.exports = {
   isLoggedIn,
   isMember,
+  isGuest,
   isAdmin,
   isLeader,
   getUserInfo,
