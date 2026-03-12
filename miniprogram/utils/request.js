@@ -345,9 +345,16 @@ const handleShopMock = (action, data) => {
   switch (action) {
     case 'getProductList':
       return Promise.resolve({ code: 0, data: { list: mockData.products } });
-    case 'getProductDetail':
+    case 'getProductDetail': {
       const product = mockData.products.find(p => p._id === data.id);
-      return Promise.resolve({ code: 0, data: product || mockData.products[0] });
+      return Promise.resolve({
+        code: 0,
+        data: {
+          product: product || mockData.products[0],
+          myPoints: mockData.currentUser.points
+        }
+      });
+    }
     case 'createOrder':
       return Promise.resolve({ code: 0, data: { orderId: 'mock_order_' + Date.now() } });
     case 'payOrderByPoints':
