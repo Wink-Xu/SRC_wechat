@@ -37,11 +37,11 @@
           bindtap="publishActivity"
         >发布</button>
         <button
-          wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
+          wx:if="{{item.status === 'ongoing'}}"
           class="btn btn-warning btn-small"
           data-id="{{item._id}}"
           bindtap="finishActivity"
-        >结束活动</button>
+        >结束并发放积分</button>
         <button
           wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
           class="btn btn-error btn-small"

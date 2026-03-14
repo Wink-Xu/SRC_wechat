@@ -75,7 +75,7 @@ const currentUser = users[CURRENT_ROLE] || users.member;
 
 // 模拟活动列表
 const activities = [
-  // 正在报名的活动（1 个）
+  // 正在报名的活动（1 个）- 改为 ongoing 状态用于测试签到功能
   {
     _id: 'activity_001',
     title: '周末晨跑 - 奥森公园',
@@ -88,8 +88,10 @@ const activities = [
     registration_deadline: '2024-03-16',
     quota: 30,
     points: 20,
-    status: 'published',
+    status: 'ongoing', // 改为 ongoing 状态
     registered_count: 15,
+    check_in_count: 8, // 已签到人数
+    check_in_enabled: true, // 启用签到
     created_by: 'leader_001'
   },
   // 往期活动（5 个）

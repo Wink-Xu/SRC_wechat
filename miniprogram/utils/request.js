@@ -137,6 +137,9 @@ const addRegistration = (activityId, userId) => {
     activity_id: activityId,
     user_id: userId,
     status: 'registered',
+    check_in_status: 'pending', // 签到状态：pending, checked_in
+    check_in_time: null,        // 签到时间
+    points_awarded: false,      // 是否已发放积分
     created_at: new Date().toISOString()
   };
   return registrations[key];
@@ -323,8 +326,79 @@ const handleActivityMock = (action, data) => {
       console.log('[Mock] 用户取消报名:', { activityId, userId });
       return Promise.resolve({ code: 0, data: { success: true } });
     }
-    case 'checkIn':
-      return Promise.resolve({ code: 0, data: { success: true, points: 20 } });
+    case 'checkIn': {
+      const userId = mockData.currentUser._id;
+      const activityId = data.activityId;
+
+      // 检查是否已报名
+      const existingReg = isRegistered(activityId, userId);
+      if (!existingReg) {
+        return Promise.resolve({ code: 1, message: '请先报名参加活动', data: null });
+      }
+
+      // 检查是否已签到
+      if (existingReg.check_in_status === 'checked_in') {
+        return Promise.resolve({ code: 1, message: '您已签到，无需重复操作', data: null });
+      }
+
+      // 更新签到状态
+      existingReg.check_in_status = 'checked_in';
+      existingReg.check_in_time = new Date().toISOString();
+
+      // 更新活动签到人数
+      const activity = mockData.activities.find(a => a._id === activityId);
+      if (activity) {
+        activity.check_in_count = (activity.check_in_count || 0) + 1;
+      }
+
+      console.log('[Mock] 用户签到成功:', { activityId, userId });
+      return Promise.resolve({ code: 0, data: { success: true } });
+    }
+    case 'getCheckInQrCode': {
+      // 生成模拟二维码数据
+      const activity = mockData.activities.find(a => a._id === data.id);
+      if (!activity) {
+        return Promise.resolve({ code: 1, message: '活动不存在', data: null });
+      }
+
+      const qrData = {
+        activity_id: data.id,
+        qr_code: `data:image/png;base64,simulated_qr_${data.id}`,
+        check_in_count: activity.check_in_count || 0
+      };
+      return Promise.resolve({ code: 0, data: qrData });
+    }
+    case 'finishActivityWithCheckIn': {
+      const activity = mockData.activities.find(a => a._id === data.id);
+      if (!activity) {
+        return Promise.resolve({ code: 1, message: '活动不存在', data: null });
+      }
+
+      // 更新活动状态
+      activity.status = 'ended';
+
+      // 给所有已签到的用户发放积分
+      const pointsToAward = activity.points || 20;
+      let awardedCount = 0;
+
+      // 遍历所有报名记录
+      Object.values(registrations).forEach(reg => {
+        if (reg.activity_id === data.id && reg.check_in_status === 'checked_in' && !reg.points_awarded) {
+          reg.points_awarded = true;
+          awardedCount++;
+        }
+      });
+
+      console.log('[Mock] 结束活动并发放积分:', { activityId: data.id, awardedCount, points: pointsToAward });
+      return Promise.resolve({
+        code: 0,
+        data: {
+          success: true,
+          awarded_count: awardedCount,
+          points_per_person: pointsToAward
+        }
+      });
+    }
     default:
       return Promise.resolve({ code: 0, data: null });
   }
@@ -428,7 +502,9 @@ const activityApi = {
   getDetail: (data) => callFunction('activity', 'getDetail', data),
   register: (data) => callFunction('activity', 'register', data),
   cancelRegistration: (data) => callFunction('activity', 'cancelRegistration', data),
-  checkIn: (data) => callFunction('activity', 'checkIn', data)
+  checkIn: (data) => callFunction('activity', 'checkIn', data),
+  getCheckInQrCode: (data) => callFunction('activity', 'getCheckInQrCode', data, { showLoad: false }),
+  finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data)
 };
 
 // 积分相关接口

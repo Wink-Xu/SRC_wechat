@@ -140,21 +140,24 @@ Page({
     }
   },
 
-  // 结束活动
-  finishActivity: function (e) {
+  // 结束活动（简化版 - 直接结束并发放积分）
+  finishActivity: async function (e) {
     const { id } = e.currentTarget.dataset;
 
-    wx.showModal({
-      title: '结束活动',
-      content: '活动结束后将进入审批流程，确认参加人员并发放积分。是否继续？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.navigateTo({
-            url: `/pages/activity-approval/activity-approval?id=${id}`
-          });
-        }
-      }
-    });
+    const confirm = await showConfirm('结束活动', '活动结束后，系统将自动给已签到的团员发放积分。确认结束？');
+    if (!confirm) return;
+
+    try {
+      const result = await activityApi.finishActivityWithCheckIn({ id });
+      showSuccess(`活动已结束，共发放 ${result.awarded_count} 人 ${result.points_per_person} 积分`);
+      this.refreshActivities();
+    } catch (error) {
+      console.error('结束活动失败', error);
+      wx.showToast({
+        title: '结束活动失败',
+        icon: 'none'
+      });
+    }
   },
 
   // 删除活动

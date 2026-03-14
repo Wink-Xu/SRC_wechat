@@ -94,7 +94,22 @@
 
       <!-- 底部操作区 -->
       <view class="footer-actions">
-        <block wx:if="{{!isRegistered && activity.status === 'published'}}">
+        <!-- 管理员查看签到码按钮（ongoing 状态） -->
+        <view wx:if="{{isAdminOrLeader && activity.status === 'ongoing'}}" class="admin-actions">
+          <button class="btn btn-secondary btn-small" bindtap="showCheckInQrCode">
+            查看签到码
+          </button>
+          <text class="checkin-count">已签到：{{checkInCount}}人</text>
+        </view>
+
+        <!-- 用户签到按钮（ongoing 状态，已报名未签到） -->
+        <block wx:elif="{{isRegistered && activity.status === 'ongoing' && registration.check_in_status !== 'checked_in'}}">
+          <button class="btn btn-primary btn-full" bindtap="handleCheckIn">
+            扫码签到
+          </button>
+        </block>
+
+        <block wx:elif="{{!isRegistered && activity.status === 'published'}}">
           <button
             class="btn btn-primary btn-full"
             bindtap="handleRegister"
@@ -110,7 +125,7 @@
           </button>
         </block>
 
-        <block wx:elif="{{isRegistered && registration.status === 'checked_in'}}">
+        <block wx:elif="{{isRegistered && registration.check_in_status === 'checked_in'}}">
           <view class="checked-in-badge">
             <image class="badge-icon" src="/images/check.png"></image>
             <text>已签到</text>
@@ -165,4 +180,22 @@
       </view>
     </block>
   </block>
+
+  <!-- 签到码弹窗 -->
+  <view class="modal-mask" wx:if="{{showCheckInQr}}" bindtap="closeCheckInQrCode">
+    <view class="modal-content" catchtap="noop">
+      <view class="modal-header">
+        <text class="modal-title">活动签到码</text>
+        <text class="modal-close" bindtap="closeCheckInQrCode">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="qr-code-placeholder">
+          <text class="qr-hint">请团员使用小程序扫码签到</text>
+        </view>
+        <view class="qr-stats">
+          <text>已签到：{{checkInCount}}人</text>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

@@ -12,7 +12,12 @@ Page({
     registration: null,
     participants: [],
     runTypeText: '',
-    canUploadPhotos: false
+    canUploadPhotos: false,
+    // 签到相关
+    showCheckInQr: false,      // 是否显示签到码弹窗
+    checkInQrCode: '',         // 签到码图片数据
+    checkInCount: 0,           // 已签到人数
+    isAdminOrLeader: false     // 是否管理员或团长
   },
 
   onLoad: function (options) {
@@ -55,6 +60,10 @@ Page({
       const canUploadPhotos = app.globalData.userInfo &&
         (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
 
+      // 检查是否是管理员或团长
+      const isAdminOrLeader = app.globalData.userInfo &&
+        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
+
       this.setData({
         activity,
         isRegistered: result.isRegistered,
@@ -62,6 +71,8 @@ Page({
         participants: result.participants || [],
         runTypeText,
         canUploadPhotos,
+        isAdminOrLeader,
+        checkInCount: activity.check_in_count || 0,
         loading: false
       });
 
@@ -166,6 +177,108 @@ Page({
         console.error('选择照片失败', err);
       }
     });
+  },
+
+  // 显示签到码
+  showCheckInQrCode: async function () {
+    try {
+      const result = await activityApi.getCheckInQrCode({ id: this.data.id });
+      this.setData({
+        checkInQrCode: result.qr_code,
+        checkInCount: result.check_in_count || 0,
+        showCheckInQr: true
+      });
+    } catch (error) {
+      console.error('获取签到码失败', error);
+      wx.showToast({
+        title: '获取签到码失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 关闭签到码弹窗
+  closeCheckInQrCode: function () {
+    this.setData({
+      showCheckInQr: false
+    });
+  },
+
+  // 扫码签到
+  handleCheckIn: function () {
+    const that = this;
+
+    wx.scanCode({
+      success: function (res) {
+        console.log('扫码结果:', res);
+
+        // 解析二维码内容，期望格式：{ type: 'checkin', activity_id: 'xxx' }
+        let qrData;
+        try {
+          qrData = JSON.parse(res.result);
+        } catch (e) {
+          // 兼容纯文本二维码（只有 activity_id）
+          qrData = { type: 'checkin', activity_id: res.result };
+        }
+
+        if (qrData.type !== 'checkin' || !qrData.activity_id) {
+          wx.showToast({
+            title: '无效的签到码',
+            icon: 'none'
+          });
+          return;
+        }
+
+        if (qrData.activity_id !== that.data.id) {
+          wx.showToast({
+            title: '此码不属于当前活动',
+            icon: 'none'
+          });
+          return;
+        }
+
+        // 确认签到
+        wx.showModal({
+          title: '确认签到',
+          content: `确认参加"${that.data.activity.title}"？`,
+          success: function (modalRes) {
+            if (modalRes.confirm) {
+              that.confirmCheckIn(qrData.activity_id);
+            }
+          }
+        });
+      },
+      fail: function (err) {
+        console.error('扫码失败', err);
+        if (err.errMsg.includes('cancel')) {
+          // 用户取消扫码，不做提示
+        } else {
+          wx.showToast({
+            title: '扫码失败，请重试',
+            icon: 'none'
+          });
+        }
+      }
+    });
+  },
+
+  // 确认签到
+  confirmCheckIn: async function (activityId) {
+    try {
+      await activityApi.checkIn({ activityId });
+      wx.showToast({
+        title: '签到成功',
+        icon: 'success'
+      });
+      // 刷新活动详情，更新签到状态
+      this.loadActivity();
+    } catch (error) {
+      console.error('签到失败', error);
+      wx.showToast({
+        title: error?.message || '签到失败，请重试',
+        icon: 'none'
+      });
+    }
   },
 
   // 预览照片
