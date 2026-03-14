@@ -1,6 +1,6 @@
 /* pages/scan-checkin/scan-checkin.wxss - On Running 极简风格 */
 page {
-  background: #FFFFFF;
+  background: var(--background);
   min-height: 100vh;
 }
 

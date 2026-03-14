@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: flex-end;
   padding-bottom: 60rpx;
-  background: #FFFFFF;
+  background: var(--background);
 }
 
 /* 背景图片 - 自适应 */

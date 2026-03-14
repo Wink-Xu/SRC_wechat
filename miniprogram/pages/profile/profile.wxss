@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--background);
 }
 
 /* 用户区域 - 极简白色背景 */
@@ -85,10 +85,10 @@
 }
 
 .btn-apply {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 500;
   padding: 16rpx 48rpx;
   border-radius: 32rpx;
   border: none;

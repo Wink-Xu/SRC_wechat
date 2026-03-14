@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--background);
 }
 
 /* 积分卡片 - 极简风格 */

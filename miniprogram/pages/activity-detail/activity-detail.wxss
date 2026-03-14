@@ -1,12 +1,12 @@
 /* pages/activity-detail/activity-detail.wxss - 昂跑风格 */
 
 page {
-  background: #FFFFFF;
+  background: var(--background);
 }
 
 .container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--background);
   padding-bottom: 180rpx;
 }
 
@@ -53,27 +53,27 @@ page {
   font-weight: 600;
   margin-bottom: 16rpx;
   background: #FFFFFF;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag.tag-primary {
   background: #FFFFFF;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag.tag-success {
   background: #FFFFFF;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag.tag-warning {
   background: #FFFFFF;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag.tag-error {
   background: #FFFFFF;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag.tag-secondary {
@@ -325,7 +325,7 @@ page {
 }
 
 .btn-primary {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
 }
 
@@ -335,7 +335,7 @@ page {
 
 .btn-secondary {
   background: #F5F5F5;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .btn-secondary:active {
@@ -353,7 +353,7 @@ page {
   padding: 24rpx;
   background: #F5F5F5;
   border-radius: 44rpx;
-  color: #000000;
+  color: #1A1A1A;
   font-size: 30rpx;
   font-weight: 600;
 }
@@ -397,8 +397,8 @@ page {
 
 .modal-title {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
 }
 
 .modal-close {
@@ -434,7 +434,7 @@ page {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #000000;
+  background: #1A1A1A;
   color: #fff;
   font-size: 24rpx;
   padding: 14rpx 36rpx;

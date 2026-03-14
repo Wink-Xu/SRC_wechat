@@ -1,14 +1,14 @@
 /* pages/activities/activities.wxss - On Running 极简风格 */
 
 page {
-  --primary: #000000;
+  --primary: #1A1A1A;
   --success: #2E7D32;
   --warning: #CC7722;
   --danger: #F44336;
   --gray: #999999;
-  --text: #000000;
+  --text: #1A1A1A;
   --text-light: #666666;
-  --bg: #FFFFFF;
+  --bg: var(--background);
 }
 
 .container {
@@ -240,7 +240,7 @@ page {
 }
 
 .tag-primary {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
 }
 

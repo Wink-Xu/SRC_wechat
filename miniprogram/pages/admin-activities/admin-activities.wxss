@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--background);
   padding-bottom: 120rpx;
 }
 
@@ -37,7 +37,7 @@
   padding: 4rpx 16rpx;
   border-radius: 16rpx;
   font-size: 22rpx;
-  font-weight: 600;
+  font-weight: 500;
   background: #F5F5F5;
   color: #666666;
 }

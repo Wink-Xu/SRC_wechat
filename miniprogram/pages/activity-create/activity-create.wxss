@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--background);
   padding: 20rpx 30rpx 160rpx;
 }
 
