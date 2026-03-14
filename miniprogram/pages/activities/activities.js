@@ -51,11 +51,11 @@ Page({
     try {
       const { page, pageSize } = this.data;
 
-      // 加载正在报名的活动
+      // 加载正在报名的活动（published 和 ongoing 状态）
       const ongoingResult = await activityApi.getList({
         page,
         limit: pageSize,
-        status: 'published'
+        status: 'published,ongoing'
       }, { showLoad: false });
 
       // 加载往期活动

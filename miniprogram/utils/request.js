@@ -176,10 +176,11 @@ const handleActivityMock = (action, data) => {
           console.log('[Mock getList] 按创建者过滤后数量:', filteredActivities.length, '(原始:', beforeCount + ')');
         }
 
-        // 按状态过滤
+        // 按状态过滤（支持多状态，逗号分隔）
         if (data.status) {
           const beforeCount = filteredActivities.length;
-          filteredActivities = filteredActivities.filter(a => a.status === data.status);
+          const statusList = data.status.split(',');
+          filteredActivities = filteredActivities.filter(a => statusList.includes(a.status));
           console.log('[Mock getList] 按状态过滤后数量:', filteredActivities.length, '(原始:', beforeCount + ', 状态:', data.status + ')');
         }
 
