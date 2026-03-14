@@ -21,7 +21,7 @@
         </view>
       </view>
 
-      <!-- 活动信息网格 -->
+      <!-- 活动信息列表 -->
       <view class="info-grid">
         <view class="info-cell">
           <image class="info-icon" src="/images/time.png"></image>
