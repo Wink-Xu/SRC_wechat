@@ -1,22 +1,22 @@
-/* pages/activity-participants/activity-participants.wxss */
+/* pages/activity-participants/activity-participants.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #F8F9FA;
+  background: #FFFFFF;
   padding-bottom: 30rpx;
 }
 
 .loading-box {
   text-align: center;
   padding: 100rpx;
-  color: #999;
+  color: #999999;
 }
 
 /* 活动头部 */
 .activity-header {
-  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  background: #000000;
   padding: 40rpx 30rpx;
-  color: #fff;
+  color: #FFFFFF;
 }
 
 .activity-title {
@@ -28,7 +28,7 @@
 
 .activity-stats {
   font-size: 26rpx;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* 报名名单列表 */
@@ -39,17 +39,17 @@
 .participant-item {
   display: flex;
   align-items: center;
-  background: #fff;
-  border-radius: 20rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
   padding: 24rpx 28rpx;
   margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+  border: 1rpx solid #F0F0F0;
 }
 
 .participant-index {
   font-size: 28rpx;
   font-weight: 700;
-  color: #9C27B0;
+  color: #000000;
   width: 48rpx;
   text-align: center;
 }
@@ -59,14 +59,13 @@
   height: 88rpx;
   border-radius: 50%;
   margin: 0 24rpx 0 16rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
 }
 
 .participant-name {
   flex: 1;
   font-size: 30rpx;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #000000;
 }
 
 .participant-status {
@@ -79,22 +78,24 @@
   border-radius: 24rpx;
   font-size: 24rpx;
   font-weight: 600;
+  background: #F5F5F5;
+  color: #666666;
 }
 
 .status-badge.checked-in {
-  background: linear-gradient(135deg, #C8E6C9, #A5D6A7);
-  color: #2E7D32;
+  background: #F5F5F5;
+  color: #000000;
 }
 
 .status-badge.registered {
-  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-  color: #1565C0;
+  background: #F5F5F5;
+  color: #666666;
 }
 
 /* 空状态 */
 .empty-box {
   text-align: center;
   padding: 100rpx 30rpx;
-  color: #999;
+  color: #999999;
   font-size: 28rpx;
 }

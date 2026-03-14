@@ -1,23 +1,23 @@
-/* pages/points-rank/points-rank.wxss */
+/* pages/points-rank/points-rank.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #FFFFFF;
 }
 
 .loading-box {
   text-align: center;
   padding: 100rpx;
-  color: #999;
+  color: #999999;
 }
 
-/* 前三名 */
+/* 前三名 - 极简黑色风格 */
 .top-three {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   padding: 40rpx 30rpx;
-  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  background: #000000;
 }
 
 .top-item {
@@ -44,7 +44,7 @@
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  border: 4rpx solid #fff;
+  border: 4rpx solid #FFFFFF;
   margin-bottom: 12rpx;
 }
 
@@ -55,17 +55,18 @@
 
 .top-name {
   font-size: 28rpx;
-  color: #fff;
+  color: #FFFFFF;
   margin-bottom: 4rpx;
   max-width: 160rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 .top-points {
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .top-badge {
@@ -74,14 +75,14 @@
   right: 10rpx;
   width: 40rpx;
   height: 40rpx;
-  background: #FFD700;
+  background: #FFFFFF;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24rpx;
   font-weight: 700;
-  color: #333;
+  color: #000000;
 }
 
 .top-item.first .top-badge {
@@ -98,17 +99,18 @@
 
 /* 排行列表 */
 .rank-list {
-  background: #fff;
+  background: #FFFFFF;
   margin: 20rpx 30rpx;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
+  border: 1rpx solid #F0F0F0;
 }
 
 .rank-item {
   display: flex;
   align-items: center;
   padding: 24rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid #F5F5F5;
 }
 
 .rank-item:last-child {
@@ -119,7 +121,7 @@
   width: 60rpx;
   font-size: 30rpx;
   font-weight: 600;
-  color: #666;
+  color: #666666;
 }
 
 .rank-avatar {
@@ -132,13 +134,14 @@
 .rank-name {
   flex: 1;
   font-size: 30rpx;
-  color: #333;
+  color: #000000;
+  font-weight: 500;
 }
 
 .rank-points {
   font-size: 28rpx;
-  color: #FF9800;
-  font-weight: 600;
+  color: #000000;
+  font-weight: 700;
 }
 
 .empty-box {
@@ -147,5 +150,5 @@
 }
 
 .empty-text {
-  color: #999;
+  color: #999999;
 }

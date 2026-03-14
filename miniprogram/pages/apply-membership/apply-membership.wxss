@@ -1,8 +1,8 @@
-/* pages/apply-membership/apply-membership.wxss */
+/* pages/apply-membership/apply-membership.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background-color: #1A1A1A;
+  background-color: #FFFFFF;
   padding: 40rpx;
 }
 
@@ -15,22 +15,24 @@
   display: block;
   font-size: 40rpx;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #000000;
   margin-bottom: 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .desc {
   display: block;
   font-size: 26rpx;
-  color: #8E8E8E;
+  color: #999999;
 }
 
 .form-card {
-  background: #2D2D2D;
-  border-radius: 28rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
   padding: 40rpx 32rpx;
   margin-bottom: 32rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border: 1rpx solid #F0F0F0;
 }
 
 .form-item {
@@ -44,8 +46,8 @@
 .form-label {
   display: block;
   font-size: 26rpx;
-  color: #FFFFFF;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 600;
   margin-bottom: 12rpx;
 }
 
@@ -59,18 +61,18 @@
   width: 130rpx;
   height: 130rpx;
   border-radius: 50%;
-  background: #3D3D3D;
+  background: #F5F5F5;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 3rpx solid #D4C4FF;
+  border: 1rpx solid #E0E0E0;
 }
 
 .avatar-btn text {
   font-size: 22rpx;
-  color: #FFFFFF;
+  color: #666666;
 }
 
 .avatar-preview {
@@ -82,30 +84,29 @@
 .form-input {
   height: 92rpx;
   padding: 0 26rpx;
-  background: #3D3D3D;
-  border-radius: 18rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
   font-size: 30rpx;
-  color: #FFFFFF;
-  border: 2rpx solid transparent;
+  color: #000000;
+  border: 1rpx solid transparent;
 }
 
 .form-input:focus {
-  border-color: #D4C4FF;
+  border-color: #000000;
 }
 
 .form-input::placeholder {
-  color: #8E8E8E;
+  color: #999999;
 }
 
 .btn-submit {
   height: 92rpx;
-  background: #C8FF54;
-  color: #1A1A1A;
+  background: #000000;
+  color: #FFFFFF;
   font-size: 32rpx;
   font-weight: 700;
   border: none;
   border-radius: 46rpx;
-  box-shadow: 0 8rpx 24rpx rgba(200, 255, 84, 0.25);
 }
 
 .btn-submit::after {
@@ -119,5 +120,5 @@
 
 .tips text {
   font-size: 22rpx;
-  color: #8E8E8E;
+  color: #999999;
 }

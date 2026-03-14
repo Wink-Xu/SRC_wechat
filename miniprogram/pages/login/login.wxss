@@ -1,8 +1,4 @@
-/* pages/login/login.wxss */
-
-page {
-  --green: #C8FF54;
-}
+/* pages/login/login.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
@@ -13,7 +9,7 @@ page {
   align-items: center;
   justify-content: flex-end;
   padding-bottom: 60rpx;
-  background: #000000;
+  background: #FFFFFF;
 }
 
 /* 背景图片 - 自适应 */
@@ -38,13 +34,12 @@ page {
 .login-btn {
   width: 100%;
   height: 96rpx;
-  background: var(--green);
-  color: #1A1A1A;
+  background: #000000;
+  color: #FFFFFF;
   font-size: 32rpx;
   font-weight: 700;
   border: none;
   border-radius: 48rpx;
-  box-shadow: 0 8rpx 24rpx rgba(200, 255, 84, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;

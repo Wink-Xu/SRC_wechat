@@ -1,57 +1,60 @@
-/* pages/order-detail/order-detail.wxss */
+/* pages/order-detail/order-detail.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #FFFFFF;
   padding-bottom: 160rpx;
 }
 
 .loading-box {
   text-align: center;
   padding: 100rpx;
-  color: #999;
+  color: #999999;
 }
 
 /* 状态卡片 */
 .status-card {
   padding: 40rpx 30rpx;
-  color: #fff;
+  color: #FFFFFF;
 }
 
 .status-pending {
-  background: linear-gradient(135deg, #FF9800, #F57C00);
+  background: #CC7722;
 }
 
 .status-paid,
 .status-shipped {
-  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  background: #000000;
 }
 
 .status-completed {
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: #2E7D32;
 }
 
 .status-cancelled {
-  background: linear-gradient(135deg, #9E9E9E, #757575);
+  background: #9E9E9E;
 }
 
 .status-text {
   font-size: 36rpx;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* 收货地址 */
 .address-card {
   display: flex;
-  background: #fff;
+  background: #FFFFFF;
   padding: 30rpx;
   margin-bottom: 20rpx;
+  border: 1rpx solid #F0F0F0;
+  border-radius: 12rpx;
 }
 
 .address-icon {
   width: 40rpx;
   height: 40rpx;
   margin-right: 20rpx;
+  opacity: 0.7;
 }
 
 .address-icon image {
@@ -65,31 +68,36 @@
 
 .address-name {
   font-size: 30rpx;
-  color: #333;
+  color: #000000;
   display: block;
   margin-bottom: 8rpx;
+  font-weight: 600;
 }
 
 .address-detail {
   font-size: 26rpx;
-  color: #666;
+  color: #666666;
 }
 
 /* 商品卡片 */
 .product-card {
-  background: #fff;
+  background: #FFFFFF;
   margin-bottom: 20rpx;
+  border: 1rpx solid #F0F0F0;
+  border-radius: 12rpx;
 }
 
 .product-header {
   padding: 24rpx 30rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid #F5F5F5;
 }
 
 .header-title {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .product-content {
@@ -101,7 +109,7 @@
 .product-image {
   width: 120rpx;
   height: 120rpx;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   margin-right: 20rpx;
 }
 
@@ -111,26 +119,29 @@
 
 .product-name {
   font-size: 28rpx;
-  color: #333;
+  color: #000000;
   display: block;
   margin-bottom: 8rpx;
+  font-weight: 600;
 }
 
 .product-meta {
   font-size: 24rpx;
-  color: #999;
+  color: #999999;
 }
 
 .product-price {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #FF9800;
+  font-weight: 700;
+  color: #000000;
 }
 
 /* 信息卡片 */
 .info-card {
-  background: #fff;
+  background: #FFFFFF;
   padding: 24rpx 30rpx;
+  border: 1rpx solid #F0F0F0;
+  border-radius: 12rpx;
 }
 
 .info-item {
@@ -142,23 +153,25 @@
 
 .info-label {
   font-size: 28rpx;
-  color: #999;
+  color: #999999;
 }
 
 .info-value {
   font-size: 28rpx;
-  color: #333;
+  color: #000000;
   display: flex;
   align-items: center;
+  font-weight: 600;
 }
 
 .copy-btn {
   margin-left: 16rpx;
   padding: 4rpx 16rpx;
-  background: #f5f5f5;
+  background: #F5F5F5;
   border-radius: 20rpx;
   font-size: 22rpx;
-  color: #666;
+  color: #666666;
+  border: 1rpx solid #E0E0E0;
 }
 
 /* 底部操作 */
@@ -167,15 +180,20 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
+  background: #FFFFFF;
   padding: 20rpx 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   display: flex;
   justify-content: flex-end;
   gap: 20rpx;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid #F0F0F0;
 }
 
 .footer-actions .btn {
   width: 200rpx;
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 32rpx;
+  font-weight: 600;
 }

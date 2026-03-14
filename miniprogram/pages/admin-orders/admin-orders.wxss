@@ -1,18 +1,19 @@
-/* pages/admin-orders/admin-orders.wxss */
+/* pages/admin-orders/admin-orders.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #FFFFFF;
 }
 
 /* 状态选项卡 */
 .status-tabs {
   display: flex;
-  background: #fff;
+  background: #FFFFFF;
   padding: 20rpx 30rpx;
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .tab-item {
@@ -20,13 +21,13 @@
   text-align: center;
   padding: 16rpx 0;
   font-size: 28rpx;
-  color: #666;
+  color: #666666;
   position: relative;
 }
 
 .tab-item.active {
-  color: #9C27B0;
-  font-weight: 600;
+  color: #000000;
+  font-weight: 700;
 }
 
 .tab-item.active::after {
@@ -37,7 +38,7 @@
   transform: translateX(-50%);
   width: 40rpx;
   height: 4rpx;
-  background: #9C27B0;
+  background: #000000;
   border-radius: 2rpx;
 }
 
@@ -47,10 +48,11 @@
 }
 
 .order-card {
-  background: #fff;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
   padding: 24rpx;
   margin-bottom: 20rpx;
+  border: 1rpx solid #F0F0F0;
 }
 
 .order-header {
@@ -62,12 +64,12 @@
 
 .order-no {
   font-size: 24rpx;
-  color: #999;
+  color: #999999;
 }
 
 .order-time {
   font-size: 24rpx;
-  color: #999;
+  color: #999999;
 }
 
 .order-user {
@@ -77,45 +79,46 @@
 .user-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: #000000;
   margin-right: 16rpx;
 }
 
 .user-phone {
   font-size: 26rpx;
-  color: #666;
+  color: #666666;
 }
 
 .order-product {
   display: flex;
   align-items: center;
   padding: 16rpx 0;
-  border-top: 1rpx solid #f5f5f5;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-top: 1rpx solid #F5F5F5;
+  border-bottom: 1rpx solid #F5F5F5;
 }
 
 .product-name {
   flex: 1;
   font-size: 28rpx;
-  color: #333;
+  color: #000000;
+  font-weight: 600;
 }
 
 .product-quantity {
   font-size: 26rpx;
-  color: #999;
+  color: #999999;
   margin-right: 20rpx;
 }
 
 .product-price {
   font-size: 28rpx;
-  font-weight: 600;
-  color: #FF9800;
+  font-weight: 700;
+  color: #000000;
 }
 
 .order-address {
   padding: 16rpx 0;
   font-size: 26rpx;
-  color: #666;
+  color: #666666;
 }
 
 .order-footer {
@@ -123,33 +126,36 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 16rpx;
-  border-top: 1rpx solid #f5f5f5;
+  border-top: 1rpx solid #F5F5F5;
 }
 
 .status-tag {
   padding: 4rpx 16rpx;
   border-radius: 16rpx;
   font-size: 22rpx;
+  font-weight: 600;
+  background: #F5F5F5;
+  color: #666666;
 }
 
 .status-paid {
-  background: #FFF8E1;
-  color: #F57C00;
+  background: #F5F5F5;
+  color: #000000;
 }
 
 .status-shipped {
-  background: #E3F2FD;
-  color: #1565C0;
+  background: #F5F5F5;
+  color: #000000;
 }
 
 .status-completed {
-  background: #E8F5E9;
+  background: #F5F5F5;
   color: #2E7D32;
 }
 
 .status-cancelled {
-  background: #f5f5f5;
-  color: #666;
+  background: #F5F5F5;
+  color: #999999;
 }
 
 /* 加载状态 */
@@ -157,13 +163,13 @@
 .loading-more {
   text-align: center;
   padding: 40rpx;
-  color: #999;
+  color: #999999;
 }
 
 .no-more {
   text-align: center;
   padding: 30rpx;
-  color: #999;
+  color: #999999;
   font-size: 24rpx;
 }
 
@@ -173,5 +179,5 @@
 }
 
 .empty-text {
-  color: #999;
+  color: #999999;
 }

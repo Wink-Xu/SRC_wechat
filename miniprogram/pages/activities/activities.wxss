@@ -1,15 +1,14 @@
-/* pages/activities/activities.wxss */
+/* pages/activities/activities.wxss - On Running 极简风格 */
 
 page {
-  --primary: #9C27B0;
-  --primary-light: #BA68C8;
-  --success: #4CAF50;
-  --warning: #FF9800;
+  --primary: #000000;
+  --success: #2E7D32;
+  --warning: #CC7722;
   --danger: #F44336;
-  --gray: #9E9E9E;
-  --text: #333333;
+  --gray: #999999;
+  --text: #000000;
   --text-light: #666666;
-  --bg: #F8F7FA;
+  --bg: #FFFFFF;
 }
 
 .container {
@@ -36,6 +35,8 @@ page {
   font-size: 32rpx;
   font-weight: 700;
   color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .section-count {
@@ -46,10 +47,10 @@ page {
 /* 正在报名 - 活动卡片 */
 .activity-card {
   background: #fff;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   padding: 28rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid #F0F0F0;
 }
 
 .activity-header {
@@ -61,7 +62,7 @@ page {
 
 .activity-title {
   font-size: 32rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
   flex: 1;
   margin-right: 16rpx;
@@ -140,10 +141,10 @@ page {
 /* 往期活动 - 封面图卡片 */
 .past-card {
   background: #fff;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   margin-bottom: 24rpx;
   overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  border: 1rpx solid #F0F0F0;
 }
 
 .cover-image {
@@ -232,32 +233,37 @@ page {
 .tag {
   display: inline-block;
   padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  border-radius: 6rpx;
   font-size: 22rpx;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
 }
 
 .tag-primary {
-  background: rgba(156, 39, 176, 0.15);
-  color: var(--primary);
+  background: #000000;
+  color: #FFFFFF;
 }
 
 .tag-success {
-  background: rgba(76, 175, 80, 0.15);
+  background: #F5F9F5;
   color: var(--success);
+  border: 1rpx solid #E5F0E5;
 }
 
 .tag-warning {
-  background: rgba(255, 152, 0, 0.15);
+  background: #F5F5F0;
   color: var(--warning);
+  border: 1rpx solid #E5E5E0;
 }
 
 .tag-secondary {
-  background: rgba(158, 158, 158, 0.15);
+  background: #F5F5F5;
   color: var(--gray);
+  border: 1rpx solid #E0E0E0;
 }
 
 .tag-error {
-  background: rgba(244, 67, 54, 0.15);
+  background: #FDF5F5;
   color: var(--danger);
+  border: 1rpx solid #F0E5E5;
 }

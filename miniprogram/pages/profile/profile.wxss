@@ -1,15 +1,16 @@
-/* pages/profile/profile.wxss */
+/* pages/profile/profile.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #FFFFFF;
 }
 
-/* 用户区域 */
+/* 用户区域 - 极简白色背景 */
 .user-section {
-  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  background: #FFFFFF;
   padding: 60rpx 30rpx;
-  color: #fff;
+  color: #000000;
+  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .user-info {
@@ -21,7 +22,7 @@
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  border: 2rpx solid #E0E0E0;
 }
 
 .user-text {
@@ -31,9 +32,10 @@
 
 .nickname {
   font-size: 36rpx;
-  font-weight: 600;
+  font-weight: 700;
   display: block;
   margin-bottom: 8rpx;
+  color: #000000;
 }
 
 .user-meta {
@@ -45,27 +47,32 @@
   padding: 4rpx 16rpx;
   border-radius: 20rpx;
   font-size: 22rpx;
-  background: rgba(255, 255, 255, 0.2);
+  background: #F5F5F5;
+  color: #666666;
+  font-weight: 600;
 }
 
 .role-tag.member {
-  background: rgba(255, 255, 255, 0.3);
+  background: #000000;
+  color: #FFFFFF;
 }
 
 .role-tag.pending {
-  background: rgba(255, 152, 0, 0.5);
+  background: #F5F5F0;
+  color: #CC7722;
 }
 
 .role-tag.guest {
-  background: rgba(158, 158, 158, 0.5);
+  background: #F5F5F5;
+  color: #999999;
 }
 
 /* 申请入团提示 */
 .apply-prompt {
   margin-top: 24rpx;
   padding: 24rpx;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,13 +80,13 @@
 
 .apply-text {
   font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.9);
+  color: #666666;
   margin-bottom: 16rpx;
 }
 
 .btn-apply {
-  background: #C8FF54;
-  color: #1A1A1A;
+  background: #000000;
+  color: #FFFFFF;
   font-size: 28rpx;
   font-weight: 600;
   padding: 16rpx 48rpx;
@@ -95,8 +102,8 @@
 .pending-prompt {
   margin-top: 24rpx;
   padding: 24rpx;
-  background: rgba(255, 152, 0, 0.15);
-  border-radius: 16rpx;
+  background: #F5F5F0;
+  border-radius: 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,31 +111,34 @@
 
 .pending-text {
   font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.95);
+  color: #000000;
+  font-weight: 600;
   margin-bottom: 8rpx;
 }
 
 .pending-sub {
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.7);
+  color: #666666;
 }
 
 .points-box {
   text-align: center;
   padding: 16rpx 24rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 16rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  margin-top: 16rpx;
 }
 
 .points-value {
   font-size: 40rpx;
-  font-weight: 700;
+  font-weight: 800;
   display: block;
+  color: #000000;
 }
 
 .points-label {
   font-size: 22rpx;
-  opacity: 0.8;
+  color: #999999;
 }
 
 .login-prompt {
@@ -143,7 +153,7 @@
   height: 120rpx;
   border-radius: 50%;
   margin-bottom: 20rpx;
-  opacity: 0.8;
+  opacity: 0.5;
 }
 
 /* 菜单区域 */
@@ -152,23 +162,26 @@
 }
 
 .menu-group {
-  background: #fff;
-  border-radius: 16rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
+  border: 1rpx solid #F0F0F0;
 }
 
 .group-title {
   font-size: 26rpx;
-  color: #999;
+  color: #999999;
   padding: 20rpx 24rpx 12rpx;
+  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   padding: 28rpx 24rpx;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid #F5F5F5;
 }
 
 .menu-item:last-child {
@@ -184,7 +197,8 @@
 .menu-title {
   flex: 1;
   font-size: 30rpx;
-  color: #333;
+  color: #000000;
+  font-weight: 500;
 }
 
 .menu-arrow {
@@ -199,5 +213,6 @@
 
 .logout-text {
   font-size: 30rpx;
-  color: #f44336;
+  color: #F44336;
+  font-weight: 600;
 }

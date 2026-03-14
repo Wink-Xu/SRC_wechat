@@ -1,15 +1,15 @@
-/* pages/product-detail/product-detail.wxss */
+/* pages/product-detail/product-detail.wxss - On Running 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: #FFFFFF;
   padding-bottom: 160rpx;
 }
 
 .loading-box {
   text-align: center;
   padding: 100rpx;
-  color: #999;
+  color: #999999;
 }
 
 /* 商品图片 */
@@ -20,14 +20,14 @@
 
 /* 商品信息 */
 .product-info {
-  background: #fff;
+  background: #FFFFFF;
   padding: 30rpx;
 }
 
 .product-name {
   font-size: 36rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #000000;
   display: block;
   margin-bottom: 20rpx;
 }
@@ -46,12 +46,12 @@
 .points-price .price-value {
   font-size: 44rpx;
   font-weight: 700;
-  color: #FF9800;
+  color: #000000;
 }
 
 .points-price .price-unit {
   font-size: 26rpx;
-  color: #FF9800;
+  color: #666666;
   margin-left: 8rpx;
 }
 
@@ -63,18 +63,18 @@
 
 .cash-price .price-label {
   font-size: 26rpx;
-  color: #999;
+  color: #999999;
   margin-right: 8rpx;
 }
 
 .cash-price .price-value {
   font-size: 32rpx;
-  color: #666;
+  color: #666666;
 }
 
 .product-stock {
   font-size: 26rpx;
-  color: #999;
+  color: #999999;
 }
 
 /* 区块 */
@@ -82,22 +82,26 @@
 .quantity-section,
 .pay-method-section,
 .address-section {
-  background: #fff;
+  background: #FFFFFF;
   margin-top: 20rpx;
   padding: 30rpx;
+  border: 1rpx solid #F0F0F0;
+  border-radius: 12rpx;
 }
 
 .section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #000000;
   display: block;
   margin-bottom: 20rpx;
+  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .desc-text {
   font-size: 28rpx;
-  color: #666;
+  color: #666666;
   line-height: 1.6;
 }
 
@@ -110,17 +114,17 @@
 .quantity-btn {
   width: 60rpx;
   height: 60rpx;
-  background: #f5f5f5;
-  border-radius: 8rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36rpx;
-  color: #333;
+  color: #000000;
 }
 
 .quantity-btn.disabled {
-  color: #ccc;
+  color: #CCCCCC;
 }
 
 .quantity-value {
@@ -128,6 +132,7 @@
   text-align: center;
   font-size: 32rpx;
   font-weight: 600;
+  color: #000000;
 }
 
 /* 支付方式 */
@@ -141,31 +146,31 @@
   display: flex;
   align-items: center;
   padding: 24rpx;
-  background: #f9f9f9;
+  background: #FFFFFF;
   border-radius: 12rpx;
-  border: 2rpx solid transparent;
+  border: 1rpx solid #F0F0F0;
 }
 
 .pay-method.active {
-  background: #E8F5E9;
-  border-color: #9C27B0;
+  background: #F5F5F5;
+  border-color: #000000;
 }
 
 .method-name {
   flex: 1;
   font-size: 28rpx;
-  color: #333;
+  color: #000000;
 }
 
 .method-value {
   font-size: 28rpx;
   font-weight: 600;
-  color: #FF9800;
+  color: #000000;
 }
 
 .method-tip {
   font-size: 22rpx;
-  color: #f44336;
+  color: #F44336;
   margin-left: 12rpx;
 }
 
@@ -177,13 +182,13 @@
 
 .address-name {
   font-size: 30rpx;
-  color: #333;
+  color: #000000;
   margin-bottom: 8rpx;
 }
 
 .address-detail {
   font-size: 26rpx;
-  color: #666;
+  color: #666666;
 }
 
 .address-empty {
@@ -194,11 +199,11 @@
 
 .address-empty text {
   font-size: 28rpx;
-  color: #999;
+  color: #999999;
 }
 
 .arrow {
-  color: #ccc;
+  color: #CCCCCC;
 }
 
 /* 底部操作 */
@@ -207,12 +212,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
+  background: #FFFFFF;
   padding: 20rpx 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-top: 1rpx solid #F0F0F0;
 }
 
 .total-info {
@@ -223,17 +228,22 @@
 
 .total-label {
   font-size: 28rpx;
-  color: #666;
+  color: #666666;
   margin-right: 8rpx;
 }
 
 .total-value {
   font-size: 36rpx;
   font-weight: 700;
-  color: #FF9800;
+  color: #000000;
 }
 
 .buy-btn {
   width: 240rpx;
   margin: 0;
+  background: #000000;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 32rpx;
+  font-weight: 600;
 }
