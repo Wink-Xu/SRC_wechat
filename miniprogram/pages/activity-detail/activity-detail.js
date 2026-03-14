@@ -41,9 +41,9 @@ Page({
       activity.statusText = this.getStatusText(activity.status);
       activity.statusClass = this.getStatusClass(activity.status);
 
-      // 格式化报名截止时间
+      // 格式化报名截止时间（精确到分钟）
       if (activity.registration_deadline) {
-        activity.registration_deadline = formatDate(activity.registration_deadline, 'YYYY-MM-DD');
+        activity.formattedRegistrationDeadline = formatDate(activity.registration_deadline, 'MM 月 DD 日 HH:mm');
       }
 
       // 跑步类型文本

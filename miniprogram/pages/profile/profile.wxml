@@ -1,86 +1,110 @@
 <!--pages/profile/profile.wxml-->
 <view class="container">
-  <!-- 用户信息 -->
-  <view class="user-section">
-    <view class="user-info" wx:if="{{isLoggedIn}}">
-      <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
-      <view class="user-text">
-        <text class="nickname">{{userInfo.nickname}}</text>
-        <view class="user-meta">
-          <text class="role-tag" wx:if="{{isLeader}}">团长</text>
-          <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
-          <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
-          <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
-          <text class="role-tag guest" wx:else>游客</text>
-        </view>
-      </view>
-      <view class="points-box">
-        <text class="points-value">{{points}}</text>
-        <text class="points-label">积分</text>
-      </view>
-    </view>
-    <!-- 申请入团提示 -->
-    <view class="apply-prompt" wx:if="{{isLoggedIn && !isMember && !isPending}}">
-      <text class="apply-text">您还不是团员，申请后可参与活动报名</text>
-      <button class="btn-apply" bindtap="goToApply">申请入团</button>
-    </view>
-    <!-- 待审批提示 -->
-    <view class="pending-prompt" wx:if="{{isPending}}">
-      <text class="pending-text">您的入团申请正在审核中</text>
-      <text class="pending-sub">请等待管理员审批</text>
-    </view>
-    <view class="login-prompt" wx:else>
-      <image class="default-avatar" src="/images/default-avatar.png"></image>
-      <button class="btn btn-primary btn-small" bindtap="goToLogin">立即登录</button>
+  <!-- 用户信息头部 -->
+  <view class="header-section">
+    <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+    <view class="role-tags" wx:if="{{isLoggedIn}}">
+      <text class="role-tag" wx:if="{{isLeader}}">团长</text>
+      <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
+      <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
+      <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
+      <text class="role-tag guest" wx:else>游客</text>
     </view>
   </view>
 
-  <!-- 功能菜单 -->
-  <view class="menu-section" wx:if="{{isLoggedIn}}">
-    <view class="menu-group">
-      <view
-        class="menu-item"
-        wx:for="{{menuItems}}"
-        wx:key="title"
-        bindtap="goToPage"
-        data-path="{{item.path}}"
-      >
-        <image class="menu-icon" src="/images/{{item.icon}}.png"></image>
-        <text class="menu-title">{{item.title}}</text>
-        <image class="menu-arrow" src="/images/arrow.png"></image>
+  <!-- Slogan -->
+  <view class="slogan-section">
+    <text class="slogan-text">In the soil of SRC we grow into our better selves.</text>
+  </view>
+
+  <!-- 数据统计卡片 -->
+  <view class="stats-card" wx:if="{{isLoggedIn}}">
+    <view class="stat-item">
+      <text class="stat-value">{{activityCount}}</text>
+      <text class="stat-label">活动次数</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{points}}</text>
+      <text class="stat-label">我的积分</text>
+    </view>
+  </view>
+
+  <!-- 功能菜单 - 3 列网格 -->
+  <view class="menu-card" wx:if="{{isLoggedIn}}">
+    <view class="menu-grid">
+      <view class="menu-grid-item" bindtap="goToMyActivities">
+        <view class="menu-grid-icon iconfont icon-time"></view>
+        <text class="menu-grid-title">我的活动</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/orders/orders">
+        <view class="menu-grid-icon iconfont icon-order"></view>
+        <text class="menu-grid-title">我的订单</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank">
+        <view class="menu-grid-icon iconfont icon-rank"></view>
+        <text class="menu-grid-title">排行榜</text>
       </view>
     </view>
+  </view>
 
-    <!-- 管理员菜单 -->
-    <view class="menu-group" wx:if="{{isAdmin}}">
-      <view class="group-title">管理功能</view>
-      <view
-        class="menu-item"
-        wx:for="{{adminMenus}}"
-        wx:key="title"
-        bindtap="goToPage"
-        data-path="{{item.path}}"
-      >
-        <image class="menu-icon" src="/images/{{item.icon}}.png"></image>
-        <text class="menu-title">{{item.title}}</text>
-        <image class="menu-arrow" src="/images/arrow.png"></image>
+  <!-- 申请入团提示 -->
+  <view class="prompt-card" wx:if="{{isLoggedIn && !isMember && !isPending}}">
+    <text class="prompt-text">您还不是团员，申请后可参与活动报名</text>
+    <button class="btn-prompt" bindtap="goToApply">申请入团</button>
+  </view>
+
+  <!-- 待审批提示 -->
+  <view class="prompt-card pending" wx:if="{{isPending}}">
+    <text class="prompt-text">您的入团申请正在审核中</text>
+    <text class="prompt-sub">请等待管理员审批</text>
+  </view>
+
+  <!-- 管理员菜单 -->
+  <view class="admin-section" wx:if="{{isAdmin || isLeader}}">
+    <view class="section-title">管理功能</view>
+    <view class="menu-grid">
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-members/admin-members">
+        <view class="menu-grid-icon iconfont icon-user"></view>
+        <text class="menu-grid-title">成员管理</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-activities/admin-activities">
+        <view class="menu-grid-icon iconfont icon-activity"></view>
+        <text class="menu-grid-title">活动管理</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-products/admin-products">
+        <view class="menu-grid-icon iconfont icon-product"></view>
+        <text class="menu-grid-title">商品管理</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-orders/admin-orders">
+        <view class="menu-grid-icon iconfont icon-order"></view>
+        <text class="menu-grid-title">订单管理</text>
       </view>
     </view>
+  </view>
 
-    <!-- 退出登录 -->
-    <view class="menu-group">
-      <view class="menu-item logout" bindtap="handleLogout">
-        <text class="logout-text">退出登录</text>
-      </view>
+  <!-- 退出登录 -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <view class="btn-logout" bindtap="handleLogout">
+      <text class="logout-text">退出登录</text>
     </view>
+  </view>
 
-    <!-- Mock 模式调试入口 -->
-    <view class="menu-group" wx:if="{{useMock}}">
-      <view class="menu-item" bindtap="goToDebug">
-        <image class="menu-icon" src="/images/user.png"></image>
-        <text class="menu-title">角色切换（Mock）</text>
-        <image class="menu-arrow" src="/images/arrow.png"></image>
-      </view>
+  <!-- 跑团介绍卡片 -->
+  <view class="intro-card">
+    <image class="intro-logo" src="/images/IMG_6754.jpg" mode="aspectFit"></image>
+    <text class="intro-text">作为武汉的先锋跑团，WuhanSRC 注重体验、美学和社交，Sunday Running Club（SRC）中，S 代表 Soil（成长的土壤），R 代表 Rise（向上的态度），C 代表 Cohesion（凝聚的纽带）。跑团旨在提供让跑步爱好者生根发芽的土壤，既是追求健康的跑道，也是了解时尚的秀场和放松休闲的社交空间。</text>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="login-overlay" wx:if="{{!isLoggedIn}}">
+    <button class="btn-login" bindtap="goToLogin">立即登录</button>
+  </view>
+
+  <!-- Mock 模式调试入口 -->
+  <view class="debug-section" wx:if="{{useMock}}">
+    <view class="btn-debug" bindtap="goToDebug">
+      <text>角色切换（Mock）</text>
     </view>
   </view>
 </view>

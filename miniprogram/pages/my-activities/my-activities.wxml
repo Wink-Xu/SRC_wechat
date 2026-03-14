@@ -1,0 +1,39 @@
+<!--pages/my-activities/my-activities.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{checkedInActivities.length === 0}}" class="empty-box">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit"></image>
+    <text class="empty-text">暂无已签到活动</text>
+  </view>
+
+  <view wx:else class="activity-list">
+    <view
+      class="activity-card"
+      wx:for="{{checkedInActivities}}"
+      wx:key="_id"
+      bindtap="goToDetail"
+      data-id="{{item._id}}"
+    >
+      <view class="cover-image">
+        <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+      </view>
+      <view class="activity-info">
+        <text class="activity-title">{{item.title}}</text>
+        <view class="activity-meta">
+          <image class="meta-icon" src="/images/time.png"></image>
+          <text class="meta-text">{{item.formattedTime}}</text>
+        </view>
+        <view class="activity-meta">
+          <image class="meta-icon" src="/images/location.png"></image>
+          <text class="meta-text">{{item.location}}</text>
+        </view>
+        <view class="checkin-badge">
+          <text>已签到</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

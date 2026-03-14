@@ -1,6 +1,24 @@
 <!--pages/activity-create/activity-create.wxml-->
 <view class="container">
   <view class="form-card">
+    <!-- 封面图上传 -->
+    <view class="form-item">
+      <text class="form-label required">活动封面图</text>
+      <view class="image-upload-wrapper">
+        <view class="image-upload" wx:if="{{!formData.cover_image}}" bindtap="chooseImage">
+          <image class="upload-icon" src="/images/add-photo.png"></image>
+          <text class="upload-text">上传封面图</text>
+        </view>
+        <view class="image-preview" wx:if="{{formData.cover_image}}">
+          <image class="preview-image" src="{{formData.cover_image}}" mode="aspectFill"></image>
+          <view class="image-actions">
+            <button class="btn-reupload" bindtap="chooseImage">重新上传</button>
+            <button class="btn-delete" bindtap="removeImage">删除</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <view class="form-item">
       <text class="form-label required">活动标题</text>
       <input

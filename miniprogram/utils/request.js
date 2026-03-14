@@ -192,6 +192,36 @@ const handleActivityMock = (action, data) => {
         console.log('[Mock getList] all=true，返回所有活动');
       }
 
+      // 为每个活动添加 participants 数据（用于我的活动页面判断签到状态）
+      const userId = mockData.currentUser._id;
+      filteredActivities = filteredActivities.map(activity => {
+        const registeredCount = activity?.registered_count || 0;
+        const mockParticipants = mockData.members
+          .filter(m => m.status === 'approved')
+          .slice(0, registeredCount)
+          .map((m, index) => ({
+            _id: m._id,
+            user_id: m._id,
+            nickname: m.nickname,
+            avatar: m.avatar || '/images/default-avatar.png',
+            check_in_status: index < 2 ? 'checked_in' : 'registered'
+          }));
+
+        // 添加当前用户的报名记录
+        const userReg = isRegistered(activity._id, userId);
+        if (userReg) {
+          mockParticipants.push({
+            ...userReg,
+            user_id: userId
+          });
+        }
+
+        return {
+          ...activity,
+          participants: mockParticipants
+        };
+      });
+
       return Promise.resolve({ code: 0, data: { list: filteredActivities } });
     }
     case 'getDetail':
@@ -208,10 +238,11 @@ const handleActivityMock = (action, data) => {
         .slice(0, registeredCount)
         .map((m, index) => ({
           _id: m._id,
+          user_id: m._id,
           nickname: m.nickname,
           avatar: m.avatar || '/images/default-avatar.png',
-          phone: m.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
-          status: index < 2 ? 'checked_in' : 'registered' // 前 2 个已签到，其余已报名
+          phone: m.phone.replace(/(\\d{3})\\d{4}(\\d{4})/, '$1****$2'),
+          check_in_status: index < 2 ? 'checked_in' : 'registered' // 前 2 个已签到，其余已报名
         }));
 
       return Promise.resolve({
@@ -242,6 +273,7 @@ const handleActivityMock = (action, data) => {
         registration_deadline: data.registration_deadline,
         quota: data.quota,
         points: data.points,
+        cover_image: data.cover_image || '', // 封面图
         status: 'published', // 新建活动自动发布
         registered_count: 0,
         created_by: mockData.currentUser._id
@@ -253,6 +285,7 @@ const handleActivityMock = (action, data) => {
       const index = mockData.activities.findIndex(a => a._id === data.id);
       if (index !== -1) {
         mockData.activities[index] = { ...mockData.activities[index], ...data };
+        console.log('[Mock] 更新了活动:', data.id, mockData.activities[index]);
       }
       return Promise.resolve({ code: 0, data: { success: true } });
     case 'publish':

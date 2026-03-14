@@ -16,45 +16,19 @@
       <text class="section-count">{{ongoingActivities.length}}个活动</text>
     </view>
     <view
-      class="activity-card"
+      class="past-card"
       wx:for="{{ongoingActivities}}"
       wx:key="_id"
       bindtap="goToDetail"
       data-id="{{item._id}}"
     >
-      <view class="activity-header">
-        <text class="activity-title">{{item.title}}</text>
-        <text class="tag {{item.statusClass}}">{{item.statusText}}</text>
+      <view class="cover-image">
+        <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
       </view>
-
-      <view class="activity-info">
-        <view class="info-item">
-          <image class="info-icon" src="/images/time.png"></image>
-          <text>{{item.formattedTime}}</text>
-        </view>
-        <view class="info-item">
-          <image class="info-icon" src="/images/location.png"></image>
-          <text>{{item.location}}</text>
-        </view>
-        <view class="info-item" wx:if="{{item.run_type}}">
-          <image class="info-icon" src="/images/user.png"></image>
-          <text>{{item.runTypeText}}</text>
-        </view>
-        <view class="info-item" wx:if="{{item.registration_deadline}}">
-          <image class="info-icon" src="/images/time.png"></image>
-          <text class="deadline-text">报名截止：{{item.registration_deadline}}</text>
-        </view>
-      </view>
-
-      <view class="activity-footer">
-        <view class="quota-info">
-          <text class="registered-count">{{item.registered_count || 0}}</text>
-          <text class="quota-text">/{{item.quota}}人</text>
-        </view>
-        <view class="points-info">
-          <text class="points-value">+{{item.points}}</text>
-          <text class="points-label">积分</text>
-        </view>
+      <view class="past-info">
+        <text class="past-title">{{item.title}}</text>
+        <text class="past-date">{{item.formattedTime}}</text>
+        <text class="corner-tag">进行中</text>
       </view>
     </view>
   </view>
@@ -68,15 +42,12 @@
     <view
       class="past-card"
       wx:for="{{pastActivities}}"
-      wx:key="_id"
+      wx:key="__id"
       bindtap="goToDetail"
       data-id="{{item._id}}"
     >
       <view class="cover-image">
         <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
-        <view class="cover-overlay">
-          <text class="cover-status tag {{item.statusClass}}">{{item.statusText}}</text>
-        </view>
       </view>
       <view class="past-info">
         <text class="past-title">{{item.title}}</text>

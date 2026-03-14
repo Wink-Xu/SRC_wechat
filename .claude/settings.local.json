@@ -16,7 +16,8 @@
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
       "Bash(git restore:*)",
-      "Bash(cat > /Users/xu/Documents/SRC_wechat/miniprogram/images/check-circle.svg << 'EOF'\n<svg width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\">\n  <circle cx=\"100\" cy=\"100\" r=\"90\" fill=\"#E8F5E9\" stroke=\"#4CAF50\" stroke-width=\"4\"/>\n  <path d=\"M60 100 L90 130 L140 70\" stroke=\"#4CAF50\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>\n</svg>\nEOF)"
+      "Bash(cat > /Users/xu/Documents/SRC_wechat/miniprogram/images/check-circle.svg << 'EOF'\n<svg width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\">\n  <circle cx=\"100\" cy=\"100\" r=\"90\" fill=\"#E8F5E9\" stroke=\"#4CAF50\" stroke-width=\"4\"/>\n  <path d=\"M60 100 L90 130 L140 70\" stroke=\"#4CAF50\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>\n</svg>\nEOF)",
+      "WebSearch"
     ]
   }
 }

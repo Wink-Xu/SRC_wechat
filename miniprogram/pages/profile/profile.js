@@ -1,5 +1,5 @@
 // pages/profile/profile.js
-const { userApi, pointsApi } = require('../../utils/request');
+const { userApi, pointsApi, activityApi } = require('../../utils/request');
 const { formatPhone, showSuccess, showConfirm, showInfo } = require('../../utils/util');
 const { isLoggedIn, isAdmin, isLeader } = require('../../utils/auth');
 const app = getApp();
@@ -14,16 +14,7 @@ Page({
     isPending: false,   // 是否待审批
     useMock: false,
     points: 0,
-    menuItems: [
-      { icon: 'points', title: '积分中心', path: '/pages/points/points' },
-      { icon: 'order', title: '我的订单', path: '/pages/orders/orders' }
-    ],
-    adminMenus: [
-      { icon: 'user', title: '成员管理', path: '/pages/admin-members/admin-members' },
-      { icon: 'activity', title: '活动管理', path: '/pages/admin-activities/admin-activities' },
-      { icon: 'product', title: '商品管理', path: '/pages/admin-products/admin-products' },
-      { icon: 'order', title: '订单管理', path: '/pages/admin-orders/admin-orders' }
-    ]
+    activityCount: 0
   },
 
   onLoad: function () {
@@ -48,25 +39,33 @@ Page({
       isMember: app.globalData.isMember,
       isPending: userInfo && userInfo.status === 'pending',
       useMock: app.USE_MOCK,
-      points: 0
+      points: 0,
+      activityCount: 0
     });
 
-    // 获取积分
+    // 获取积分和活动次数（仅团员）
     if (isLoggedIn && app.globalData.isMember) {
       try {
-        const result = await pointsApi.getBalance();
-        this.setData({ points: result.points || 0 });
+        const pointsResult = await pointsApi.getBalance();
+        this.setData({ points: pointsResult.points || 0 });
+
+        // 获取活动次数（已签到的活动数量）
+        const activityResult = await activityApi.getList({ status: 'all' });
+        const activities = activityResult.list || [];
+        const userId = app.globalData.userInfo?._id;
+
+        // 筛选已签到的活动
+        const checkedInActivities = activities.filter(activity => {
+          const registrations = activity.participants || [];
+          const userRegistration = registrations.find(r => r.user_id === userId);
+          return userRegistration && userRegistration.check_in_status === 'checked_in';
+        });
+
+        this.setData({ activityCount: checkedInActivities.length });
       } catch (error) {
         console.error('获取积分失败', error);
       }
     }
-  },
-
-  // 跳转到调试页面（角色切换）
-  goToDebug: function () {
-    wx.navigateTo({
-      url: '/pages/debug/debug'
-    });
   },
 
   // 跳转到登录
@@ -80,6 +79,22 @@ Page({
   goToApply: function () {
     wx.navigateTo({
       url: '/pages/apply-membership/apply-membership'
+    });
+  },
+
+  // 跳转到我的活动页面
+  goToMyActivities: function () {
+    console.log('goToMyActivities 被调用，isLoggedIn:', this.data.isLoggedIn);
+    if (!this.data.isLoggedIn) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+    console.log('准备跳转到 /pages/my-activities/my-activities');
+    wx.navigateTo({
+      url: '/pages/my-activities/my-activities'
     });
   },
 
@@ -98,10 +113,10 @@ Page({
     wx.navigateTo({ url: path });
   },
 
-  // 跳转到管理后台
-  goToAdmin: function () {
+  // 跳转到调试页面（角色切换）
+  goToDebug: function () {
     wx.navigateTo({
-      url: '/pages/admin/admin'
+      url: '/pages/debug/debug'
     });
   },
 
@@ -116,14 +131,10 @@ Page({
     this.setData({
       isLoggedIn: false,
       userInfo: null,
-      points: 0
+      points: 0,
+      activityCount: 0
     });
 
     showSuccess('已退出登录');
-  },
-
-  // 格式化手机号
-  formatPhone: function (phone) {
-    return formatPhone(phone);
   }
 });

@@ -1,5 +1,7 @@
 /* app.wxss - 全局样式 - On Running 极简风格 */
 
+@import './styles/iconfont.wxss';
+
 /* 主题变量 - 极简黑白配色 */
 page {
   --primary: #1A1A1A;

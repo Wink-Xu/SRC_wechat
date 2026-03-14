@@ -16,10 +16,10 @@ page {
   color: #999;
 }
 
-/* ========== 封面图头部 - 昂跑风格 ========== */
+/* ========== 封面图头部 - 优化版 ========== */
 .cover-header {
   position: relative;
-  height: 400rpx;
+  height: 480rpx;
   overflow: hidden;
 }
 
@@ -34,161 +34,170 @@ page {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
 }
 
 .cover-content {
   position: absolute;
   bottom: 0;
-  left: 0;
   right: 0;
-  padding: 0 32rpx 28rpx;
-}
-
-.status-tag {
-  display: inline-block;
-  padding: 8rpx 20rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
-  font-weight: 600;
-  margin-bottom: 16rpx;
-  background: #FFFFFF;
-  color: #1A1A1A;
-}
-
-.status-tag.tag-primary {
-  background: #FFFFFF;
-  color: #1A1A1A;
-}
-
-.status-tag.tag-success {
-  background: #FFFFFF;
-  color: #1A1A1A;
-}
-
-.status-tag.tag-warning {
-  background: #FFFFFF;
-  color: #1A1A1A;
-}
-
-.status-tag.tag-error {
-  background: #FFFFFF;
-  color: #1A1A1A;
-}
-
-.status-tag.tag-secondary {
-  background: #FFFFFF;
-  color: #666666;
+  left: auto;
+  width: 70%;
+  padding: 16rpx 32rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12rpx;
 }
 
 .activity-title {
   display: block;
-  font-size: 40rpx;
-  font-weight: 500;
+  font-size: 36rpx;
+  font-weight: 600;
   color: #fff;
   line-height: 1.3;
   margin-bottom: 16rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+  text-shadow: 0 2rpx 12rpx rgba(0,0,0,0.4);
+  text-align: right;
 }
 
 .points-tag {
   display: inline-flex;
   align-items: baseline;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   padding: 8rpx 20rpx;
   border-radius: 20rpx;
+  backdrop-filter: blur(10rpx);
 }
 
 .points-value {
-  font-size: 34rpx;
-  font-weight: 600;
+  font-size: 32rpx;
+  font-weight: 700;
   color: #1A1A1A;
 }
 
 .points-label {
   font-size: 22rpx;
   color: #666666;
-  margin-left: 4rpx;
+  margin-left: 6rpx;
 }
 
-/* ========== 信息网格 - 横向列表 ========== */
+/* ========== 信息网格 - 优化版 ========== */
 .info-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rpx;
-  padding: 1rpx;
-  background: #EEEEEE;
-  margin: 0;
-  border-radius: 0;
+  background: #FFFFFF;
+  padding: 0 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .info-cell {
   display: flex;
-  align-items: center;
-  padding: 28rpx 32rpx;
-  background: #FFFFFF;
-  gap: 20rpx;
+  align-items: baseline;
+  padding: 24rpx 0;
+  gap: 16rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.info-cell:first-child {
+  padding-top: 40rpx;
+}
+
+.info-cell:last-child {
+  border-bottom: none;
+  padding-bottom: 40rpx;
 }
 
 .info-icon {
   width: 40rpx;
   height: 40rpx;
-  opacity: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #1A1A1A;
+}
+
+/* 时间图标 */
+.icon-time::before {
+  content: "\23F0";
+}
+
+/* 地点图标 */
+.icon-location::before {
+  content: "\1F4CD";
+}
+
+/* 用户图标 */
+.icon-user::before {
+  content: "\1F464";
+}
+
+/* 跑步图标 */
+.icon-run::before {
+  content: "\1F3C3";
+}
+
+/* 多人图标 */
+.icon-users::before {
+  content: "\1F465";
 }
 
 .info-label {
-  font-size: 24rpx;
-  color: #999999;
-  margin-bottom: 0;
-  min-width: 100rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  min-width: 140rpx;
+  flex-shrink: 0;
 }
 
 .info-value {
   font-size: 28rpx;
-  color: #1A1A1A;
-  font-weight: 500;
-  line-height: 1.4;
+  color: #333333;
+  font-weight: 400;
+  line-height: 1.9;
+  flex: 1;
 }
 
 .info-value .highlight {
   color: #1A1A1A;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 32rpx;
 }
 
 /* ========== 通用卡片 ========== */
 .section-card {
   background: #FFFFFF;
-  margin: 0;
-  border-radius: 0;
-  padding: 32rpx;
-  border-bottom: 1rpx solid #F5F5F5;
+  padding: 40rpx 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
 }
 
 .card-header-simple {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
 }
 
 .card-title {
-  font-size: 30rpx;
-  font-weight: 500;
+  font-size: 28rpx;
+  font-weight: 600;
   color: #1A1A1A;
   text-transform: uppercase;
-  letter-spacing: 0.5rpx;
+  letter-spacing: 1rpx;
 }
 
 .desc-text {
   font-size: 28rpx;
-  color: #666;
-  line-height: 1.8;
+  color: #333333;
+  line-height: 1.9;
   display: block;
 }
 
 .desc-text.highlight-text {
-  color: #FF9800;
+  color: #CC7722;
   font-weight: 600;
 }
 
@@ -201,9 +210,9 @@ page {
 
 .photo-item {
   aspect-ratio: 1;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
-  background: #f5f5f5;
+  background: #F5F5F5;
 }
 
 .photo-img {
@@ -213,8 +222,8 @@ page {
 
 .no-photos {
   text-align: center;
-  padding: 60rpx 30rpx;
-  color: #999;
+  padding: 80rpx 30rpx;
+  color: #CCCCCC;
   font-size: 26rpx;
 }
 
@@ -222,36 +231,36 @@ page {
 .participants-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
 .participant-item {
   display: flex;
   align-items: center;
-  padding: 12rpx 24rpx;
+  padding: 16rpx 28rpx;
   background: #F5F5F5;
-  border-radius: 36rpx;
+  border-radius: 40rpx;
 }
 
 .participant-avatar {
-  width: 48rpx;
-  height: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
-  margin-right: 12rpx;
+  margin-right: 16rpx;
 }
 
 .participant-name {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #1A1A1A;
   font-weight: 500;
 }
 
 .status-dot {
-  width: 14rpx;
-  height: 14rpx;
+  width: 16rpx;
+  height: 16rpx;
   border-radius: 50%;
-  background: #CCCCCC;
-  margin-left: 8rpx;
+  background: #E0E0E0;
+  margin-left: 10rpx;
 }
 
 .status-dot.checked-in {
@@ -262,21 +271,20 @@ page {
   display: flex;
   align-items: center;
   color: #1A1A1A;
-  font-size: 24rpx;
-  font-weight: 500;
-  text-decoration: underline;
+  font-size: 26rpx;
+  font-weight: 600;
 }
 
 .arrow-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-left: 4rpx;
+  width: 32rpx;
+  height: 32rpx;
+  margin-left: 6rpx;
 }
 
 .no-participants {
   text-align: center;
-  padding: 40rpx;
-  color: #999;
+  padding: 48rpx;
+  color: #CCCCCC;
   font-size: 26rpx;
 }
 
@@ -286,15 +294,16 @@ page {
   align-items: center;
   background: #1A1A1A;
   color: #FFFFFF;
-  padding: 12rpx 24rpx;
-  border-radius: 20rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
   font-size: 24rpx;
+  font-weight: 500;
 }
 
 .upload-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
 }
 
 /* ========== 底部操作区 ========== */
@@ -304,18 +313,18 @@ page {
   left: 0;
   right: 0;
   background: #FFFFFF;
-  padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid #F0F0F0;
 }
 
 .btn {
-  height: 88rpx;
-  border-radius: 44rpx;
+  height: 96rpx;
+  border-radius: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 600;
   border: none;
 }
@@ -350,18 +359,18 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24rpx;
+  padding: 28rpx;
   background: #F5F5F5;
-  border-radius: 44rpx;
+  border-radius: 48rpx;
   color: #1A1A1A;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 600;
 }
 
 .badge-icon {
-  width: 44rpx;
-  height: 44rpx;
-  margin-right: 12rpx;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 14rpx;
 }
 
 /* ========== 签到码弹窗 ========== */
@@ -475,4 +484,20 @@ page {
   height: 60rpx;
   padding: 0 32rpx;
   font-size: 26rpx;
+}
+
+/* 签到提示 */
+.checkin-hint-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx;
+  background: #F5F5F5;
+  border-radius: 48rpx;
+}
+
+.checkin-hint {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
 }

@@ -2,6 +2,7 @@
 const { activityApi } = require('../../utils/request');
 const { formatDate, showSuccess, showInfo } = require('../../utils/util');
 const { requireAdmin } = require('../../utils/auth');
+const app = getApp();
 
 Page({
   data: {
@@ -19,7 +20,8 @@ Page({
       registration_deadline_date: '',
       registration_deadline_time: '',
       quota: 20,
-      points: 10
+      points: 10,
+      cover_image: ''
     },
     runTypes: [
       { value: 'road', label: '路跑' },
@@ -83,7 +85,8 @@ Page({
           registration_deadline_date: registrationDeadlineDate,
           registration_deadline_time: registrationDeadlineTime,
           quota: activity.quota,
-          points: activity.points
+          points: activity.points,
+          cover_image: activity.cover_image || ''
         }
       });
     } catch (error) {
@@ -152,6 +155,57 @@ Page({
     this.setData({ 'formData.points': parseInt(e.detail.value) || 0 });
   },
 
+  // 选择封面图
+  chooseImage: function () {
+    const that = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        const tempFilePath = res.tempFilePaths[0];
+
+        // Mock 模式下直接使用临时路径显示图片
+        if (app.USE_MOCK) {
+          that.setData({
+            'formData.cover_image': tempFilePath
+          });
+          showSuccess('封面图上传成功');
+          return;
+        }
+
+        // 非 Mock 模式：上传到云存储
+        wx.cloud.uploadFile({
+          cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.png`,
+          filePath: tempFilePath,
+          success: function (uploadRes) {
+            that.setData({
+              'formData.cover_image': uploadRes.fileID
+            });
+            showSuccess('封面图上传成功');
+          },
+          fail: function (uploadErr) {
+            console.error('上传图片失败', uploadErr);
+            wx.showToast({
+              title: '上传失败',
+              icon: 'none'
+            });
+          }
+        });
+      },
+      fail: function (err) {
+        console.error('选择图片失败', err);
+      }
+    });
+  },
+
+  // 删除封面图
+  removeImage: function () {
+    this.setData({
+      'formData.cover_image': ''
+    });
+  },
+
   // 提交表单
   handleSubmit: async function () {
     const { formData, isEdit, id } = this.data;
@@ -209,7 +263,8 @@ Page({
       end_time: `${formData.start_date} ${formData.end_time}`,
       registration_deadline: `${formData.registration_deadline_date} ${formData.registration_deadline_time}`,
       quota: formData.quota,
-      points: formData.points
+      points: formData.points,
+      cover_image: formData.cover_image
     };
 
     try {

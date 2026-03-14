@@ -138,6 +138,81 @@
   color: #1A1A1A;
 }
 
+/* 图片上传 */
+.image-upload-wrapper {
+  margin-top: 12rpx;
+}
+
+.image-upload {
+  width: 100%;
+  height: 300rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid transparent;
+}
+
+.image-upload:active {
+  border-color: #1A1A1A;
+}
+
+.upload-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.5;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.image-preview {
+  position: relative;
+  width: 100%;
+  height: 300rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+  padding: 16rpx;
+}
+
+.image-actions .btn {
+  padding: 8rpx 24rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  border: none;
+}
+
+.btn-reupload {
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+
+.btn-delete {
+  background: #F44336;
+  color: #FFFFFF;
+}
+
 .submit-btn {
   position: fixed;
   bottom: 40rpx;
