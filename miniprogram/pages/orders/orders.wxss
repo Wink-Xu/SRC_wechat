@@ -26,8 +26,8 @@
 }
 
 .tab-item.active {
-  color: #000000;
-  font-weight: 700;
+  color: #1A1A1A;
+  font-weight: 600;
 }
 
 .tab-item.active::after {
@@ -38,7 +38,7 @@
   transform: translateX(-50%);
   width: 40rpx;
   height: 4rpx;
-  background: #000000;
+  background: #1A1A1A;
   border-radius: 2rpx;
 }
 
@@ -69,8 +69,8 @@
 
 .order-status {
   font-size: 26rpx;
-  font-weight: 600;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
 }
 
 .status-pending {
@@ -79,7 +79,7 @@
 
 .status-paid,
 .status-shipped {
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-completed {
@@ -113,9 +113,9 @@
 
 .product-name {
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   margin-bottom: 12rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .product-quantity {
@@ -148,8 +148,8 @@
 
 .total-value {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 /* 加载状态 */

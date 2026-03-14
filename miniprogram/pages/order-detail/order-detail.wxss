@@ -24,7 +24,7 @@
 
 .status-paid,
 .status-shipped {
-  background: #000000;
+  background: #1A1A1A;
 }
 
 .status-completed {
@@ -37,7 +37,7 @@
 
 .status-text {
   font-size: 36rpx;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 /* 收货地址 */
@@ -68,10 +68,10 @@
 
 .address-name {
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   display: block;
   margin-bottom: 8rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .address-detail {
@@ -94,8 +94,8 @@
 
 .header-title {
   font-size: 28rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -119,10 +119,10 @@
 
 .product-name {
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   display: block;
   margin-bottom: 8rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .product-meta {
@@ -132,8 +132,8 @@
 
 .product-price {
   font-size: 28rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 /* 信息卡片 */
@@ -158,10 +158,10 @@
 
 .info-value {
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   display: flex;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .copy-btn {
@@ -191,9 +191,9 @@
 
 .footer-actions .btn {
   width: 200rpx;
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
   border: none;
   border-radius: 32rpx;
-  font-weight: 600;
+  font-weight: 500;
 }

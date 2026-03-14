@@ -14,14 +14,14 @@
 
 /* 活动头部 */
 .activity-header {
-  background: #000000;
+  background: #1A1A1A;
   padding: 40rpx 30rpx;
   color: #FFFFFF;
 }
 
 .activity-title {
   font-size: 36rpx;
-  font-weight: 700;
+  font-weight: 500;
   display: block;
   margin-bottom: 12rpx;
 }
@@ -48,8 +48,8 @@
 
 .participant-index {
   font-size: 28rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   width: 48rpx;
   text-align: center;
 }
@@ -64,8 +64,8 @@
 .participant-name {
   flex: 1;
   font-size: 30rpx;
-  font-weight: 600;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
 }
 
 .participant-status {
@@ -77,14 +77,14 @@
   padding: 10rpx 24rpx;
   border-radius: 24rpx;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 500;
   background: #F5F5F5;
   color: #666666;
 }
 
 .status-badge.checked-in {
   background: #F5F5F5;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-badge.registered {

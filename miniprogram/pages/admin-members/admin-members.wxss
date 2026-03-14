@@ -26,8 +26,8 @@
 }
 
 .tab-item.active {
-  color: #000000;
-  font-weight: 700;
+  color: #1A1A1A;
+  font-weight: 600;
 }
 
 .tab-item.active::after {
@@ -38,7 +38,7 @@
   transform: translateX(-50%);
   width: 40rpx;
   height: 4rpx;
-  background: #000000;
+  background: #1A1A1A;
   border-radius: 2rpx;
 }
 
@@ -79,8 +79,8 @@
 
 .member-name {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   margin-right: 12rpx;
 }
 
@@ -90,11 +90,11 @@
   font-size: 20rpx;
   background: #F5F5F5;
   color: #666666;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .role-tag.admin {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
 }
 

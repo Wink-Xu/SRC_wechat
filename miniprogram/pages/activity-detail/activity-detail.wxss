@@ -84,7 +84,7 @@ page {
 .activity-title {
   display: block;
   font-size: 40rpx;
-  font-weight: 700;
+  font-weight: 500;
   color: #fff;
   line-height: 1.3;
   margin-bottom: 16rpx;
@@ -101,8 +101,8 @@ page {
 
 .points-value {
   font-size: 34rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .points-label {
@@ -145,14 +145,14 @@ page {
 
 .info-value {
   font-size: 28rpx;
-  color: #000000;
-  font-weight: 600;
+  color: #1A1A1A;
+  font-weight: 500;
   line-height: 1.4;
 }
 
 .info-value .highlight {
-  color: #000000;
-  font-weight: 700;
+  color: #1A1A1A;
+  font-weight: 600;
   font-size: 32rpx;
 }
 
@@ -174,8 +174,8 @@ page {
 
 .card-title {
   font-size: 30rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -242,7 +242,7 @@ page {
 
 .participant-name {
   font-size: 26rpx;
-  color: #000000;
+  color: #1A1A1A;
   font-weight: 500;
 }
 
@@ -255,15 +255,15 @@ page {
 }
 
 .status-dot.checked-in {
-  background: #000000;
+  background: #1A1A1A;
 }
 
 .view-all-btn {
   display: flex;
   align-items: center;
-  color: #000000;
+  color: #1A1A1A;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: underline;
 }
 
@@ -284,7 +284,7 @@ page {
 .upload-btn {
   display: flex;
   align-items: center;
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
   padding: 12rpx 24rpx;
   border-radius: 20rpx;

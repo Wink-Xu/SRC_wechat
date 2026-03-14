@@ -11,13 +11,13 @@
   color: #999999;
 }
 
-/* 前三名 - 极简黑色风格 */
+/* 前三名 - 极简风格 */
 .top-three {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   padding: 40rpx 30rpx;
-  background: #000000;
+  background: #1A1A1A;
 }
 
 .top-item {
@@ -61,7 +61,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .top-points {
@@ -134,14 +134,14 @@
 .rank-name {
   flex: 1;
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   font-weight: 500;
 }
 
 .rank-points {
   font-size: 28rpx;
-  color: #000000;
-  font-weight: 700;
+  color: #1A1A1A;
+  font-weight: 600;
 }
 
 .empty-box {

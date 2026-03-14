@@ -27,8 +27,8 @@
 
 .activity-title {
   font-size: 30rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   flex: 1;
   margin-right: 16rpx;
 }
@@ -54,7 +54,7 @@
 
 .status-ongoing {
   background: #F5F5F5;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-ended {
@@ -141,7 +141,7 @@
   bottom: 60rpx;
   width: 100rpx;
   height: 100rpx;
-  background: #000000;
+  background: #1A1A1A;
   border-radius: 50%;
   display: flex;
   align-items: center;

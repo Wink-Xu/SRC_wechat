@@ -24,10 +24,10 @@
 
 .form-label {
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   display: block;
   margin-bottom: 12rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .form-input {
@@ -36,12 +36,12 @@
   background: #F5F5F5;
   border-radius: 12rpx;
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   border: 1rpx solid transparent;
 }
 
 .form-input:focus {
-  border-color: #000000;
+  border-color: #1A1A1A;
 }
 
 .form-textarea {
@@ -51,13 +51,13 @@
   background: #F5F5F5;
   border-radius: 12rpx;
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   box-sizing: border-box;
   border: 1rpx solid transparent;
 }
 
 .form-textarea:focus {
-  border-color: #000000;
+  border-color: #1A1A1A;
 }
 
 .form-picker {
@@ -72,7 +72,7 @@
 
 .form-picker text {
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .form-picker .placeholder {
@@ -81,11 +81,11 @@
 
 .save-btn {
   margin-bottom: 20rpx;
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
   border: none;
   border-radius: 32rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn-error {

@@ -8,14 +8,14 @@
 .header {
   background: #FFFFFF;
   padding: 40rpx 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
 .header-title {
   font-size: 36rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -42,13 +42,13 @@
 
 .stat-value {
   font-size: 48rpx;
-  font-weight: 800;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
   display: block;
 }
 
 .stat-card.highlight .stat-value {
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .stat-label {
@@ -90,9 +90,9 @@
 
 .menu-title {
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   margin-right: 16rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .menu-desc {

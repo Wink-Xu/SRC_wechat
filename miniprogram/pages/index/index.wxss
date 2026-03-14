@@ -8,7 +8,7 @@
 .header {
   background: #FFFFFF;
   padding: 40rpx 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
@@ -31,9 +31,9 @@
 
 .nickname {
   font-size: 36rpx;
-  font-weight: 700;
+  font-weight: 500;
   display: block;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-tag {
@@ -47,7 +47,7 @@
 }
 
 .status-tag.member {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
 }
 
@@ -72,8 +72,8 @@
 
 .points-value {
   font-size: 40rpx;
-  font-weight: 800;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .login-prompt {
@@ -85,7 +85,7 @@
 
 .prompt-text {
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 /* 快捷入口 */
@@ -129,8 +129,8 @@
 
 .section-title {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -165,8 +165,8 @@
 
 .activity-title {
   font-size: 30rpx;
-  color: #000000;
-  font-weight: 600;
+  color: #1A1A1A;
+  font-weight: 500;
   display: block;
   margin-bottom: 8rpx;
 }
@@ -191,8 +191,8 @@
 
 .activity-points .points-num {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
   display: block;
 }
 

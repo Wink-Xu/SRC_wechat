@@ -24,13 +24,13 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#9C27B0",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "Sunday Running",
-    "navigationBarTextStyle": "white"
+    "navigationBarTextStyle": "black"
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#9C27B0",
+    "selectedColor": "#1A1A1A",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [

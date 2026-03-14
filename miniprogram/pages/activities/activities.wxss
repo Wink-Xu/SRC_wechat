@@ -33,8 +33,8 @@ page {
 
 .section-title {
   font-size: 32rpx;
-  font-weight: 700;
-  color: var(--text);
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -62,8 +62,8 @@ page {
 
 .activity-title {
   font-size: 32rpx;
-  font-weight: 700;
-  color: var(--text);
+  font-weight: 500;
+  color: #1A1A1A;
   flex: 1;
   margin-right: 16rpx;
   line-height: 1.4;
@@ -113,8 +113,8 @@ page {
 }
 
 .registered-count {
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 500;
+  color: #1A1A1A;
 }
 
 .quota-text {
@@ -128,8 +128,8 @@ page {
 
 .points-value {
   font-size: 32rpx;
-  font-weight: 700;
-  color: var(--warning);
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .points-label {
@@ -182,8 +182,8 @@ page {
 .past-title {
   display: block;
   font-size: 30rpx;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 500;
+  color: #1A1A1A;
   margin-bottom: 12rpx;
   line-height: 1.4;
 }

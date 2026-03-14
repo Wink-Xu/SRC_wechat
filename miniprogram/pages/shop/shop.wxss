@@ -17,8 +17,8 @@
 
 .header-title {
   font-size: 36rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
 }
@@ -66,13 +66,13 @@
 
 .product-name {
   font-size: 28rpx;
-  color: #000000;
+  color: #1A1A1A;
   display: block;
   margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .product-price {
@@ -86,8 +86,8 @@
 
 .points-price .price-value {
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .points-price .price-unit {

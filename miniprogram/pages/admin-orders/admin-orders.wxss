@@ -26,8 +26,8 @@
 }
 
 .tab-item.active {
-  color: #000000;
-  font-weight: 700;
+  color: #1A1A1A;
+  font-weight: 600;
 }
 
 .tab-item.active::after {
@@ -38,7 +38,7 @@
   transform: translateX(-50%);
   width: 40rpx;
   height: 4rpx;
-  background: #000000;
+  background: #1A1A1A;
   border-radius: 2rpx;
 }
 
@@ -78,8 +78,8 @@
 
 .user-name {
   font-size: 30rpx;
-  font-weight: 600;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   margin-right: 16rpx;
 }
 
@@ -99,8 +99,8 @@
 .product-name {
   flex: 1;
   font-size: 28rpx;
-  color: #000000;
-  font-weight: 600;
+  color: #1A1A1A;
+  font-weight: 500;
 }
 
 .product-quantity {
@@ -111,8 +111,8 @@
 
 .product-price {
   font-size: 28rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .order-address {
@@ -133,19 +133,19 @@
   padding: 4rpx 16rpx;
   border-radius: 16rpx;
   font-size: 22rpx;
-  font-weight: 600;
+  font-weight: 500;
   background: #F5F5F5;
   color: #666666;
 }
 
 .status-paid {
   background: #F5F5F5;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-shipped {
   background: #F5F5F5;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .status-completed {

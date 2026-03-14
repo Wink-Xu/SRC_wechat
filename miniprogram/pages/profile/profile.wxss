@@ -9,7 +9,7 @@
 .user-section {
   background: #FFFFFF;
   padding: 60rpx 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   border-bottom: 1rpx solid #F0F0F0;
 }
 
@@ -32,10 +32,10 @@
 
 .nickname {
   font-size: 36rpx;
-  font-weight: 700;
+  font-weight: 500;
   display: block;
   margin-bottom: 8rpx;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .user-meta {
@@ -49,11 +49,11 @@
   font-size: 22rpx;
   background: #F5F5F5;
   color: #666666;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .role-tag.member {
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
 }
 
@@ -111,8 +111,8 @@
 
 .pending-text {
   font-size: 26rpx;
-  color: #000000;
-  font-weight: 600;
+  color: #1A1A1A;
+  font-weight: 500;
   margin-bottom: 8rpx;
 }
 
@@ -131,9 +131,9 @@
 
 .points-value {
   font-size: 40rpx;
-  font-weight: 800;
+  font-weight: 600;
   display: block;
-  color: #000000;
+  color: #1A1A1A;
 }
 
 .points-label {
@@ -197,7 +197,7 @@
 .menu-title {
   flex: 1;
   font-size: 30rpx;
-  color: #000000;
+  color: #1A1A1A;
   font-weight: 500;
 }
 

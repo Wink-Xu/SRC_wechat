@@ -16,8 +16,8 @@
 .debug-title {
   display: block;
   font-size: 32rpx;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   margin-bottom: 10rpx;
   text-transform: uppercase;
   letter-spacing: 0.5rpx;
@@ -61,8 +61,8 @@
 .role-name {
   display: block;
   font-size: 30rpx;
-  font-weight: 600;
-  color: #000000;
+  font-weight: 500;
+  color: #1A1A1A;
   margin-bottom: 8rpx;
 }
 
@@ -78,11 +78,11 @@
 
 .switch-btn {
   padding: 12rpx 30rpx;
-  background: #000000;
+  background: #1A1A1A;
   color: #FFFFFF;
   border-radius: 30rpx;
   font-size: 26rpx;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
 }
 
@@ -108,5 +108,5 @@
   font-size: 28rpx;
   padding: 24rpx;
   border-radius: 12rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
