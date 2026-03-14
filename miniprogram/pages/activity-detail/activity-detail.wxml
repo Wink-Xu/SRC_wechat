@@ -189,9 +189,8 @@
         <text class="modal-close" bindtap="closeCheckInQrCode">×</text>
       </view>
       <view class="modal-body">
-        <view class="qr-code-placeholder">
-          <text class="qr-hint">请团员使用小程序扫码签到</text>
-        </view>
+        <image class="qr-code-img" src="{{checkInQrCode}}" mode="aspectFit"></image>
+        <text class="qr-hint">请团员使用小程序扫码签到</text>
         <view class="qr-stats">
           <text>已签到：{{checkInCount}}人</text>
         </view>
