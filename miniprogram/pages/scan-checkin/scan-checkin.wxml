@@ -45,8 +45,8 @@
       <block wx:else>
         <!-- 未签到 -->
         <view class="checkin-box">
-          <text class="checkin-title">确认参加此活动？</text>
-          <text class="checkin-desc">签到成功后将获得活动积分</text>
+          <text class="checkin-title">活动签到</text>
+          <text class="checkin-desc">确认签到后，活动结束时将自动获得 {{activity.points}} 积分</text>
 
           <button class="btn btn-primary btn-full" bindtap="confirmCheckIn">
             确认签到

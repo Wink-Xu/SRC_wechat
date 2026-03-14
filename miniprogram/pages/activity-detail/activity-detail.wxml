@@ -102,33 +102,18 @@
           <text class="checkin-count">已签到：{{checkInCount}}人</text>
         </view>
 
-        <!-- 用户签到按钮（ongoing 状态，已报名未签到） -->
-        <block wx:elif="{{isRegistered && activity.status === 'ongoing' && registration.check_in_status !== 'checked_in'}}">
-          <button class="btn btn-primary btn-full" bindtap="handleCheckIn">
-            扫码签到
-          </button>
-        </block>
-
-        <block wx:elif="{{!isRegistered && activity.status === 'published'}}">
-          <button
-            class="btn btn-primary btn-full"
-            bindtap="handleRegister"
-            disabled="{{activity.registered_count >= activity.quota}}"
-          >
-            {{activity.registered_count >= activity.quota ? '名额已满' : '立即报名'}}
-          </button>
-        </block>
-
-        <block wx:elif="{{isRegistered && activity.status === 'published'}}">
-          <button class="btn btn-secondary btn-full" bindtap="handleCancelRegistration">
-            取消报名
-          </button>
-        </block>
-
+        <!-- 已签到用户显示已签到标识 -->
         <block wx:elif="{{isRegistered && registration.check_in_status === 'checked_in'}}">
           <view class="checked-in-badge">
             <image class="badge-icon" src="/images/check.png"></image>
             <text>已签到</text>
+          </view>
+        </block>
+
+        <!-- 未签到用户显示提示 -->
+        <block wx:elif="{{isRegistered && activity.status === 'ongoing'}}">
+          <view class="checkin-hint-box">
+            <text class="checkin-hint">请使用微信"扫一扫"扫描签到码</text>
           </view>
         </block>
       </view>
@@ -190,14 +175,9 @@
       </view>
       <view class="modal-body">
         <image class="qr-code-img" src="{{checkInQrCode}}" mode="aspectFit"></image>
-        <text class="qr-hint">小程序内扫码</text>
+        <text class="qr-hint">微信"扫一扫"即可签到</text>
         <view class="qr-actions">
           <button class="btn-save" bindtap="saveQrCode">保存图片</button>
-        </view>
-        <view class="qr-tip">
-          <text class="tip-title">使用方式：</text>
-          <text class="tip-text">1. 团员在活动详情页点击"扫码签到"</text>
-          <text class="tip-text">2. 或直接用微信扫此码签到</text>
         </view>
         <view class="qr-stats">
           <text>已签到：{{checkInCount}}人</text>

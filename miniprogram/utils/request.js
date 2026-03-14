@@ -362,26 +362,21 @@ const handleActivityMock = (action, data) => {
         return Promise.resolve({ code: 1, message: '活动不存在', data: null });
       }
 
-      // 小程序码参数（用于微信主界面扫码）
+      // 二维码内容：使用微信开发者工具可识别的格式
+      // 格式：https://<app-id>.appid.weixin.qq.com/pages/scan-checkin/scan-checkin?scene=<scene-data>
+      // 开发环境下，使用简单的 JSON 格式，由 app.js 的 onShow 解析处理
       const qrContent = JSON.stringify({
         type: 'checkin',
         activity_id: data.id
       });
 
-      // 使用微信官方小程序码 API 的模拟 URL
-      // 生产环境应该调用 wx.cloud.callFunction 生成小程序码
+      // 使用在线二维码生成服务
+      // 注意：这是普通二维码，不是微信官方小程序码
+      // 生产环境需要调用微信 API 生成真正的小程序码
       const qrData = {
         activity_id: data.id,
-        // 二维码（用于小程序内扫码）
+        // 二维码图片 URL
         qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrContent)}`,
-        // 小程序码（用于微信主界面扫码）- 模拟
-        mini_program_qr: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
-          JSON.stringify({
-            type: 'checkin',
-            activity_id: data.id,
-            page: 'pages/scan-checkin/scan-checkin'
-          })
-        )}`,
         check_in_count: activity.check_in_count || 0,
         qr_content: qrContent
       };

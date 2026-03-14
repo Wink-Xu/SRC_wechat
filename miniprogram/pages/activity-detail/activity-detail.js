@@ -255,46 +255,6 @@ Page({
     });
   },
 
-  // 扫码签到 - 跳转到签到页面
-  handleCheckIn: function () {
-    wx.scanCode({
-      success: (res) => {
-        console.log('扫码结果:', res);
-
-        // 解析二维码内容
-        let qrData;
-        try {
-          qrData = JSON.parse(res.result);
-        } catch (e) {
-          qrData = { type: 'checkin', activity_id: res.result };
-        }
-
-        // 验证二维码类型
-        if (qrData.type !== 'checkin') {
-          wx.showToast({
-            title: '无效的签到码',
-            icon: 'none'
-          });
-          return;
-        }
-
-        // 跳转到签到确认页，传入二维码数据
-        wx.navigateTo({
-          url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(res.result)}`
-        });
-      },
-      fail: (err) => {
-        console.error('扫码失败', err);
-        if (!err.errMsg.includes('cancel')) {
-          wx.showToast({
-            title: '扫码失败，请重试',
-            icon: 'none'
-          });
-        }
-      }
-    });
-  },
-
   // 预览照片
   previewImage: function (e) {
     const index = e.currentTarget.dataset.index;
