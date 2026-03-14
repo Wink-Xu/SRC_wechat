@@ -204,24 +204,22 @@ Page({
     });
   },
 
-  // 扫码签到
+  // 扫码签到 - 跳转到签到页面
   handleCheckIn: function () {
-    const that = this;
-
     wx.scanCode({
-      success: function (res) {
+      success: (res) => {
         console.log('扫码结果:', res);
 
-        // 解析二维码内容，期望格式：{ type: 'checkin', activity_id: 'xxx' }
+        // 解析二维码内容
         let qrData;
         try {
           qrData = JSON.parse(res.result);
         } catch (e) {
-          // 兼容纯文本二维码（只有 activity_id）
           qrData = { type: 'checkin', activity_id: res.result };
         }
 
-        if (qrData.type !== 'checkin' || !qrData.activity_id) {
+        // 验证二维码类型
+        if (qrData.type !== 'checkin') {
           wx.showToast({
             title: '无效的签到码',
             icon: 'none'
@@ -229,30 +227,14 @@ Page({
           return;
         }
 
-        if (qrData.activity_id !== that.data.id) {
-          wx.showToast({
-            title: '此码不属于当前活动',
-            icon: 'none'
-          });
-          return;
-        }
-
-        // 确认签到
-        wx.showModal({
-          title: '确认签到',
-          content: `确认参加"${that.data.activity.title}"？`,
-          success: function (modalRes) {
-            if (modalRes.confirm) {
-              that.confirmCheckIn(qrData.activity_id);
-            }
-          }
+        // 跳转到签到确认页，传入二维码数据
+        wx.navigateTo({
+          url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(res.result)}`
         });
       },
-      fail: function (err) {
+      fail: (err) => {
         console.error('扫码失败', err);
-        if (err.errMsg.includes('cancel')) {
-          // 用户取消扫码，不做提示
-        } else {
+        if (!err.errMsg.includes('cancel')) {
           wx.showToast({
             title: '扫码失败，请重试',
             icon: 'none'
@@ -260,25 +242,6 @@ Page({
         }
       }
     });
-  },
-
-  // 确认签到
-  confirmCheckIn: async function (activityId) {
-    try {
-      await activityApi.checkIn({ activityId });
-      wx.showToast({
-        title: '签到成功',
-        icon: 'success'
-      });
-      // 刷新活动详情，更新签到状态
-      this.loadActivity();
-    } catch (error) {
-      console.error('签到失败', error);
-      wx.showToast({
-        title: error?.message || '签到失败，请重试',
-        icon: 'none'
-      });
-    }
   },
 
   // 预览照片

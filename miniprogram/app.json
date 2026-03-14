@@ -6,6 +6,7 @@
     "pages/activity-detail/activity-detail",
     "pages/activity-participants/activity-participants",
     "pages/activity-create/activity-create",
+    "pages/scan-checkin/scan-checkin",
     "pages/points/points",
     "pages/points-rank/points-rank",
     "pages/shop/shop",
