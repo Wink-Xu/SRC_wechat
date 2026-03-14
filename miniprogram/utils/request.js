@@ -362,18 +362,28 @@ const handleActivityMock = (action, data) => {
         return Promise.resolve({ code: 1, message: '活动不存在', data: null });
       }
 
-      // 使用微信官方二维码生成 API（生产环境应该调用云函数生成）
-      // 这里使用一个在线二维码生成服务的模拟 URL
+      // 小程序码参数（用于微信主界面扫码）
       const qrContent = JSON.stringify({
         type: 'checkin',
         activity_id: data.id
       });
 
+      // 使用微信官方小程序码 API 的模拟 URL
+      // 生产环境应该调用 wx.cloud.callFunction 生成小程序码
       const qrData = {
         activity_id: data.id,
+        // 二维码（用于小程序内扫码）
         qr_code: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrContent)}`,
+        // 小程序码（用于微信主界面扫码）- 模拟
+        mini_program_qr: `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(
+          JSON.stringify({
+            type: 'checkin',
+            activity_id: data.id,
+            page: 'pages/scan-checkin/scan-checkin'
+          })
+        )}`,
         check_in_count: activity.check_in_count || 0,
-        qr_content: qrContent // 用于调试
+        qr_content: qrContent
       };
       return Promise.resolve({ code: 0, data: qrData });
     }

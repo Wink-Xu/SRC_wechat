@@ -27,7 +27,7 @@ App({
     } else {
       // 初始化云开发
       if (!wx.cloud) {
-        console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+        console.error('请使用 2.2.3 或以上的基础库以使用云开发');
       } else {
         wx.cloud.init({
           env: 'your-env-id', // 替换为你的云开发环境 ID
@@ -37,6 +37,49 @@ App({
 
       // 检查登录状态（仅非 Mock 模式使用缓存）
       this.checkLoginStatus();
+    }
+  },
+
+  // 当小程序从微信主界面扫码进入时处理
+  onShow: function (options) {
+    console.log('onShow options:', options);
+
+    // 处理微信扫码进入的场景
+    if (options && options.scene) {
+      this.handleScanCode(options.scene);
+    }
+  },
+
+  // 处理扫码进入
+  handleScanCode: function (scene) {
+    console.log('处理扫码场景:', scene);
+
+    let qrData;
+    try {
+      qrData = JSON.parse(decodeURIComponent(scene));
+    } catch (e) {
+      qrData = { type: 'checkin', activity_id: scene };
+    }
+
+    console.log('解析二维码数据:', qrData);
+
+    // 处理签到二维码
+    if (qrData.type === 'checkin' && qrData.activity_id) {
+      // 延迟跳转，确保 app 初始化完成
+      setTimeout(() => {
+        wx.navigateTo({
+          url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(scene)}`,
+          fail: (err) => {
+            console.error('跳转失败', err);
+            // 如果已在 scan-checkin 页面，尝试重定向
+            if (err.errMsg.includes('already')) {
+              wx.redirectTo({
+                url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(scene)}`
+              });
+            }
+          }
+        });
+      }, 300);
     }
   },
 

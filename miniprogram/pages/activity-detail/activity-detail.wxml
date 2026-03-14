@@ -190,7 +190,15 @@
       </view>
       <view class="modal-body">
         <image class="qr-code-img" src="{{checkInQrCode}}" mode="aspectFit"></image>
-        <text class="qr-hint">请团员使用小程序扫码签到</text>
+        <text class="qr-hint">小程序内扫码</text>
+        <view class="qr-actions">
+          <button class="btn-save" bindtap="saveQrCode">保存图片</button>
+        </view>
+        <view class="qr-tip">
+          <text class="tip-title">使用方式：</text>
+          <text class="tip-text">1. 团员在活动详情页点击"扫码签到"</text>
+          <text class="tip-text">2. 或直接用微信扫此码签到</text>
+        </view>
         <view class="qr-stats">
           <text>已签到：{{checkInCount}}人</text>
         </view>

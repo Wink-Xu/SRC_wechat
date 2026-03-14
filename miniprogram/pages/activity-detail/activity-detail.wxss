@@ -420,9 +420,51 @@ page {
 
 .qr-hint {
   display: block;
-  font-size: 26rpx;
-  color: #666;
+  font-size: 24rpx;
+  color: #999;
   margin-bottom: 16rpx;
+}
+
+.qr-actions {
+  margin-bottom: 20rpx;
+}
+
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  color: #fff;
+  font-size: 24rpx;
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
+  border: none;
+}
+
+.btn-save::after {
+  border: none;
+}
+
+.qr-tip {
+  background: #F8F9FA;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.tip-title {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.tip-text {
+  display: block;
+  font-size: 22rpx;
+  color: #666;
+  line-height: 1.6;
 }
 
 .qr-stats {

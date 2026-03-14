@@ -204,6 +204,57 @@ Page({
     });
   },
 
+  // 保存二维码图片
+  saveQrCode: function () {
+    const that = this;
+    wx.showLoading({ title: '保存中...' });
+
+    // 下载图片并保存
+    wx.downloadFile({
+      url: this.data.checkInQrCode,
+      success: function (res) {
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success: function () {
+            wx.hideLoading();
+            wx.showToast({
+              title: '保存成功',
+              icon: 'success'
+            });
+          },
+          fail: function (err) {
+            wx.hideLoading();
+            if (err.errMsg.includes('auth deny')) {
+              wx.showModal({
+                title: '提示',
+                content: '您已拒绝相册权限，请在设置中开启',
+                confirmText: '去设置',
+                success: function (modalRes) {
+                  if (modalRes.confirm) {
+                    wx.openSetting();
+                  }
+                }
+              });
+            } else {
+              wx.showToast({
+                title: '保存失败',
+                icon: 'none'
+              });
+            }
+          }
+        });
+      },
+      fail: function (err) {
+        wx.hideLoading();
+        wx.showToast({
+          title: '下载图片失败',
+          icon: 'none'
+        });
+        console.error('下载图片失败', err);
+      }
+    });
+  },
+
   // 扫码签到 - 跳转到签到页面
   handleCheckIn: function () {
     wx.scanCode({
