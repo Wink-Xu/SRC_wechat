@@ -5,8 +5,8 @@ App({
   // Mock 模式开关：true=使用本地模拟数据，false=使用云开发
   USE_MOCK: true,
 
-  // 当前角色（仅 Mock 模式有效）
-  CURRENT_ROLE: 'admin', // 'guest' | 'member' | 'leader' | 'admin' | 'pending'
+  // 当前角色（仅 Mock 模式有效）：'guest' 表示游客模式（未登录）
+  CURRENT_ROLE: 'guest', // 'guest' | 'member' | 'leader' | 'admin' | 'pending'
 
   globalData: {
     userInfo: null,
@@ -85,6 +85,13 @@ App({
   // Mock 模式切换角色
   setMockRole: function(role) {
     if (!this.USE_MOCK) return;
+
+    // 游客模式不设置用户信息
+    if (role === 'guest') {
+      this.globalData.isGuest = true;
+      console.log('[Mock Mode] 游客模式，可以浏览内容');
+      return;
+    }
 
     const users = mockData.users;
     const user = users[role] || users.member;

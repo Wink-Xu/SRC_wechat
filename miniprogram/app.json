@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/apply-membership/apply-membership",
     "pages/activities/activities",
     "pages/activity-detail/activity-detail",
     "pages/activity-participants/activity-participants",
@@ -14,6 +13,7 @@
     "pages/orders/orders",
     "pages/order-detail/order-detail",
     "pages/profile/profile",
+    "pages/apply-membership/apply-membership",
     "pages/address-edit/address-edit",
     "pages/admin/admin",
     "pages/admin-members/admin-members",
