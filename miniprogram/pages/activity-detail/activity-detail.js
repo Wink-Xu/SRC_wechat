@@ -91,7 +91,16 @@ Page({
 
     // 检查是否登录
     if (!app.globalData.isLoggedIn) {
-      wx.navigateTo({ url: '/pages/login/login' });
+      wx.showModal({
+        title: '请先登录',
+        content: '请前往"我的"页面进行登录',
+        showCancel: false,
+        success: () => {
+          wx.switchTab({
+            url: '/pages/profile/profile'
+          });
+        }
+      });
       return;
     }
 

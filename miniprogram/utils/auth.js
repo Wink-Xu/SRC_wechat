@@ -86,13 +86,21 @@ const hasPermission = (allowedRoles) => {
 
 /**
  * 要求登录
- * 如果未登录则跳转到登录页面
+ * 如果未登录则提示用户去"我的"页面登录
  * @returns {boolean} 是否已登录
  */
 const requireLogin = () => {
   if (!isLoggedIn()) {
-    wx.navigateTo({
-      url: '/pages/login/login'
+    wx.showModal({
+      title: '请先登录',
+      content: '请前往"我的"页面进行登录',
+      showCancel: false,
+      success: () => {
+        // 用户确认后，跳转到"我的"页面
+        wx.switchTab({
+          url: '/pages/profile/profile'
+        });
+      }
     });
     return false;
   }

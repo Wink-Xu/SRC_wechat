@@ -98,7 +98,7 @@ page {
 
 .slogan-text {
   font-size: 26rpx;
-  color: #666666;
+  color: var(--brand-pink);
   font-weight: 600;
 }
 

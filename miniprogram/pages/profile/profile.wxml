@@ -98,7 +98,7 @@
 
   <!-- 未登录提示 -->
   <view class="login-overlay" wx:if="{{!isLoggedIn}}">
-    <button class="btn-login" bindtap="goToLogin">立即登录</button>
+    <button class="btn-login" bindtap="handleLogin">立即登录</button>
   </view>
 
   <!-- Mock 模式调试入口 -->

@@ -1,7 +1,6 @@
 // pages/profile/profile.js
 const { userApi, pointsApi, activityApi } = require('../../utils/request');
 const { formatPhone, showSuccess, showConfirm, showInfo } = require('../../utils/util');
-const { isLoggedIn, isAdmin, isLeader } = require('../../utils/auth');
 const app = getApp();
 
 Page({
@@ -68,11 +67,34 @@ Page({
     }
   },
 
-  // 跳转到登录
-  goToLogin: function () {
-    wx.navigateTo({
-      url: '/pages/login/login'
-    });
+  // 微信授权登录
+  handleLogin: async function () {
+    try {
+      const app = getApp();
+      await app.handleLogin();
+
+      // 登录成功，刷新页面
+      this.refreshUserInfo();
+
+      wx.showToast({
+        title: '登录成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('登录失败', error);
+      if (error.errMsg && error.errMsg.includes('auth deny')) {
+        // 用户拒绝授权
+        wx.showToast({
+          title: '你已拒绝授权',
+          icon: 'none'
+        });
+      } else {
+        wx.showToast({
+          title: '登录失败，请重试',
+          icon: 'none'
+        });
+      }
+    }
   },
 
   // 跳转到申请入团页面

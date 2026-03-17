@@ -18,6 +18,7 @@ page {
   --error: #F44336;
   --success: #2E7D32;
   --warning: #CC7722;
+  --brand-pink: #E91E9B;
 
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   font-size: 28rpx;

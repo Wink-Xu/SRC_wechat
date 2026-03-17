@@ -126,5 +126,38 @@ App({
     this.globalData.isAdmin = false;
     this.globalData.isLeader = false;
     wx.removeStorageSync('userInfo');
+  },
+
+  // 处理登录（在 profile 页面调用）
+  handleLogin: function () {
+    return new Promise((resolve, reject) => {
+      // Mock 模式下直接返回模拟用户
+      if (this.USE_MOCK) {
+        const mockUser = mockData.currentUser;
+        this.updateUserInfo(mockUser);
+        resolve(mockUser);
+        return;
+      }
+
+      // 真实模式：调用微信授权登录
+      wx.getUserProfile({
+        desc: '用于完善用户资料',
+        lang: 'zh_CN',
+        success: (res) => {
+          const userInfo = res.userInfo;
+          // 调用云函数登录
+          const { userApi } = require('./utils/request');
+          userApi.login({
+            nickName: userInfo.nickName,
+            avatarUrl: userInfo.avatarUrl,
+            gender: userInfo.gender
+          }).then(resolve).catch(reject);
+        },
+        fail: (err) => {
+          console.error('getUserProfile fail', err);
+          reject(err);
+        }
+      });
+    });
   }
 });
