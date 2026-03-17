@@ -14,16 +14,15 @@ App({
     isMember: false,      // 是否是团员（已批准）
     isAdmin: false,       // 是否是管理员
     isLeader: false,      // 是否是团长
-    isGuest: false        // 是否是游客（已登录但未申请入团）
+    isGuest: true         // 默认是游客（未登录）
   },
 
   onLaunch: function () {
     // Mock 模式下不初始化云开发
     if (this.USE_MOCK) {
       console.log('[Mock Mode] 使用本地模拟数据，不初始化云开发');
-      // Mock 模式下直接设置模拟用户，忽略缓存
-      this.setMockRole(this.CURRENT_ROLE);
-      console.log('[Mock Mode] 已设置模拟用户数据，角色：' + this.CURRENT_ROLE);
+      // Mock 模式下默认为游客模式，可以浏览内容
+      console.log('[Mock Mode] 默认为游客模式，可以浏览内容');
     } else {
       // 初始化云开发
       if (!wx.cloud) {

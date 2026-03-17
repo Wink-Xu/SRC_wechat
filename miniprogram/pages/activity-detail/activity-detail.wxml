@@ -88,6 +88,16 @@
 
       <!-- 底部操作区 -->
       <view class="footer-actions">
+        <!-- 未报名用户显示报名按钮 -->
+        <block wx:if="{{!isRegistered && (activity.status === 'published' || activity.status === 'ongoing')}}">
+          <button class="btn-register" bindtap="handleRegister">立即报名</button>
+        </block>
+
+        <!-- 已报名用户显示取消报名按钮（活动进行中之前） -->
+        <block wx:elif="{{isRegistered && activity.status === 'published'}}">
+          <button class="btn-cancel-register" bindtap="handleCancelRegistration">取消报名</button>
+        </block>
+
         <!-- 管理员查看签到码按钮（ongoing 状态） -->
         <view wx:if="{{isAdminOrLeader && activity.status === 'ongoing'}}" class="admin-actions">
           <button class="btn btn-secondary btn-small" bindtap="showCheckInQrCode">

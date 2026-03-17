@@ -61,8 +61,8 @@ Page({
         (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
 
       // 检查是否是管理员或团长
-      const isAdminOrLeader = app.globalData.userInfo &&
-        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
+      const isAdminOrLeader = !!(app.globalData.userInfo &&
+        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader'));
 
       this.setData({
         activity,
