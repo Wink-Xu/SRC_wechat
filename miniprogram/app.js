@@ -35,46 +35,8 @@ App({
         });
       }
 
-      // 检查登录状态（仅非 Mock 模式使用缓存）
+      // 检查登录状态
       this.checkLoginStatus();
-
-      // 自动初始化数据库集合
-      this.autoInitializeDatabase();
-    }
-  },
-
-  // 自动初始化数据库（仅执行一次）
-  autoInitializeDatabase: async function () {
-    try {
-      // 检查是否已初始化
-      const hasInit = wx.getStorageSync('hasInit');
-      if (hasInit) {
-        console.log('[初始化] 已初始化过，跳过');
-        return;
-      }
-
-      console.log('[初始化] 开始初始化数据库集合...');
-
-      // 等待云开发初始化完成
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const { callFunction } = require('./utils/request');
-
-      const result = await callFunction('init', 'main', {}, {
-        showLoad: false,
-        showErrorMsg: false
-      });
-
-      console.log('[初始化] 结果:', result);
-
-      if (result && result.data) {
-        // 标记已初始化
-        wx.setStorageSync('hasInit', true);
-        console.log('[初始化] 初始化完成，集合已创建');
-      }
-    } catch (error) {
-      console.error('[初始化] 失败:', error);
-      // 初始化失败不影响使用，只是可能需要手动创建集合
     }
   },
 
