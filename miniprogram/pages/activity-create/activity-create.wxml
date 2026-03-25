@@ -6,8 +6,9 @@
       <text class="form-label required">活动封面图</text>
       <view class="image-upload-wrapper">
         <view class="image-upload" wx:if="{{!formData.cover_image}}" bindtap="chooseImage">
-          <image class="upload-icon" src="/images/add-photo.png"></image>
-          <text class="upload-text">上传封面图</text>
+          <view class="upload-box">
+            <text class="upload-text">上传</text>
+          </view>
         </view>
         <view class="image-preview" wx:if="{{formData.cover_image}}">
           <image class="preview-image" src="{{formData.cover_image}}" mode="aspectFill"></image>
@@ -75,7 +76,7 @@
 
     <!-- Dress Code -->
     <view class="form-item">
-      <text class="form-label">Dress Code</text>
+      <text class="form-label">DressCode</text>
       <input
         class="form-input"
         type="text"
@@ -132,7 +133,7 @@
 
     <view class="form-item form-row">
       <view class="form-item-half">
-        <text class="form-label required">报名截止</text>
+        <text class="form-label">报名截止</text>
         <picker
           mode="date"
           start="{{minDate}}"
@@ -140,20 +141,20 @@
         >
           <view class="form-picker">
             <text class="{{formData.registration_deadline_date ? '' : 'placeholder'}}">
-              {{formData.registration_deadline_date || '选择日期'}}
+              {{formData.registration_deadline_date || '无'}}
             </text>
           </view>
         </picker>
       </view>
       <view class="form-item-half">
-        <text class="form-label required">截止时间</text>
+        <text class="form-label">截止时间</text>
         <picker
           mode="time"
           bindchange="onRegistrationDeadlineTimeChange"
         >
           <view class="form-picker">
             <text class="{{formData.registration_deadline_time ? '' : 'placeholder'}}">
-              {{formData.registration_deadline_time || '选择时间'}}
+              {{formData.registration_deadline_time || '无'}}
             </text>
           </view>
         </picker>

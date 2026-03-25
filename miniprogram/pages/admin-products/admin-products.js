@@ -15,7 +15,7 @@ Page({
     formData: {
       name: '',
       description: '',
-      image: '',
+      images: [],  // 改为数组支持多张图片
       points_price: '',
       cash_price: '',
       stock: ''
@@ -99,7 +99,7 @@ Page({
       formData: {
         name: '',
         description: '',
-        image: '',
+        images: [],
         points_price: '',
         cash_price: '',
         stock: ''
@@ -110,21 +110,27 @@ Page({
   // 编辑商品
   editProduct: function (e) {
     const { id } = e.currentTarget.dataset;
+    console.log('[编辑商品] 商品 ID:', id);
     const product = this.data.products.find(p => p._id === id);
+    console.log('[编辑商品] 商品数据:', product);
 
     if (product) {
+      // 过滤掉默认图片，只显示用户上传的图片
+      const images = (product.images || []).filter(img => img !== '/images/default-product.png');
+
       this.setData({
         showAddModal: true,
         editingId: id,
         formData: {
           name: product.name,
           description: product.description || '',
-          image: product.image || '',
+          images: images,
           points_price: product.points_price ? String(product.points_price) : '',
           cash_price: product.cash_price ? String(product.cash_price / 100) : '',
           stock: String(product.stock)
         }
       });
+      console.log('[编辑商品] 表单数据已设置，图片:', this.data.formData.images);
     }
   },
 
@@ -136,28 +142,90 @@ Page({
     });
   },
 
-  // 选择图片
+  // 阻止事件冒泡
+  stopTap: function () {
+    // 阻止点击弹窗内容时关闭
+  },
+
+  // 选择图片（支持多张）
   chooseImage: function () {
+    const app = getApp();
+    const currentImages = this.data.formData.images;
+    const remainingCount = 9 - currentImages.length; // 最多 9 张
+
+    console.log('[选择图片] 当前图片数量:', currentImages.length);
+    console.log('[选择图片] 当前图片:', currentImages);
+
+    if (remainingCount <= 0) {
+      showInfo('最多上传 9 张图片');
+      return;
+    }
+
     wx.chooseImage({
-      count: 1,
+      count: remainingCount,
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
-      success: async (res) => {
-        const tempFilePath = res.tempFilePaths[0];
-        // 上传到云存储
-        const cloudPath = `products/${Date.now()}-${Math.random().toString(36).substr(2)}.jpg`;
-        try {
-          const uploadRes = await wx.cloud.uploadFile({
-            cloudPath,
-            filePath: tempFilePath
-          });
+      success: (res) => {
+        console.log('[选择图片] 选择的图片:', res.tempFilePaths);
+        const tempFilePaths = res.tempFilePaths;
+        // Mock 模式下直接使用临时路径
+        if (app.USE_MOCK) {
+          const newImages = currentImages.concat(tempFilePaths);
+          console.log('[选择图片] 新图片数组:', newImages);
           this.setData({
-            'formData.image': uploadRes.fileID
+            'formData.images': newImages
           });
-        } catch (error) {
-          showInfo('图片上传失败');
+          showSuccess(`已选择 ${tempFilePaths.length} 张图片`);
+        } else {
+          // 真实模式上传到云存储
+          wx.showLoading({ title: '上传中...' });
+          const uploadPromises = tempFilePaths.map((path) => {
+            const cloudPath = `products/${Date.now()}-${Math.random().toString(36).substr(2)}.jpg`;
+            return wx.cloud.uploadFile({ cloudPath, filePath: path });
+          });
+
+          Promise.all(uploadPromises)
+            .then((results) => {
+              wx.hideLoading();
+              const fileIDs = results.map((res) => res.fileID);
+              const newImages = currentImages.concat(fileIDs);
+              this.setData({
+                'formData.images': newImages
+              });
+              showSuccess(`上传成功 ${results.length} 张图片`);
+            })
+            .catch(() => {
+              wx.hideLoading();
+              showInfo('图片上传失败');
+            });
         }
+      },
+      fail: () => {
+        showInfo('图片选择失败');
       }
+    });
+  },
+
+  // 删除图片
+  deleteImage: function (e) {
+    const { index } = e.currentTarget.dataset;
+    console.log('[删除图片] 删除索引:', index);
+    const images = this.data.formData.images.slice(); // 创建副本
+    images.splice(index, 1);
+    console.log('[删除图片] 删除后的图片:', images);
+    this.setData({
+      'formData.images': images
+    });
+  },
+
+  // 预览图片
+  previewImage: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const images = this.data.formData.images;
+    console.log('[预览图片] 预览索引:', index, '图片列表:', images);
+    wx.previewImage({
+      current: images[index],  // 使用图片 URL 而不是 index
+      urls: images
     });
   },
 
@@ -181,7 +249,7 @@ Page({
     const data = {
       name: formData.name.trim(),
       description: formData.description.trim(),
-      image: formData.image,
+      images: formData.images,  // 使用 images 数组
       points_price: formData.points_price ? parseInt(formData.points_price) : null,
       cash_price: formData.cash_price ? Math.round(parseFloat(formData.cash_price) * 100) : null,
       stock: parseInt(formData.stock),

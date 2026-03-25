@@ -3,8 +3,9 @@ const app = getApp();
 
 Page({
   data: {
-    currentRole: 'member',
+    currentRole: 'guest',
     roles: [
+      { role: 'guest', name: '游客', desc: '游客身份，可以浏览内容但不能报名' },
       { role: 'member', name: '团员', desc: '普通团员，可以报名参加活动' },
       { role: 'leader', name: '团长', desc: '团长权限，可以管理所有功能' },
       { role: 'admin', name: '管理员', desc: '管理员权限，可以管理成员、活动等' }

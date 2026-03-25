@@ -52,6 +52,7 @@
       <view class="past-info">
         <text class="past-title">{{item.title}}</text>
         <text class="past-date">{{item.formattedTime}}</text>
+        <text class="corner-tag ended">已结束</text>
       </view>
     </view>
   </view>

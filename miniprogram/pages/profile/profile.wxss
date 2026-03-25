@@ -17,6 +17,24 @@ page {
   background: #FFFFFF;
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #F5F5F5;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+}
+
 .nickname {
   font-size: 40rpx;
   font-weight: 600;
@@ -291,4 +309,13 @@ page {
 .btn-debug text {
   font-size: 26rpx;
   color: #999999;
+}
+
+.btn-test-panel {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-test-panel text {
+  color: #FFFFFF;
+  font-weight: 500;
 }

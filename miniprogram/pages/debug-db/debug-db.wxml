@@ -1,0 +1,130 @@
+<!--pages/debug-db/debug-db.wxml-->
+<view class="container">
+  <view class="title">数据库调试</view>
+
+  <!-- 诊断信息 -->
+  <view class="section">
+    <view class="section-title">诊断结果</view>
+    <view class="diagnosis-card" wx:if="{{diagnosis}}">
+      <view class="diagnosis-status {{diagnosis.hasIssues ? 'has-issues' : 'ok'}}">
+        <text>{{diagnosis.hasIssues ? '发现问题' : '一切正常'}}</text>
+      </view>
+      <view class="diagnosis-list" wx:if="{{diagnosis.issues.length > 0}}">
+        <view class="diagnosis-item" wx:for="{{diagnosis.issues}}" wx:key="{{index}}">
+          <text class="issue-icon">⚠️</text>
+          <text class="issue-text">{{item}}</text>
+        </view>
+      </view>
+      <view class="suggestion-list" wx:if="{{diagnosis.suggestions.length > 0}}">
+        <view class="suggestion-title">建议操作：</view>
+        <view class="suggestion-item" wx:for="{{diagnosis.suggestions}}" wx:key="{{index}}">
+          <text class="suggestion-icon">💡</text>
+          <text class="suggestion-text">{{item}}</text>
+        </view>
+      </view>
+      <button class="fix-btn" wx:if="{{diagnosis.hasIssues}}" bindtap="fixUserRole">一键修复</button>
+    </view>
+  </view>
+
+  <!-- 当前用户状态 -->
+  <view class="section">
+    <view class="section-title">当前用户信息</view>
+    <view class="info-card">
+      <view class="info-row">
+        <text class="label">昵称:</text>
+        <text class="value">{{userInfo.nickname}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">OpenID:</text>
+        <text class="value small">{{currentUserId}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户在数据库中的记录 -->
+  <view class="section" wx:if="{{currentUserInDb}}">
+    <view class="section-title">数据库中的用户记录</view>
+    <view class="info-card">
+      <view class="info-row">
+        <text class="label">_id:</text>
+        <text class="value small">{{currentUserInDb._id || 'N/A'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">role:</text>
+        <text class="value {{currentUserInDb.isLeader || currentUserInDb.isAdmin ? 'bool-true' : 'bool-false'}}">{{currentUserInDb.role}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">status:</text>
+        <text class="value {{currentUserInDb.isApproved ? 'bool-true' : 'bool-false'}}">{{currentUserInDb.status}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">hasLeaderPermission:</text>
+        <text class="value {{currentUserInDb.hasLeaderPermission ? 'bool-true' : 'bool-false'}}">{{currentUserInDb.hasLeaderPermission}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">shouldHaveLeaderPermission:</text>
+        <text class="value {{currentUserInDb.shouldHaveLeaderPermission ? 'bool-true' : 'bool-false'}}">{{currentUserInDb.shouldHaveLeaderPermission}}</text>
+      </view>
+      <view class="info-row" wx:if="{{currentUserInDb.issues.length > 0}}">
+        <text class="label">issues:</text>
+        <view class="issues-list">
+          <view class="issue-item" wx:for="{{currentUserInDb.issues}}" wx:key="{{index}}">
+            <text class="issue-dot">⚠️</text>
+            <text class="issue-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 全局状态 -->
+  <view class="section">
+    <view class="section-title">全局状态 (app.globalData)</view>
+    <view class="info-card">
+      <view class="info-row">
+        <text class="label">isLoggedIn:</text>
+        <text class="value {{globalData.isLoggedIn ? 'bool-true' : 'bool-false'}}">{{globalData.isLoggedIn}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">isLeader:</text>
+        <text class="value {{globalData.isLeader ? 'bool-true' : 'bool-false'}}">{{globalData.isLeader}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">isAdmin:</text>
+        <text class="value {{globalData.isAdmin ? 'bool-true' : 'bool-false'}}">{{globalData.isAdmin}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">isMember:</text>
+        <text class="value {{globalData.isMember ? 'bool-true' : 'bool-false'}}">{{globalData.isMember}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户列表 -->
+  <view class="section">
+    <view class="section-title">users 集合 ({{users.length}} 条)</view>
+    <view class="list-card" wx:for="{{users}}" wx:key="_id">
+      <view class="list-item">
+        <text class="item-name">{{item.nickname}}</text>
+        <text class="item-role">role: {{item.role}}</text>
+        <text class="item-status">status: {{item.status}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="section">
+    <view class="section-title">activities 集合 ({{activities.length}} 条)</view>
+    <view class="list-card" wx:for="{{activities}}" wx:key="_id">
+      <view class="list-item">
+        <text class="item-name">{{item.title}}</text>
+        <text class="item-status">status: {{item.status}}</text>
+      </view>
+    </view>
+    <view wx:if="{{activities.length === 0}}" class="empty-tip">
+      没有活动数据，请检查 init 云函数是否创建了示例数据
+    </view>
+  </view>
+
+  <button class="refresh-btn" bindtap="loadDbInfo">刷新数据</button>
+</view>

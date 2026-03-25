@@ -1,6 +1,7 @@
 {
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
+  "cloudfunctionTemplateRoot": "",
   "setting": {
     "urlCheck": false,
     "es6": true,
@@ -37,20 +38,23 @@
     "showES6CompileOption": false,
     "minifyWXML": true
   },
-  "appid": "wxe737c89eb3569c21",
+  "appid": "wxfab0c5bd74364f44",
   "projectname": "SundayRunningClub",
   "description": "SundayRunningClub 跑团小程序",
-  "cloudfunctionTemplateRoot": "",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
   "compileType": "miniprogram",
-  "libVersion": "3.14.3",
+  "libVersion": "2.25.3",
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
     "ignore": [],
     "include": []
+  },
+  "cloud": {
+    "functionId": "",
+    "env": "cloud1-2gyhe7s5efa4155f"
   }
 }

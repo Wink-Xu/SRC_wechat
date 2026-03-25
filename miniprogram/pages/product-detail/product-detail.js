@@ -1,7 +1,7 @@
 // pages/product-detail/product-detail.js
 const { shopApi, pointsApi } = require('../../utils/request');
 const { formatMoney, showSuccess, showInfo, showConfirm } = require('../../utils/util');
-const { isMember, requireMember } = require('../../utils/auth');
+const { isLoggedIn, isMember, requireLogin } = require('../../utils/auth');
 
 Page({
   data: {
@@ -50,7 +50,7 @@ Page({
 
   // 加载我的积分
   loadMyPoints: async function () {
-    if (!isMember()) return;
+    if (!isLoggedIn()) return;
 
     try {
       const result = await pointsApi.getBalance();
@@ -92,6 +92,7 @@ Page({
   selectAddress: function () {
     wx.chooseAddress({
       success: (res) => {
+        console.log('[选择地址] 成功:', res);
         const address = {
           name: res.userName,
           phone: res.telNumber,
@@ -102,13 +103,36 @@ Page({
         };
         this.setData({ address });
         wx.setStorageSync('defaultAddress', address);
+      },
+      fail: (err) => {
+        console.error('[选择地址] 失败:', err);
+        // 用户拒绝授权或取消选择
+        if (err.errMsg && err.errMsg.includes('auth deny')) {
+          wx.showModal({
+            title: '提示',
+            content: '您未授权收货地址，请在设置中开启权限',
+            confirmText: '去设置',
+            success: (res) => {
+              if (res.confirm) {
+                wx.openSetting();
+              }
+            }
+          });
+        } else if (err.errMsg && err.errMsg.includes('cancel')) {
+          // 用户取消选择，不做处理
+        } else {
+          wx.showToast({
+            title: '选择地址失败',
+            icon: 'none'
+          });
+        }
       }
     });
   },
 
   // 提交订单
   handleSubmit: async function () {
-    if (!requireMember()) return;
+    if (!requireLogin()) return;
 
     const { product, quantity, address, payMethod, myPoints } = this.data;
 
@@ -202,5 +226,14 @@ Page({
       title: this.data.product?.name || '商品推荐',
       path: `/pages/product-detail/product-detail?id=${this.data.id}`
     };
+  },
+
+  // 预览细节图片
+  previewDetailImage: function (e) {
+    const { index } = e.currentTarget.dataset;
+    wx.previewImage({
+      current: index,
+      urls: this.data.product.images
+    });
   }
 });

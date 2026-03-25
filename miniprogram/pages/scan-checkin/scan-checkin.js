@@ -7,32 +7,38 @@ Page({
     activity: null,
     loading: true,
     hasCheckedIn: false,
-    checkInTime: ''
+    checkInTime: '',
+    error: null
   },
 
   onLoad: function (options) {
-    // 从扫码进入，options.scene 包含二维码内容
     console.log('扫码进入，options:', options);
 
-    let qrData;
-    try {
-      // 尝试解析二维码内容
-      qrData = JSON.parse(options.scene || '{}');
-    } catch (e) {
-      qrData = { type: 'checkin', activity_id: options.scene };
+    let activityId = null;
+
+    // 小程序码扫码进入，scene 参数是活动 ID
+    if (options.scene) {
+      // decodeURIComponent 解码 scene
+      const scene = decodeURIComponent(options.scene);
+      console.log('scene:', scene);
+      activityId = scene;
     }
 
-    if (qrData.type !== 'checkin' || !qrData.activity_id) {
-      wx.showToast({
-        title: '无效的签到码',
-        icon: 'none'
+    // 普通二维码扫码进入
+    if (options.q || options.activity_id) {
+      activityId = options.q || options.activity_id;
+    }
+
+    if (!activityId) {
+      this.setData({
+        loading: false,
+        error: '无效的签到码'
       });
-      setTimeout(() => wx.navigateBack(), 1500);
       return;
     }
 
-    this.setData({ activityId: qrData.activity_id });
-    this.loadActivity(qrData.activity_id);
+    this.setData({ activityId });
+    this.loadActivity(activityId);
   },
 
   // 加载活动信息
@@ -42,24 +48,10 @@ Page({
       const activity = result.activity;
 
       // 检查活动状态
-      if (activity.status !== 'ongoing' && activity.status !== 'published') {
-        wx.showToast({
-          title: '活动未开始或已结束',
-          icon: 'none'
-        });
-        setTimeout(() => wx.navigateBack(), 1500);
-        return;
-      }
-
-      // 检查是否已报名
-      if (!result.isRegistered) {
-        wx.showModal({
-          title: '提示',
-          content: '您还未报名参加此活动，请先报名',
-          showCancel: false,
-          success: () => {
-            wx.navigateBack();
-          }
+      if (activity.status !== 'ongoing') {
+        this.setData({
+          loading: false,
+          error: '活动未开始或已结束，无法签到'
         });
         return;
       }
@@ -68,7 +60,7 @@ Page({
       if (result.registration && result.registration.check_in_status === 'checked_in') {
         this.setData({
           hasCheckedIn: true,
-          checkInTime: result.registration.check_in_time
+          checkInTime: result.registration.checked_in_at
         });
       }
 
@@ -81,7 +73,8 @@ Page({
           ...activity,
           formattedTime
         },
-        loading: false
+        loading: false,
+        isRegistered: result.isRegistered
       });
 
       wx.setNavigationBarTitle({
@@ -89,47 +82,75 @@ Page({
       });
     } catch (error) {
       console.error('加载活动失败', error);
-      wx.showToast({
-        title: '加载失败，请重试',
-        icon: 'none'
+      this.setData({
+        loading: false,
+        error: '加载活动信息失败'
       });
-      setTimeout(() => wx.navigateBack(), 1500);
     }
   },
 
-  // 确认签到
+  // 确认签到（团员自助签到）
   confirmCheckIn: async function () {
-    wx.showLoading({
-      title: '签到中...'
-    });
+    // 检查登录状态
+    if (!app.globalData.isLoggedIn) {
+      wx.showModal({
+        title: '请先登录',
+        content: '登录后才能签到',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({
+              url: '/pages/profile/profile'
+            });
+          }
+        }
+      });
+      return;
+    }
+
+    // 检查是否是团员
+    if (app.globalData.userInfo.status !== 'approved') {
+      wx.showToast({
+        title: '仅限正式团员签到',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showLoading({ title: '签到中...' });
 
     try {
-      await activityApi.checkIn({ activityId: this.data.activityId });
+      const result = await activityApi.selfCheckIn({ activityId: this.data.activityId });
 
       wx.hideLoading();
 
-      // 显示签到成功动画
       this.setData({
         hasCheckedIn: true,
         checkInTime: new Date().toISOString()
       });
 
-      wx.showToast({
+      wx.showModal({
         title: '签到成功',
-        icon: 'success'
+        content: `签到成功！活动结束后将获得 ${result.points} 积分`,
+        showCancel: false,
+        success: () => {
+          wx.navigateBack();
+        }
       });
-
-      // 1.5 秒后返回
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
     } catch (error) {
       wx.hideLoading();
       wx.showToast({
-        title: error?.message || '签到失败，请重试',
+        title: error?.message || '签到失败',
         icon: 'none'
       });
     }
+  },
+
+  // 去报名
+  goToRegister: function () {
+    wx.redirectTo({
+      url: `/pages/activity-detail/activity-detail?id=${this.data.activityId}`
+    });
   },
 
   // 返回

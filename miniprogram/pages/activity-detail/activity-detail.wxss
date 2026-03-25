@@ -16,11 +16,73 @@ page {
   color: #999;
 }
 
+/* 非团员查看限制 */
+.permission-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 60rpx;
+}
+
+.denied-icon {
+  font-size: 100rpx;
+  margin-bottom: 40rpx;
+}
+
+.denied-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+}
+
+.denied-desc {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.btn-apply {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 500;
+  padding: 24rpx 60rpx;
+  border-radius: 48rpx;
+  border: none;
+}
+
 /* ========== 封面图头部 - 优化版 ========== */
 .cover-header {
   position: relative;
   height: 480rpx;
   overflow: hidden;
+}
+
+.past-cover {
+  height: 400rpx;
+}
+
+.cover-actions {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  z-index: 10;
+}
+
+.btn-change-cover {
+  background: rgba(0, 0, 0, 0.6);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 24rpx;
+  border: none;
+}
+
+.btn-change-cover::after {
+  border: none;
 }
 
 .cover-image {
@@ -158,6 +220,7 @@ page {
   font-weight: 400;
   line-height: 1.9;
   flex: 1;
+  text-align: left;
 }
 
 .info-value .highlight {
@@ -213,11 +276,55 @@ page {
   border-radius: 12rpx;
   overflow: hidden;
   background: #F5F5F5;
+  position: relative;
+}
+
+.photo-item.selected {
+  border: 4rpx solid #1A1A1A;
+  box-sizing: border-box;
 }
 
 .photo-img {
   width: 100%;
   height: 100%;
+}
+
+.photo-delete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-delete text {
+  color: #fff;
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.photo-check {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: #1A1A1A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-check text {
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
 .no-photos {
@@ -292,18 +399,50 @@ page {
 .upload-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   background: #1A1A1A;
   color: #FFFFFF;
-  padding: 10rpx 20rpx;
+  padding: 12rpx 28rpx;
   border-radius: 24rpx;
-  font-size: 24rpx;
+  font-size: 26rpx;
   font-weight: 500;
+  min-width: 80rpx;
 }
 
-.upload-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: 8rpx;
+.edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F5F5;
+  color: #1A1A1A;
+  padding: 12rpx 28rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  min-width: 80rpx;
+  margin-left: 16rpx;
+}
+
+.photo-actions {
+  display: flex;
+  align-items: center;
+}
+
+.select-btns {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.select-btn {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  padding: 8rpx 16rpx;
+}
+
+.select-btn.delete {
+  color: #F44336;
+  font-weight: 500;
 }
 
 /* ========== 底部操作区 ========== */
@@ -522,6 +661,29 @@ page {
   height: 60rpx;
   padding: 0 32rpx;
   font-size: 26rpx;
+}
+
+/* 签到入口 */
+.checkin-entry {
+  width: 100%;
+}
+
+.btn-scan-checkin {
+  width: 100%;
+  height: 96rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-scan-checkin::after {
+  border: none;
 }
 
 /* 签到提示 */

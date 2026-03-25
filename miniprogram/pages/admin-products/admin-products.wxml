@@ -11,7 +11,7 @@
     </view>
 
     <view class="product-card" wx:for="{{products}}" wx:key="_id">
-      <image class="product-image" src="{{item.image || '/images/default-product.png'}}"></image>
+      <image class="product-image" src="{{item.images[0] || item.image || '/images/default-product.png'}}"></image>
       <view class="product-info">
         <text class="product-name">{{item.name}}</text>
         <view class="product-price">
@@ -49,8 +49,8 @@
   </view>
 
   <!-- 添加/编辑弹窗 -->
-  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="closeModal">
-    <view class="modal-content" catchtap="">
+  <view class="modal-mask" wx:if="{{showAddModal}}">
+    <view class="modal-content" catchtap="stopTap">
       <view class="modal-header">
         <text class="modal-title">{{editingId ? '编辑商品' : '添加商品'}}</text>
         <text class="modal-close" bindtap="closeModal">×</text>
@@ -66,9 +66,20 @@
         </view>
         <view class="form-item">
           <text class="form-label">商品图片</text>
-          <view class="image-upload" bindtap="chooseImage">
-            <image wx:if="{{formData.image}}" class="preview-image" src="{{formData.image}}" mode="aspectFill"></image>
-            <text wx:else class="upload-text">+ 上传图片</text>
+          <view class="image-upload">
+            <!-- 图片预览网格 -->
+            <view wx:if="{{formData.images.length > 0}}" class="image-preview-list">
+              <view class="image-preview-item" wx:for="{{formData.images}}" wx:key="index">
+                <image class="preview-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-index="{{index}}"></image>
+                <view class="image-delete" bindtap="deleteImage" data-index="{{index}}">×</view>
+              </view>
+            </view>
+            <!-- 上传按钮 -->
+            <view wx:if="{{formData.images.length < 9}}" class="upload-btn" bindtap="chooseImage">
+              <view class="upload-add">
+                <text class="upload-icon">+</text>
+              </view>
+            </view>
           </view>
         </view>
         <view class="form-item">

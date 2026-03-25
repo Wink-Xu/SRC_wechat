@@ -48,17 +48,20 @@ Page({
 
     try {
       const result = await shopApi.getProductList({ page, limit: pageSize });
+      console.log('[Shop] 商品列表结果:', result);
 
       const products = (result.list || []).map(item => ({
         ...item,
         cashPriceYuan: item.cash_price ? formatMoney(item.cash_price) : null
       }));
+      console.log('[Shop] 处理后的商品:', products);
 
       this.setData({
         products: page === 1 ? products : [...this.data.products, ...products],
         hasMore: products.length >= pageSize,
         loading: false
       });
+      console.log('[Shop] 页面数据已设置，商品数量:', this.data.products.length);
     } catch (error) {
       console.error('加载商品列表失败', error);
       this.setData({ loading: false });

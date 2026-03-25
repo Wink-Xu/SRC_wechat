@@ -235,14 +235,6 @@ Page({
       showInfo('请选择结束时间');
       return;
     }
-    if (!formData.registration_deadline_date) {
-      showInfo('请选择报名截止日期');
-      return;
-    }
-    if (!formData.registration_deadline_time) {
-      showInfo('请选择报名截止时间');
-      return;
-    }
     if (formData.quota <= 0) {
       showInfo('名额必须大于 0');
       return;
@@ -261,11 +253,15 @@ Page({
       dress_code: formData.dress_code.trim(),
       start_time: `${formData.start_date} ${formData.start_time}`,
       end_time: `${formData.start_date} ${formData.end_time}`,
-      registration_deadline: `${formData.registration_deadline_date} ${formData.registration_deadline_time}`,
       quota: formData.quota,
       points: formData.points,
       cover_image: formData.cover_image
     };
+
+    // 报名截止时间（可选）
+    if (formData.registration_deadline_date && formData.registration_deadline_time) {
+      submitData.registration_deadline = `${formData.registration_deadline_date} ${formData.registration_deadline_time}`;
+    }
 
     try {
       if (isEdit) {

@@ -13,6 +13,12 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const { action, ...data } = event;
 
+  // 注意：manageProduct 调用时，action 会被 data.action 覆盖
+  // 所以需要检查是否是商品操作
+  if (['create', 'update', 'delete'].includes(action) && data.data) {
+    return handleManageProduct(event, wxContext);
+  }
+
   switch (action) {
     case 'getStatistics':
       return handleGetStatistics(data, wxContext);
@@ -25,7 +31,7 @@ exports.main = async (event, context) => {
     case 'getOrders':
       return handleGetOrders(data, wxContext);
     default:
-      return { code: -1, message: '未知操作' };
+      return { code: -1, message: '未知操作: ' + action };
   }
 };
 
@@ -107,9 +113,12 @@ async function handleGetPendingMembers(data, wxContext) {
 }
 
 // 管理商品
-async function handleManageProduct(data, wxContext) {
+async function handleManageProduct(event, wxContext) {
   const openid = wxContext.OPENID;
-  const { action, id, data: productData } = data;
+  // 兼容两种调用方式
+  const action = event.data?.action || event.action;
+  const id = event.data?.id || event.id;
+  const productData = event.data?.data || event.data;
 
   try {
     // 检查权限
@@ -123,14 +132,14 @@ async function handleManageProduct(data, wxContext) {
     }
 
     if (action === 'create') {
-      await db.collection('products').add({
+      const result = await db.collection('products').add({
         data: {
           ...productData,
           created_at: db.serverDate(),
           updated_at: db.serverDate()
         }
       });
-      return { code: 0, message: '创建成功' };
+      return { code: 0, data: { id: result._id }, message: '创建成功' };
     }
 
     if (action === 'update') {
@@ -148,10 +157,10 @@ async function handleManageProduct(data, wxContext) {
       return { code: 0, message: '删除成功' };
     }
 
-    return { code: -1, message: '未知操作' };
+    return { code: -1, message: '未知操作: ' + action };
   } catch (error) {
     console.error('管理商品失败', error);
-    return { code: -1, message: '操作失败' };
+    return { code: -1, message: '操作失败: ' + error.message };
   }
 }
 

@@ -37,11 +37,17 @@
           bindtap="publishActivity"
         >发布</button>
         <button
-          wx:if="{{item.status === 'ongoing'}}"
+          wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
+          class="btn btn-info btn-small"
+          data-id="{{item._id}}"
+          bindtap="showCheckInQrCode"
+        >签到码</button>
+        <button
+          wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
           class="btn btn-warning btn-small"
           data-id="{{item._id}}"
           bindtap="finishActivity"
-        >结束并发放积分</button>
+        >结束活动</button>
         <button
           wx:if="{{item.status === 'published' || item.status === 'ongoing'}}"
           class="btn btn-error btn-small"
@@ -69,5 +75,25 @@
   <!-- 创建按钮 -->
   <view class="fab-btn" bindtap="createActivity">
     <text class="fab-icon">+</text>
+  </view>
+
+  <!-- 签到码弹窗 -->
+  <view class="modal-mask" wx:if="{{showCheckInQr}}" bindtap="closeCheckInQrCode">
+    <view class="modal-content" catchtap="noop">
+      <view class="modal-header">
+        <text class="modal-title">活动签到码</text>
+        <text class="modal-close" bindtap="closeCheckInQrCode">×</text>
+      </view>
+      <view class="modal-body">
+        <image class="qr-code-img" src="{{checkInQrCode}}" mode="aspectFit"></image>
+        <text class="qr-hint">微信"扫一扫"即可签到</text>
+        <view class="qr-actions">
+          <button class="btn-save" bindtap="saveQrCode">保存图片</button>
+        </view>
+        <view class="qr-stats">
+          <text>已签到：{{checkInCount}}人</text>
+        </view>
+      </view>
+    </view>
   </view>
 </view>

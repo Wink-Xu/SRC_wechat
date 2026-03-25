@@ -13,11 +13,10 @@ Page({
     participants: [],
     runTypeText: '',
     canUploadPhotos: false,
-    // 签到相关
-    showCheckInQr: false,      // 是否显示签到码弹窗
-    checkInQrCode: '',         // 签到码图片数据
-    checkInCount: 0,           // 已签到人数
-    isAdminOrLeader: false     // 是否管理员或团长
+    isMember: false,
+    // 批量删除照片
+    isSelectMode: false,
+    selectedPhotos: []
   },
 
   onLoad: function (options) {
@@ -55,14 +54,11 @@ Page({
       };
       const runTypeText = runTypeMap[activity.run_type] || '路跑';
 
-      // 检查是否可以上传照片（管理员或团长）
+      // 检查用户状态
       const app = getApp();
-      const canUploadPhotos = app.globalData.userInfo &&
-        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader');
-
-      // 检查是否是管理员或团长
-      const isAdminOrLeader = !!(app.globalData.userInfo &&
-        (app.globalData.userInfo.role === 'admin' || app.globalData.userInfo.role === 'leader'));
+      const userInfo = app.globalData.userInfo;
+      const isMember = userInfo && userInfo.status === 'approved';
+      const canUploadPhotos = userInfo && (userInfo.role === 'admin' || userInfo.role === 'leader');
 
       this.setData({
         activity,
@@ -71,9 +67,10 @@ Page({
         participants: result.participants || [],
         runTypeText,
         canUploadPhotos,
-        isAdminOrLeader,
-        checkInCount: activity.check_in_count || 0,
-        loading: false
+        isMember,
+        loading: false,
+        isSelectMode: false,
+        selectedPhotos: []
       });
 
       wx.setNavigationBarTitle({
@@ -153,115 +150,56 @@ Page({
   },
 
   // 上传照片
-  uploadPhotos: function () {
+  uploadPhotos: async function () {
     const self = this;
-    wx.chooseMedia({
-      count: 9,
-      mediaType: ['image'],
-      sourceType: ['album', 'camera'],
-      sizeType: ['compressed'],
-      success: function (res) {
-        const tempFiles = res.tempFiles;
-        if (tempFiles && tempFiles.length > 0) {
-          wx.showLoading({ title: '上传中...' });
-
-          // 模拟上传成功
-          setTimeout(function () {
-            wx.hideLoading();
-            const newPhotos = tempFiles.map(function (file) {
-              return file.tempFilePath;
-            });
-            const currentPhotos = self.data.activity.photos || [];
-            const updatedPhotos = currentPhotos.concat(newPhotos);
-
-            self.setData({
-              'activity.photos': updatedPhotos
-            });
-
-            wx.showToast({ title: '上传成功', icon: 'success' });
-          }, 1000);
-        }
-      },
-      fail: function (err) {
-        console.error('选择照片失败', err);
-      }
-    });
-  },
-
-  // 显示签到码
-  showCheckInQrCode: async function () {
     try {
-      const result = await activityApi.getCheckInQrCode({ id: this.data.id });
-      this.setData({
-        checkInQrCode: result.qr_code,
-        checkInCount: result.check_in_count || 0,
-        showCheckInQr: true
+      const chooseRes = await new Promise((resolve, reject) => {
+        wx.chooseMedia({
+          count: 9,
+          mediaType: ['image'],
+          sourceType: ['album', 'camera'],
+          sizeType: ['compressed'],
+          success: resolve,
+          fail: reject
+        });
       });
-    } catch (error) {
-      console.error('获取签到码失败', error);
-      wx.showToast({
-        title: '获取签到码失败',
-        icon: 'none'
+
+      const tempFiles = chooseRes.tempFiles;
+      if (!tempFiles || tempFiles.length === 0) return;
+
+      wx.showLoading({ title: '上传中...' });
+
+      // 上传照片到云存储
+      const uploadPromises = tempFiles.map(file => {
+        return new Promise((resolve, reject) => {
+          const cloudPath = `activity_photos/${self.data.id}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
+          wx.cloud.uploadFile({
+            cloudPath: cloudPath,
+            filePath: file.tempFilePath,
+            success: res => resolve(res.fileID),
+            fail: reject
+          });
+        });
       });
+
+      const fileIDs = await Promise.all(uploadPromises);
+
+      // 调用云函数更新照片列表
+      await activityApi.updatePhotos({
+        id: self.data.id,
+        photos: fileIDs
+      });
+
+      wx.hideLoading();
+      wx.showToast({ title: '上传成功', icon: 'success' });
+
+      // 重新加载活动详情
+      self.loadActivity();
+    } catch (err) {
+      wx.hideLoading();
+      console.error('上传照片失败', err);
+      wx.showToast({ title: '上传失败', icon: 'none' });
     }
-  },
-
-  // 关闭签到码弹窗
-  closeCheckInQrCode: function () {
-    this.setData({
-      showCheckInQr: false
-    });
-  },
-
-  // 保存二维码图片
-  saveQrCode: function () {
-    const that = this;
-    wx.showLoading({ title: '保存中...' });
-
-    // 下载图片并保存
-    wx.downloadFile({
-      url: this.data.checkInQrCode,
-      success: function (res) {
-        wx.saveImageToPhotosAlbum({
-          filePath: res.tempFilePath,
-          success: function () {
-            wx.hideLoading();
-            wx.showToast({
-              title: '保存成功',
-              icon: 'success'
-            });
-          },
-          fail: function (err) {
-            wx.hideLoading();
-            if (err.errMsg.includes('auth deny')) {
-              wx.showModal({
-                title: '提示',
-                content: '您已拒绝相册权限，请在设置中开启',
-                confirmText: '去设置',
-                success: function (modalRes) {
-                  if (modalRes.confirm) {
-                    wx.openSetting();
-                  }
-                }
-              });
-            } else {
-              wx.showToast({
-                title: '保存失败',
-                icon: 'none'
-              });
-            }
-          }
-        });
-      },
-      fail: function (err) {
-        wx.hideLoading();
-        wx.showToast({
-          title: '下载图片失败',
-          icon: 'none'
-        });
-        console.error('下载图片失败', err);
-      }
-    });
   },
 
   // 预览照片
@@ -275,11 +213,239 @@ Page({
     });
   },
 
+  // 删除照片
+  deletePhoto: async function (e) {
+    const index = e.currentTarget.dataset.index;
+    const photos = this.data.activity.photos || [];
+
+    const confirm = await showConfirm('删除照片', '确定要删除这张照片吗？');
+    if (!confirm) return;
+
+    try {
+      const newPhotos = [...photos];
+      newPhotos.splice(index, 1);
+
+      await activityApi.updatePhotos({
+        id: this.data.id,
+        photos: newPhotos
+      });
+
+      showSuccess('已删除');
+      this.loadActivity();
+    } catch (error) {
+      console.error('删除照片失败', error);
+      wx.showToast({ title: '删除失败', icon: 'none' });
+    }
+  },
+
+  // 进入选择模式
+  enterSelectMode: function () {
+    this.setData({
+      isSelectMode: true,
+      selectedPhotos: []
+    });
+  },
+
+  // 取消选择模式
+  cancelSelectMode: function () {
+    this.setData({
+      isSelectMode: false,
+      selectedPhotos: []
+    });
+  },
+
+  // 切换选择照片
+  toggleSelectPhoto: function (e) {
+    const index = e.currentTarget.dataset.index;
+    const selectedPhotos = [...this.data.selectedPhotos];
+    const idx = selectedPhotos.indexOf(index);
+
+    if (idx > -1) {
+      selectedPhotos.splice(idx, 1);
+    } else {
+      selectedPhotos.push(index);
+    }
+
+    this.setData({ selectedPhotos });
+  },
+
+  // 全选
+  selectAll: function () {
+    const photos = this.data.activity.photos || [];
+    const allIndexes = photos.map((_, index) => index);
+    this.setData({ selectedPhotos: allIndexes });
+  },
+
+  // 批量删除选中的照片
+  deleteSelectedPhotos: async function () {
+    const { selectedPhotos, activity } = this.data;
+    const photos = activity.photos || [];
+
+    if (selectedPhotos.length === 0) return;
+
+    const confirm = await showConfirm('删除照片', `确定要删除选中的 ${selectedPhotos.length} 张照片吗？`);
+    if (!confirm) return;
+
+    try {
+      // 按索引从大到小排序，避免删除时索引变化
+      const sortedIndexes = [...selectedPhotos].sort((a, b) => b - a);
+      const newPhotos = [...photos];
+
+      sortedIndexes.forEach(index => {
+        newPhotos.splice(index, 1);
+      });
+
+      await activityApi.updatePhotos({
+        id: this.data.id,
+        photos: newPhotos
+      });
+
+      showSuccess(`已删除 ${selectedPhotos.length} 张照片`);
+      this.setData({
+        isSelectMode: false,
+        selectedPhotos: []
+      });
+      this.loadActivity();
+    } catch (error) {
+      console.error('批量删除照片失败', error);
+      wx.showToast({ title: '删除失败', icon: 'none' });
+    }
+  },
+
+  // 更换封面图
+  changeCoverImage: async function () {
+    const self = this;
+    try {
+      const chooseRes = await new Promise((resolve, reject) => {
+        wx.chooseMedia({
+          count: 1,
+          mediaType: ['image'],
+          sourceType: ['album', 'camera'],
+          sizeType: ['compressed'],
+          success: resolve,
+          fail: reject
+        });
+      });
+
+      const tempFile = chooseRes.tempFiles[0];
+      if (!tempFile) return;
+
+      wx.showLoading({ title: '上传中...' });
+
+      // 上传封面图到云存储
+      const cloudPath = `activity_covers/${self.data.id}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
+      const uploadRes = await new Promise((resolve, reject) => {
+        wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: tempFile.tempFilePath,
+          success: resolve,
+          fail: reject
+        });
+      });
+
+      // 调用云函数更新封面
+      await activityApi.updateCoverImage({
+        id: self.data.id,
+        coverImage: uploadRes.fileID
+      });
+
+      wx.hideLoading();
+      wx.showToast({ title: '更换成功', icon: 'success' });
+
+      // 重新加载活动详情
+      self.loadActivity();
+    } catch (err) {
+      wx.hideLoading();
+      console.error('更换封面失败', err);
+      wx.showToast({ title: '更换失败', icon: 'none' });
+    }
+  },
+
   // 查看报名名单
   viewParticipants: function () {
     wx.navigateTo({
       url: `/pages/activity-participants/activity-participants?id=${this.data.id}`
     });
+  },
+
+  // 去申请入团
+  goToApply: function () {
+    wx.navigateTo({
+      url: '/pages/apply-membership/apply-membership'
+    });
+  },
+
+  // 扫码签到
+  scanToCheckIn: function () {
+    const self = this;
+    wx.scanCode({
+      success: function (res) {
+        console.log('扫码结果:', res);
+
+        let activityId = null;
+
+        // 尝试解析扫码结果
+        if (res.result) {
+          try {
+            const qrData = JSON.parse(res.result);
+            if (qrData.type === 'checkin' && qrData.activity_id) {
+              activityId = qrData.activity_id;
+            }
+          } catch (e) {
+            // 可能是小程序码，result 是活动 ID
+            activityId = res.result;
+          }
+        }
+
+        if (!activityId) {
+          wx.showToast({
+            title: '无效的签到码',
+            icon: 'none'
+          });
+          return;
+        }
+
+        // 验证是否是当前活动
+        if (activityId !== self.data.id) {
+          wx.showToast({
+            title: '这不是当前活动的签到码',
+            icon: 'none'
+          });
+          return;
+        }
+
+        // 执行签到
+        self.doSelfCheckIn();
+      },
+      fail: function (err) {
+        console.error('扫码失败', err);
+      }
+    });
+  },
+
+  // 执行自助签到
+  doSelfCheckIn: async function () {
+    wx.showLoading({ title: '签到中...' });
+
+    try {
+      const result = await activityApi.selfCheckIn({ activityId: this.data.id });
+      wx.hideLoading();
+
+      wx.showModal({
+        title: '签到成功',
+        content: `签到成功！活动结束后将获得 ${result.points} 积分`,
+        showCancel: false,
+        success: () => {
+          this.loadActivity();
+        }
+      });
+    } catch (error) {
+      wx.hideLoading();
+      wx.showToast({
+        title: error?.message || '签到失败',
+        icon: 'none'
+      });
+    }
   },
 
   // 获取状态文本

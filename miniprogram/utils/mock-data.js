@@ -9,7 +9,7 @@
 // 'admin'  - 管理员
 // 'pending' - 待审批用户
 // ============================================
-const CURRENT_ROLE = 'admin';
+const CURRENT_ROLE = 'guest';
 
 // 模拟用户数据
 const users = {
@@ -92,6 +92,8 @@ const activities = [
     registered_count: 15,
     check_in_count: 8, // 已签到人数
     check_in_enabled: true, // 启用签到
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
     created_by: 'leader_001'
   },
   // 往期活动（5 个）
@@ -109,17 +111,9 @@ const activities = [
     points: 25,
     status: 'ended',
     registered_count: 38,
-    created_by: 'leader_001',
-    cover_image: '/images/cover-1.svg',
-    photos: [
-      '/images/activity-1-1.svg', '/images/activity-1-2.svg', '/images/activity-1-3.svg',
-      '/images/activity-1-4.svg', '/images/activity-1-5.svg', '/images/activity-1-6.svg',
-      '/images/activity-1-7.svg', '/images/activity-1-8.svg', '/images/activity-1-9.svg',
-      '/images/activity-1-10.svg', '/images/activity-1-11.svg', '/images/activity-1-12.svg',
-      '/images/activity-1-13.svg', '/images/activity-1-14.svg', '/images/activity-1-15.svg',
-      '/images/activity-1-16.svg', '/images/activity-1-17.svg', '/images/activity-1-18.svg',
-      '/images/activity-1-19.svg', '/images/activity-1-20.svg'
-    ]
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
+    created_by: 'leader_001'
   },
   {
     _id: 'activity_past_002',
@@ -135,17 +129,9 @@ const activities = [
     points: 20,
     status: 'ended',
     registered_count: 22,
-    created_by: 'admin_001',
-    cover_image: '/images/cover-2.svg',
-    photos: [
-      '/images/activity-2-1.svg', '/images/activity-2-2.svg', '/images/activity-2-3.svg',
-      '/images/activity-2-4.svg', '/images/activity-2-5.svg', '/images/activity-2-6.svg',
-      '/images/activity-2-7.svg', '/images/activity-2-8.svg', '/images/activity-2-9.svg',
-      '/images/activity-2-10.svg', '/images/activity-2-11.svg', '/images/activity-2-12.svg',
-      '/images/activity-2-13.svg', '/images/activity-2-14.svg', '/images/activity-2-15.svg',
-      '/images/activity-2-16.svg', '/images/activity-2-17.svg', '/images/activity-2-18.svg',
-      '/images/activity-2-19.svg', '/images/activity-2-20.svg'
-    ]
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
+    created_by: 'admin_001'
   },
   {
     _id: 'activity_past_003',
@@ -161,17 +147,9 @@ const activities = [
     points: 40,
     status: 'ended',
     registered_count: 20,
-    created_by: 'leader_001',
-    cover_image: '/images/cover-3.svg',
-    photos: [
-      '/images/activity-3-1.svg', '/images/activity-3-2.svg', '/images/activity-3-3.svg',
-      '/images/activity-3-4.svg', '/images/activity-3-5.svg', '/images/activity-3-6.svg',
-      '/images/activity-3-7.svg', '/images/activity-3-8.svg', '/images/activity-3-9.svg',
-      '/images/activity-3-10.svg', '/images/activity-3-11.svg', '/images/activity-3-12.svg',
-      '/images/activity-3-13.svg', '/images/activity-3-14.svg', '/images/activity-3-15.svg',
-      '/images/activity-3-16.svg', '/images/activity-3-17.svg', '/images/activity-3-18.svg',
-      '/images/activity-3-19.svg', '/images/activity-3-20.svg'
-    ]
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
+    created_by: 'leader_001'
   },
   {
     _id: 'activity_past_004',
@@ -187,17 +165,9 @@ const activities = [
     points: 25,
     status: 'ended',
     registered_count: 28,
-    created_by: 'admin_001',
-    cover_image: '/images/cover-4.svg',
-    photos: [
-      '/images/activity-4-1.svg', '/images/activity-4-2.svg', '/images/activity-4-3.svg',
-      '/images/activity-4-4.svg', '/images/activity-4-5.svg', '/images/activity-4-6.svg',
-      '/images/activity-4-7.svg', '/images/activity-4-8.svg', '/images/activity-4-9.svg',
-      '/images/activity-4-10.svg', '/images/activity-4-11.svg', '/images/activity-4-12.svg',
-      '/images/activity-4-13.svg', '/images/activity-4-14.svg', '/images/activity-4-15.svg',
-      '/images/activity-4-16.svg', '/images/activity-4-17.svg', '/images/activity-4-18.svg',
-      '/images/activity-4-19.svg', '/images/activity-4-20.svg'
-    ]
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
+    created_by: 'admin_001'
   },
   {
     _id: 'activity_past_005',
@@ -213,17 +183,9 @@ const activities = [
     points: 30,
     status: 'ended',
     registered_count: 15,
-    created_by: 'admin_002',
-    cover_image: '/images/cover-5.svg',
-    photos: [
-      '/images/activity-5-1.svg', '/images/activity-5-2.svg', '/images/activity-5-3.svg',
-      '/images/activity-5-4.svg', '/images/activity-5-5.svg', '/images/activity-5-6.svg',
-      '/images/activity-5-7.svg', '/images/activity-5-8.svg', '/images/activity-5-9.svg',
-      '/images/activity-5-10.svg', '/images/activity-5-11.svg', '/images/activity-5-12.svg',
-      '/images/activity-5-13.svg', '/images/activity-5-14.svg', '/images/activity-5-15.svg',
-      '/images/activity-5-16.svg', '/images/activity-5-17.svg', '/images/activity-5-18.svg',
-      '/images/activity-5-19.svg', '/images/activity-5-20.svg'
-    ]
+    cover_image: '', // 封面图
+    photos: [], // 活动照片
+    created_by: 'admin_002'
   }
 ];
 
@@ -233,7 +195,7 @@ const products = [
     _id: 'product_001',
     name: '定制速干 T 恤',
     description: 'SundayRunningClub 定制速干 T 恤，透气舒适',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 500,
     cash_price: 9900,
     stock: 50,
@@ -243,7 +205,7 @@ const products = [
     _id: 'product_002',
     name: '运动腰包',
     description: '防水运动腰包，可装手机钥匙',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 300,
     cash_price: 5900,
     stock: 30,
@@ -253,7 +215,7 @@ const products = [
     _id: 'product_003',
     name: '硅胶能量手环',
     description: '硅胶材质，防水防汗',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 100,
     cash_price: 1900,
     stock: 100,
@@ -263,7 +225,7 @@ const products = [
     _id: 'product_004',
     name: '速干运动毛巾',
     description: '速干吸汗，便携收纳袋',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 200,
     cash_price: 3900,
     stock: 40,
@@ -273,7 +235,7 @@ const products = [
     _id: 'product_005',
     name: '不锈钢运动水壶',
     description: '500ml 容量，保温保冷',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 350,
     cash_price: 6900,
     stock: 25,
@@ -283,7 +245,7 @@ const products = [
     _id: 'product_006',
     name: '跑步运动帽',
     description: '速干透气，可调节',
-    image: '/images/default-product.png',
+    images: ['/images/default-product.png'],
     points_price: 150,
     cash_price: 2900,
     stock: 60,

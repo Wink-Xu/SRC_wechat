@@ -2,13 +2,18 @@
 <view class="container">
   <!-- 用户信息头部 -->
   <view class="header-section">
-    <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
-    <view class="role-tags" wx:if="{{isLoggedIn}}">
-      <text class="role-tag" wx:if="{{isLeader}}">团长</text>
-      <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
-      <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
-      <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
-      <text class="role-tag guest" wx:else>游客</text>
+    <view class="header-top">
+      <image class="user-avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+        <view class="role-tags" wx:if="{{isLoggedIn}}">
+          <text class="role-tag" wx:if="{{isLeader}}">团长</text>
+          <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
+          <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
+          <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
+          <text class="role-tag guest" wx:else>游客</text>
+        </view>
+      </view>
     </view>
   </view>
 
@@ -85,7 +90,7 @@
 
   <!-- 跑团介绍卡片 -->
   <view class="intro-card">
-    <image class="intro-logo" src="/images/IMG_6754.jpg" mode="aspectFit"></image>
+    <image class="intro-logo" src="/images/logo.jpg" mode="aspectFit"></image>
     <text class="intro-text">作为武汉的先锋跑团，WuhanSRC 注重体验、美学和社交，Sunday Running Club（SRC）中，S 代表 Soil（成长的土壤），R 代表 Rise（向上的态度），C 代表 Cohesion（凝聚的纽带）。跑团旨在提供让跑步爱好者生根发芽的土壤，既是追求健康的跑道，也是了解时尚的秀场和放松休闲的社交空间。</text>
   </view>
 
@@ -105,6 +110,20 @@
   <view class="debug-section" wx:if="{{useMock}}">
     <view class="btn-debug" bindtap="goToDebug">
       <text>角色切换（Mock）</text>
+    </view>
+  </view>
+
+  <!-- 数据库调试入口 -->
+  <view class="debug-section">
+    <view class="btn-debug" bindtap="goToDbDebug">
+      <text>数据库调试</text>
+    </view>
+  </view>
+
+  <!-- 测试工具面板入口 -->
+  <view class="debug-section">
+    <view class="btn-debug btn-test-panel" bindtap="goToTestPanel">
+      <text>🛠️ 测试工具面板</text>
     </view>
   </view>
 </view>

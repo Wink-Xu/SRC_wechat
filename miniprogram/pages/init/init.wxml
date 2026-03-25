@@ -1,0 +1,22 @@
+<!--pages/init/init.wxml-->
+<view class="container">
+  <view class="icon">
+    <text wx:if="{{status === 'initializing'}}">⏳</text>
+    <text wx:elif="{{status === 'completed'}}">✅</text>
+    <text wx:elif="{{status === 'error'}}">❌</text>
+  </view>
+
+  <view class="message">{{message}}</view>
+
+  <view class="results" wx:if="{{results.length > 0}}">
+    <view wx:for="{{results}}" wx:key="*this" class="result-item">
+      {{item}}
+    </view>
+  </view>
+
+  <view class="hint" wx:if="{{status === 'completed'}}">
+    即将跳转到首页...
+  </view>
+
+  <button wx:if="{{status === 'error'}}" type="primary" bindtap="retry">重试</button>
+</view>

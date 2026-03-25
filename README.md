@@ -1,11 +1,5 @@
 # SundayRunningClub 跑团小程序
 
-## 项目状态
-
-**当前阶段**: Mock 模式开发（无云开发环境）
-
-由于微信测试号不支持云开发，当前使用本地 Mock 数据进行 UI 开发和测试。
-
 ## 页面结构
 
 ```
@@ -26,23 +20,6 @@ Tab 导航（3 个页面）
 ```
 
 ## 技术配置
-
-### Mock 模式开关
-
-在 `miniprogram/app.js` 中设置：
-
-```javascript
-App({
-  USE_MOCK: true,  // true = 使用本地模拟数据，false = 使用云开发
-  // ...
-});
-```
-
-在 `miniprogram/utils/request.js` 中设置：
-
-```javascript
-const USE_MOCK = true;  // true = 使用 Mock API，false = 使用云函数
-```
 
 ## Mock 数据
 
@@ -100,19 +77,8 @@ const USE_MOCK = true;  // true = 使用 Mock API，false = 使用云函数
 - ✅ 管理后台入口（管理员/团长）
 - ✅ 退出登录
 
-## 下一步计划
-
-完成 UI 测试后，需要：
-
-1. 开通正式小程序账号（非测试号）
-2. 开通云开发服务
-3. 部署云函数
-4. 初始化数据库
-5. 切换到云开发模式
-
 ## 开发文档
 
 - [需求文档](./docs/spec.md)
 - [技术方案](./docs/plan.md)
 - [任务列表](./docs/task.md)
-- [Mock 模式指南](./docs/mock-mode-guide.md)

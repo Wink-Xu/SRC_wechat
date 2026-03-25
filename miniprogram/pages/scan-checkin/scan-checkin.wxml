@@ -4,6 +4,15 @@
     <text>加载中...</text>
   </view>
 
+  <block wx:elif="{{error}}">
+    <!-- 错误状态 -->
+    <view class="error-box">
+      <text class="error-icon">⚠️</text>
+      <text class="error-text">{{error}}</text>
+      <button class="btn-back" bindtap="goBack">返回</button>
+    </view>
+  </block>
+
   <block wx:elif="{{activity}}">
     <!-- 活动信息卡片 -->
     <view class="activity-card">
@@ -13,19 +22,19 @@
 
       <view class="activity-info">
         <view class="info-item">
-          <image class="info-icon" src="/images/time.png"></image>
+          <text class="info-icon">⏰</text>
           <text class="info-text">{{activity.formattedTime}}</text>
         </view>
         <view class="info-item">
-          <image class="info-icon" src="/images/location.png"></image>
+          <text class="info-icon">📍</text>
           <text class="info-text">{{activity.location}}</text>
         </view>
         <view class="info-item">
-          <image class="info-icon" src="/images/user.png"></image>
+          <text class="info-icon">🏃</text>
           <text class="info-text">{{activity.runTypeText || '路跑'}}</text>
         </view>
         <view class="info-item">
-          <image class="info-icon" src="/images/trophy.png"></image>
+          <text class="info-icon">🏆</text>
           <text class="info-text">完成可获得 {{activity.points}} 积分</text>
         </view>
       </view>
@@ -36,25 +45,35 @@
       <block wx:if="{{hasCheckedIn}}">
         <!-- 已签到 -->
         <view class="checked-in-box">
-          <image class="checked-icon" src="/images/check-circle.png"></image>
+          <text class="checked-icon">✅</text>
           <text class="checked-title">您已签到</text>
-          <text class="checked-time">签到时间：{{checkInTime}}</text>
+          <text class="checked-desc">活动结束后将自动获得 {{activity.points}} 积分</text>
         </view>
+        <button class="btn-back" bindtap="goBack">返回</button>
+      </block>
+
+      <block wx:elif="{{!isRegistered}}">
+        <!-- 未报名 -->
+        <view class="not-registered-box">
+          <text class="warning-icon">📋</text>
+          <text class="warning-title">您未报名此活动</text>
+          <text class="warning-desc">请先报名后再签到</text>
+        </view>
+        <button class="btn-primary" bindtap="goToRegister">去报名</button>
+        <button class="btn-back" bindtap="goBack">返回</button>
       </block>
 
       <block wx:else>
         <!-- 未签到 -->
         <view class="checkin-box">
           <text class="checkin-title">活动签到</text>
-          <text class="checkin-desc">确认签到后，活动结束时将自动获得 {{activity.points}} 积分</text>
-
-          <button class="btn btn-primary btn-full" bindtap="confirmCheckIn">
-            确认签到
-          </button>
-          <button class="btn btn-secondary btn-full" bindtap="goBack">
-            取消
-          </button>
+          <text class="checkin-desc">确认签到后，活动结束时将获得 {{activity.points}} 积分</text>
         </view>
+
+        <button class="btn-primary" bindtap="confirmCheckIn">
+          确认签到
+        </button>
+        <button class="btn-back" bindtap="goBack">取消</button>
       </block>
     </view>
   </block>

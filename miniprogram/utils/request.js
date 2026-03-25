@@ -2,14 +2,23 @@
 
 const { showLoading, hideLoading, showError } = require('./util');
 
-// Mock 模式开关：true=使用本地模拟数据，false=使用云函数
-const USE_MOCK = true;
+// 云函数模式开关：true=使用本地模拟数据，false=使用云函数
+const USE_MOCK = false;
 
 // 模拟数据
 let mockData = null;
 if (USE_MOCK) {
   mockData = require('./mock-data');
 }
+
+// 测试 openid 列表（与 test-panel.js 保持一致）
+const TEST_OPENIDS = [
+  'test_openid_leader_001',
+  'test_openid_admin_001',
+  'test_openid_member_001',
+  'test_openid_pending_001',
+  'test_openid_guest_001'
+];
 
 /**
  * 调用云函数
@@ -35,12 +44,24 @@ const callFunction = async (name, action, data = {}, options = {}) => {
   }
 
   try {
+    // 获取当前用户的 openid，如果是测试用户则传递 testOpenid 参数
+    const app = getApp();
+    const userOpenid = app.globalData.userInfo?.openid;
+    const isTestUser = userOpenid && TEST_OPENIDS.includes(userOpenid);
+
+    const requestData = {
+      action,
+      ...data
+    };
+
+    // 如果是测试用户，添加 testOpenid 参数
+    if (isTestUser) {
+      requestData.testOpenid = userOpenid;
+    }
+
     const res = await wx.cloud.callFunction({
       name,
-      data: {
-        action,
-        ...data
-      }
+      data: requestData
     });
 
     if (showLoad) {
@@ -446,6 +467,36 @@ const handleActivityMock = (action, data) => {
         }
       });
     }
+    case 'uploadPhotos': {
+      const activityIndex = mockData.activities.findIndex(a => a._id === data.activityId);
+      if (activityIndex === -1) {
+        return Promise.resolve({ code: 1, message: '活动不存在', data: null });
+      }
+
+      // 初始化 photos 数组
+      if (!mockData.activities[activityIndex].photos) {
+        mockData.activities[activityIndex].photos = [];
+      }
+
+      // 添加新照片
+      const newPhotos = data.photos || [];
+      mockData.activities[activityIndex].photos = mockData.activities[activityIndex].photos.concat(newPhotos);
+
+      // 设置第一张照片为封面图（如果没有封面图）
+      if (!mockData.activities[activityIndex].cover_image && newPhotos.length > 0) {
+        mockData.activities[activityIndex].cover_image = newPhotos[0];
+      }
+
+      console.log('[Mock] 上传活动照片:', { activityId: data.activityId, photoCount: newPhotos.length });
+      return Promise.resolve({
+        code: 0,
+        data: {
+          success: true,
+          photos: mockData.activities[activityIndex].photos,
+          cover_image: mockData.activities[activityIndex].cover_image
+        }
+      });
+    }
     default:
       return Promise.resolve({ code: 0, data: null });
   }
@@ -469,12 +520,28 @@ const handlePointsMock = (action, data) => {
 };
 
 // 商城相关 Mock API
+// 持久化存储新创建的商品（不被 require 缓存重置）
+const createdProducts = [];
+console.log('[Mock] createdProducts 初始化，当前长度:', createdProducts.length);
+
 const handleShopMock = (action, data) => {
+  // 每次都重新获取 mockData，确保使用最新数据
+  mockData = require('./mock-data');
+
   switch (action) {
-    case 'getProductList':
-      return Promise.resolve({ code: 0, data: { list: mockData.products } });
+    case 'getProductList': {
+      // 合并原始商品和创建的商品
+      console.log('[Mock shop] createdProducts 数量:', createdProducts.length);
+      const allProducts = [...mockData.products, ...createdProducts];
+      console.log('[Mock shop] 返回商品总数:', allProducts.length);
+      return Promise.resolve({ code: 0, data: { list: allProducts } });
+    }
     case 'getProductDetail': {
-      const product = mockData.products.find(p => p._id === data.id);
+      // 先在创建的商品中查找，再在原始商品中查找
+      let product = createdProducts.find(p => p._id === data.id);
+      if (!product) {
+        product = mockData.products.find(p => p._id === data.id);
+      }
       return Promise.resolve({
         code: 0,
         data: {
@@ -501,7 +568,12 @@ const handleShopMock = (action, data) => {
 };
 
 // 管理后台 Mock API
+let productCounter = 100; // 用于生成新产品 ID
+
 const handleAdminMock = (action, data) => {
+  // 每次都重新获取 mockData，确保使用最新数据
+  mockData = require('./mock-data');
+
   switch (action) {
     case 'getStatistics':
       return Promise.resolve({
@@ -518,9 +590,35 @@ const handleAdminMock = (action, data) => {
         code: 0,
         data: { list: mockData.members.filter(m => m.status === 'pending') }
       });
-    case 'manageProduct':
-    case 'updateOrderStatus':
+    case 'manageProduct': {
+      // 创建或更新商品
+      console.log('[Mock admin] manageProduct action:', data.action);
+      if (data.action === 'create') {
+        const newProduct = {
+          _id: 'product_' + (++productCounter),
+          name: data.data.name,
+          description: data.data.description || '',
+          images: data.data.images || [],  // 支持多张图片
+          points_price: data.data.points_price || null,
+          cash_price: data.data.cash_price || null,
+          stock: data.data.stock || 0,
+          status: data.data.status || 'available'
+        };
+        createdProducts.push(newProduct);  // 保存到持久化数组
+        console.log('[Mock admin] 创建了新商品，createdProducts 数量:', createdProducts.length);
+        console.log('[Mock admin] 新商品:', newProduct);
+        return Promise.resolve({ code: 0, data: { success: true, product: newProduct } });
+      } else if (data.action === 'update') {
+        const index = mockData.products.findIndex(p => p._id === data.id);
+        if (index !== -1) {
+          mockData.products[index] = { ...mockData.products[index], ...data.data };
+          console.log('[Mock] 更新了商品:', data.id, mockData.products[index]);
+        }
+        return Promise.resolve({ code: 0, data: { success: true } });
+      }
       return Promise.resolve({ code: 0, data: { success: true } });
+    }
+    case 'updateOrderStatus':
     case 'getOrders':
       return Promise.resolve({ code: 0, data: { list: [] } });
     default:
@@ -542,6 +640,8 @@ const userApi = {
 const activityApi = {
   create: (data) => callFunction('activity', 'create', data),
   update: (data) => callFunction('activity', 'update', data),
+  updatePhotos: (data) => callFunction('activity', 'updatePhotos', data),
+  updateCoverImage: (data) => callFunction('activity', 'updateCoverImage', data),
   publish: (data) => callFunction('activity', 'publish', data),
   cancel: (data) => callFunction('activity', 'cancel', data),
   delete: (data) => callFunction('activity', 'delete', data),
@@ -550,8 +650,10 @@ const activityApi = {
   register: (data) => callFunction('activity', 'register', data),
   cancelRegistration: (data) => callFunction('activity', 'cancelRegistration', data),
   checkIn: (data) => callFunction('activity', 'checkIn', data),
+  selfCheckIn: (data) => callFunction('activity', 'selfCheckIn', data),
   getCheckInQrCode: (data) => callFunction('activity', 'getCheckInQrCode', data, { showLoad: false }),
-  finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data)
+  finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data),
+  uploadPhotos: (data) => callFunction('activity', 'uploadPhotos', data)
 };
 
 // 积分相关接口
@@ -585,11 +687,38 @@ const adminApi = {
   getOrders: (data) => callFunction('admin', 'getOrders', data, { showLoad: false })
 };
 
+// 调试接口
+const debugApi = {
+  checkUser: (data) => callFunction('debug', 'checkUser', data, { showLoad: false, showErrorMsg: false }),
+  fixUserRole: (data) => callFunction('debug', 'fixUserRole', data),
+  checkActivities: (data) => callFunction('debug', 'checkActivities', data, { showLoad: false, showErrorMsg: false })
+};
+
+// 测试工具接口
+const testUserApi = {
+  createTestUsers: (data) => callFunction('test-user', 'createTestUsers', data),
+  listTestUsers: (data) => callFunction('test-user', 'listTestUsers', data, { showLoad: false }),
+  switchToUser: (data) => callFunction('test-user', 'switchToUser', data),
+  resetTestUsers: (data) => callFunction('test-user', 'resetTestUsers', data),
+  deleteTestUser: (data) => callFunction('test-user', 'deleteTestUser', data)
+};
+
+const testDataApi = {
+  initTestData: (data) => callFunction('test-data', 'initTestData', data),
+  createTestActivities: (data) => callFunction('test-data', 'createTestActivities', data),
+  createTestProducts: (data) => callFunction('test-data', 'createTestProducts', data),
+  resetAllData: (data) => callFunction('test-data', 'resetAllData', data),
+  cleanupAllData: (data) => callFunction('test-data', 'cleanupAllData', data)
+};
+
 module.exports = {
   callFunction,
   userApi,
   activityApi,
   pointsApi,
   shopApi,
-  adminApi
+  adminApi,
+  debugApi,
+  testUserApi,
+  testDataApi
 };

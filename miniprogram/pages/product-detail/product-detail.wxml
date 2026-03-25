@@ -5,8 +5,12 @@
   </view>
 
   <block wx:elif="{{product}}">
-    <!-- 商品图片 -->
-    <image class="product-image" src="{{product.image || '/images/default-product.png'}}" mode="aspectFill"></image>
+    <!-- 商品图片轮播 -->
+    <swiper class="product-swiper" indicator-dots="{{true}}" autoplay="{{false}}" circular="{{true}}">
+      <swiper-item wx:for="{{product.images || []}}" wx:key="index">
+        <image class="product-image" src="{{item}}" mode="aspectFill"></image>
+      </swiper-item>
+    </swiper>
 
     <!-- 商品信息 -->
     <view class="product-info">
@@ -25,9 +29,15 @@
     </view>
 
     <!-- 商品描述 -->
-    <view class="product-desc" wx:if="{{product.description}}">
+    <view class="product-desc" wx:if="{{product.description || product.images.length > 1}}">
       <text class="section-title">商品描述</text>
-      <text class="desc-text">{{product.description}}</text>
+      <text class="desc-text" wx:if="{{product.description}}">{{product.description}}</text>
+      <!-- 商品细节图片 -->
+      <view class="detail-images" wx:if="{{product.images.length > 1}}">
+        <view class="detail-image-item" wx:for="{{product.images}}" wx:key="index">
+          <image class="detail-image" src="{{item}}" mode="widthFix" bindtap="previewDetailImage" data-index="{{index}}"></image>
+        </view>
+      </view>
     </view>
 
     <!-- 数量选择 -->

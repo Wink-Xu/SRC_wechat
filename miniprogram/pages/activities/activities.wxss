@@ -184,6 +184,10 @@ page {
   background: #1A1A1A;
 }
 
+.corner-tag.ended {
+  background: #999999;
+}
+
 .past-title {
   display: block;
   font-size: 30rpx;

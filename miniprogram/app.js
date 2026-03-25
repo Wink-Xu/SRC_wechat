@@ -2,8 +2,8 @@
 const mockData = require('./utils/mock-data');
 
 App({
-  // Mock 模式开关：true=使用本地模拟数据，false=使用云开发
-  USE_MOCK: true,
+  // 云函数模式开关：true=使用本地模拟数据，false=使用云函数
+  USE_MOCK: false,
 
   // 当前角色（仅 Mock 模式有效）：'guest' 表示游客模式（未登录）
   CURRENT_ROLE: 'guest', // 'guest' | 'member' | 'leader' | 'admin' | 'pending'
@@ -22,6 +22,7 @@ App({
     if (this.USE_MOCK) {
       console.log('[Mock Mode] 使用本地模拟数据，不初始化云开发');
       // Mock 模式下默认为游客模式，可以浏览内容
+      this.setMockRole(this.CURRENT_ROLE);
       console.log('[Mock Mode] 默认为游客模式，可以浏览内容');
     } else {
       // 初始化云开发
@@ -29,13 +30,51 @@ App({
         console.error('请使用 2.2.3 或以上的基础库以使用云开发');
       } else {
         wx.cloud.init({
-          env: 'your-env-id', // 替换为你的云开发环境 ID
+          env: 'cloud1-2gyhe7s5efa4155f', // 云开发环境 ID
           traceUser: true
         });
       }
 
       // 检查登录状态（仅非 Mock 模式使用缓存）
       this.checkLoginStatus();
+
+      // 自动初始化数据库集合
+      this.autoInitializeDatabase();
+    }
+  },
+
+  // 自动初始化数据库（仅执行一次）
+  autoInitializeDatabase: async function () {
+    try {
+      // 检查是否已初始化
+      const hasInit = wx.getStorageSync('hasInit');
+      if (hasInit) {
+        console.log('[初始化] 已初始化过，跳过');
+        return;
+      }
+
+      console.log('[初始化] 开始初始化数据库集合...');
+
+      // 等待云开发初始化完成
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const { callFunction } = require('./utils/request');
+
+      const result = await callFunction('init', 'main', {}, {
+        showLoad: false,
+        showErrorMsg: false
+      });
+
+      console.log('[初始化] 结果:', result);
+
+      if (result && result.data) {
+        // 标记已初始化
+        wx.setStorageSync('hasInit', true);
+        console.log('[初始化] 初始化完成，集合已创建');
+      }
+    } catch (error) {
+      console.error('[初始化] 失败:', error);
+      // 初始化失败不影响使用，只是可能需要手动创建集合
     }
   },
 
@@ -86,10 +125,12 @@ App({
   setMockRole: function(role) {
     if (!this.USE_MOCK) return;
 
-    // 游客模式不设置用户信息
+    // 游客模式也设置用户信息
     if (role === 'guest') {
-      this.globalData.isGuest = true;
-      console.log('[Mock Mode] 游客模式，可以浏览内容');
+      const users = mockData.users;
+      const user = users.guest;
+      this.updateUserInfo(user);
+      console.log('[Mock Mode] 游客模式，可以浏览内容', user);
       return;
     }
 

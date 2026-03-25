@@ -10,7 +10,12 @@ Page({
     loadingMore: false,
     hasMore: true,
     page: 1,
-    pageSize: 10
+    pageSize: 10,
+    // 签到码弹窗
+    showCheckInQr: false,
+    checkInQrCode: '',
+    checkInCount: 0,
+    currentActivityId: ''
   },
 
   onLoad: function () {
@@ -112,7 +117,7 @@ Page({
   publishActivity: async function (e) {
     const { id } = e.currentTarget.dataset;
 
-    const confirm = await showConfirm('发布活动', '确定要发布此活动吗？');
+    const confirm = await showConfirm('发布活动', '确定要发布此活动吗？发布后团员可以报名和签到。');
     if (!confirm) return;
 
     try {
@@ -148,7 +153,7 @@ Page({
     if (!confirm) return;
 
     try {
-      const result = await activityApi.finishActivityWithCheckIn({ id });
+      const result = await activityApi.finishActivityWithCheckIn({ activityId: id });
       showSuccess(`活动已结束，共发放 ${result.awarded_count} 人 ${result.points_per_person} 积分`);
       this.refreshActivities();
     } catch (error) {
@@ -158,6 +163,84 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  // 显示签到码
+  showCheckInQrCode: async function (e) {
+    const { id } = e.currentTarget.dataset;
+
+    try {
+      const result = await activityApi.getCheckInQrCode({ id });
+      this.setData({
+        currentActivityId: id,
+        checkInQrCode: result.qr_code,
+        checkInCount: result.check_in_count || 0,
+        showCheckInQr: true
+      });
+    } catch (error) {
+      console.error('获取签到码失败', error);
+      wx.showToast({
+        title: '获取签到码失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 关闭签到码弹窗
+  closeCheckInQrCode: function () {
+    this.setData({
+      showCheckInQr: false
+    });
+  },
+
+  // 保存二维码图片
+  saveQrCode: function () {
+    const that = this;
+    wx.showLoading({ title: '保存中...' });
+
+    wx.downloadFile({
+      url: this.data.checkInQrCode,
+      success: function (res) {
+        wx.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success: function () {
+            wx.hideLoading();
+            wx.showToast({
+              title: '保存成功',
+              icon: 'success'
+            });
+          },
+          fail: function (err) {
+            wx.hideLoading();
+            if (err.errMsg.includes('auth deny')) {
+              wx.showModal({
+                title: '提示',
+                content: '您已拒绝相册权限，请在设置中开启',
+                confirmText: '去设置',
+                success: function (modalRes) {
+                  if (modalRes.confirm) {
+                    wx.openSetting();
+                  }
+                }
+              });
+            } else {
+              wx.showToast({
+                title: '保存失败',
+                icon: 'none'
+              });
+            }
+          }
+        });
+      },
+      fail: function (err) {
+        wx.hideLoading();
+        wx.showToast({
+          title: '下载图片失败',
+          icon: 'none'
+        });
+        console.error('下载图片失败', err);
+      }
+    });
   },
 
   // 删除活动

@@ -58,8 +58,8 @@ async function handleLogin(data, wxContext) {
       nickname: '微信用户',
       avatar: '',
       phone: '',
-      role: 'member',
-      status: 'pending', // 新用户需要申请入团
+      role: 'member',     // 默认设置为团员
+      status: 'pending',  // 需要申请审核
       points: 0,
       created_at: db.serverDate(),
       updated_at: db.serverDate()
@@ -207,7 +207,7 @@ async function handleSetRole(data, wxContext) {
   const openid = wxContext.OPENID;
 
   try {
-    // 检查权限（只有团长可以设置）
+    // 检查权限（只有团长可以设置管理员）
     const leaderResult = await db.collection('users').where({
       openid,
       role: 'leader'
