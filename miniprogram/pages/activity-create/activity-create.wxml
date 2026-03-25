@@ -45,14 +45,19 @@
 
     <view class="form-item">
       <text class="form-label required">集合地点</text>
-      <input
-        class="form-input"
-        type="text"
-        placeholder="请输入集合地点"
-        value="{{formData.location}}"
-        bindinput="onLocationInput"
-        maxlength="100"
-      />
+      <view class="location-input-wrapper">
+        <input
+          class="form-input location-input"
+          type="text"
+          placeholder="请输入或选择集合地点"
+          value="{{formData.location}}"
+          bindinput="onLocationInput"
+          maxlength="100"
+        />
+        <button class="btn-choose-location" bindtap="chooseLocation">
+          <text>选点</text>
+        </button>
+      </view>
     </view>
 
     <!-- 跑步类型 -->

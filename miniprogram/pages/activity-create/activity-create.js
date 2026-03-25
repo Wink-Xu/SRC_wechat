@@ -12,6 +12,8 @@ Page({
       title: '',
       description: '',
       location: '',
+      latitude: null,
+      longitude: null,
       run_type: 'road', // road | trail | hiking | brand
       dress_code: '',
       start_date: '',
@@ -77,6 +79,8 @@ Page({
           title: activity.title,
           description: activity.description || '',
           location: activity.location,
+          latitude: activity.latitude || null,
+          longitude: activity.longitude || null,
           run_type: activity.run_type || 'road',
           dress_code: activity.dress_code || '',
           start_date: startDate,
@@ -107,6 +111,27 @@ Page({
   // 输入地点
   onLocationInput: function (e) {
     this.setData({ 'formData.location': e.detail.value });
+  },
+
+  // 选择地图位置
+  chooseLocation: function () {
+    const that = this;
+    wx.chooseLocation({
+      success: function (res) {
+        // res.name: 位置名称
+        // res.address: 详细地址
+        // res.latitude: 纬度
+        // res.longitude: 经度
+        that.setData({
+          'formData.location': res.name || res.address,
+          'formData.latitude': res.latitude,
+          'formData.longitude': res.longitude
+        });
+      },
+      fail: function (err) {
+        console.error('选择位置失败', err);
+      }
+    });
   },
 
   // 选择跑步类型
@@ -249,6 +274,8 @@ Page({
       title: formData.title.trim(),
       description: formData.description.trim(),
       location: formData.location.trim(),
+      latitude: formData.latitude,
+      longitude: formData.longitude,
       run_type: formData.run_type,
       dress_code: formData.dress_code.trim(),
       start_time: `${formData.start_date} ${formData.start_time}`,
