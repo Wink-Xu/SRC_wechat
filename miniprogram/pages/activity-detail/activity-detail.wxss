@@ -179,6 +179,19 @@ page {
   font-size: 32rpx;
 }
 
+.location-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: #1A1A1A;
+}
+
+.location-icon {
+  font-size: 20rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
 /* ========== 活动详情卡片 ========== */
 .section-card {
   background: #FFFFFF;

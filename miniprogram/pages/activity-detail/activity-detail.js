@@ -375,6 +375,37 @@ Page({
     });
   },
 
+  // 打开地图查看地点
+  openLocation: function () {
+    const activity = this.data.activity;
+    if (!activity || !activity.location) {
+      wx.showToast({
+        title: '暂无地点信息',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 如果有经纬度，直接定位
+    if (activity.latitude && activity.longitude) {
+      wx.openLocation({
+        latitude: activity.latitude,
+        longitude: activity.longitude,
+        name: activity.location,
+        scale: 16
+      });
+    } else {
+      // 没有经纬度，打开地图让用户搜索
+      wx.openLocation({
+        latitude: 30.5728,  // 武汉默认坐标
+        longitude: 114.2793,
+        name: activity.location,
+        address: activity.location,
+        scale: 16
+      });
+    }
+  },
+
   // 扫码签到
   scanToCheckIn: function () {
     const self = this;

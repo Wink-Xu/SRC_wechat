@@ -45,7 +45,10 @@
         </view>
         <view class="info-cell">
           <text class="info-label">集合地点</text>
-          <text class="info-value">{{activity.location}}</text>
+          <view class="info-value location-value" bindtap="openLocation">
+            <text>{{activity.location}}</text>
+            <text class="location-icon">▶</text>
+          </view>
         </view>
         <view class="info-cell">
           <text class="info-label">跑步类型</text>
