@@ -38,15 +38,21 @@
     "list": [
       {
         "pagePath": "pages/activities/activities",
-        "text": "活动"
+        "text": "活动",
+        "iconPath": "images/activity.png",
+        "selectedIconPath": "images/activity-active.png"
       },
       {
         "pagePath": "pages/shop/shop",
-        "text": "周边"
+        "text": "周边",
+        "iconPath": "images/shop.png",
+        "selectedIconPath": "images/shop-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
       }
     ]
   },
