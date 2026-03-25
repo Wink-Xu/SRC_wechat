@@ -29,6 +29,34 @@
         </view>
       </view>
 
+      <!-- 活动信息列表 -->
+      <view class="info-grid">
+        <view class="info-cell">
+          <text class="info-label">活动时间</text>
+          <text class="info-value">{{activity.formattedTime}}</text>
+        </view>
+        <view class="info-cell">
+          <text class="info-label">集合地点</text>
+          <text class="info-value">{{activity.location}}</text>
+        </view>
+        <view class="info-cell">
+          <text class="info-label">跑步类型</text>
+          <text class="info-value">{{runTypeText}}</text>
+        </view>
+        <view class="info-cell" wx:if="{{activity.registration_deadline}}">
+          <text class="info-label">报名截止</text>
+          <text class="info-value">{{activity.formattedRegistrationDeadline}}</text>
+        </view>
+        <view class="info-cell" wx:if="{{activity.dress_code}}">
+          <text class="info-label">DressCode</text>
+          <text class="info-value">{{activity.dress_code}}</text>
+        </view>
+        <view class="info-cell">
+          <text class="info-label">报名人数</text>
+          <text class="info-value"><text class="highlight">{{activity.registered_count || 0}}</text>/{{activity.quota}}人</text>
+        </view>
+      </view>
+
       <!-- 活动详情 -->
       <view class="section-card">
         <view class="card-header-simple">
@@ -37,54 +65,17 @@
         <text class="desc-text">{{activity.description}}</text>
       </view>
 
-      <!-- 活动信息列表 -->
-      <view class="info-grid">
-        <view class="info-cell">
-          <text class="info-icon icon-time"></text>
-          <text class="info-label">活动时间</text>
-          <text class="info-value">{{activity.formattedTime}}</text>
-        </view>
-        <view class="info-cell">
-          <text class="info-icon icon-location"></text>
-          <text class="info-label">集合地点</text>
-          <text class="info-value">{{activity.location}}</text>
-        </view>
-        <view class="info-cell">
-          <text class="info-icon icon-run"></text>
-          <text class="info-label">跑步类型</text>
-          <text class="info-value">{{runTypeText}}</text>
-        </view>
-        <view class="info-cell" wx:if="{{activity.registration_deadline}}">
-          <text class="info-icon icon-time"></text>
-          <text class="info-label">报名截止</text>
-          <text class="info-value">{{activity.formattedRegistrationDeadline}}</text>
-        </view>
-        <view class="info-cell" wx:if="{{activity.dress_code}}">
-          <text class="info-icon icon-user"></text>
-          <text class="info-label">DressCode</text>
-          <text class="info-value">{{activity.dress_code}}</text>
-        </view>
-        <view class="info-cell">
-          <text class="info-icon icon-users"></text>
-          <text class="info-label">报名人数</text>
-          <text class="info-value">
-            <text class="highlight">{{activity.registered_count || 0}}</text>
-            <text>/{{activity.quota}}人</text>
-          </text>
-        </view>
-      </view>
-
       <!-- 已报名团员 -->
       <view class="section-card">
         <view class="card-header-simple">
-          <text class="card-title">已报名团员</text>
-          <view class="view-all-btn" bindtap="viewParticipants">
-            <text>查看全部 {{activity.registered_count || 0}}人</text>
+          <text class="card-title">已报名</text>
+          <view class="view-all-btn" bindtap="viewParticipants" wx:if="{{participants.length > 0}}">
+            <text>全部 {{activity.registered_count || 0}}人</text>
             <image class="arrow-icon" src="/images/arrow-right.png"></image>
           </view>
         </view>
         <view class="participants-list" wx:if="{{participants.length > 0}}">
-          <view class="participant-item" wx:for="{{participants}}" wx:for-limit="5" wx:key="_id">
+          <view class="participant-item" wx:for="{{participants}}" wx:for-limit="6" wx:key="_id">
             <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
             <text class="participant-name">{{item.nickname}}</text>
             <text class="status-dot {{item.status === 'checked_in' ? 'checked-in' : ''}}" wx:if="{{item.status}}"></text>
