@@ -142,13 +142,6 @@ Page({
     });
   },
 
-  // 跳转到数据库调试页面
-  goToDbDebug: function () {
-    wx.navigateTo({
-      url: '/pages/debug-db/debug-db'
-    });
-  },
-
   // 跳转到测试工具面板
   goToTestPanel: function () {
     wx.navigateTo({
