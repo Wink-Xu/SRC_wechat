@@ -106,15 +106,8 @@
     <button class="btn-login" bindtap="handleLogin">立即登录</button>
   </view>
 
-  <!-- Mock 模式调试入口 -->
-  <view class="debug-section" wx:if="{{useMock}}">
-    <view class="btn-debug" bindtap="goToDebug">
-      <text>角色切换（Mock）</text>
-    </view>
-  </view>
-
-  <!-- 测试工具面板入口（开发调试用） -->
-  <view class="debug-section" wx:if="{{useMock}}">
+  <!-- 测试工具面板入口 -->
+  <view class="debug-section">
     <view class="btn-debug btn-test-panel" bindtap="goToTestPanel">
       <text>🛠️ 测试工具面板</text>
     </view>

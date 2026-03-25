@@ -5,8 +5,9 @@ App({
   // 云函数模式开关：true=使用本地模拟数据，false=使用云函数
   USE_MOCK: false,
 
-  // 当前角色（仅 Mock 模式有效）：'guest' 表示游客模式（未登录）
-  CURRENT_ROLE: 'guest', // 'guest' | 'member' | 'leader' | 'admin' | 'pending'
+  // 当前角色（仅 Mock 模式有效）
+  // 'guest' - 游客 | 'member' - 团员 | 'leader' - 团长 | 'admin' - 管理员 | 'pending' - 待审批
+  CURRENT_ROLE: 'admin',
 
   globalData: {
     userInfo: null,

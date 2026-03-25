@@ -2,14 +2,18 @@
 
 const { showLoading, hideLoading, showError } = require('./util');
 
-// 云函数模式开关：true=使用本地模拟数据，false=使用云函数
-const USE_MOCK = false;
-
-// 模拟数据
+// 模拟数据（延迟加载）
 let mockData = null;
-if (USE_MOCK) {
-  mockData = require('./mock-data');
-}
+
+// 获取 Mock 模式状态
+const getUseMock = () => {
+  try {
+    const app = getApp();
+    return app && app.USE_MOCK;
+  } catch (e) {
+    return false;
+  }
+};
 
 // 测试 openid 列表（与 test-panel.js 保持一致）
 const TEST_OPENIDS = [
@@ -29,8 +33,10 @@ const TEST_OPENIDS = [
  * @returns {Promise<Object>} 返回结果
  */
 const callFunction = async (name, action, data = {}, options = {}) => {
+  const useMock = getUseMock();
+
   // Mock 模式：直接返回模拟数据
-  if (USE_MOCK) {
+  if (useMock) {
     // 每次都重新获取 mockData，确保数据是最新的
     mockData = require('./mock-data');
     const result = await handleMockApi(name, action, data, options);
