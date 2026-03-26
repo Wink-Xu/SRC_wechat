@@ -12,7 +12,10 @@ Page({
     myPoints: 0,
     address: null,
     payMethod: 'wechat', // points | wechat
-    showBuyModal: false // 购买确认弹窗
+    showBuyModal: false, // 购买确认弹窗
+    isMember: false, // 是否是团员
+    sizes: ['S', 'M', 'L', 'XL'],
+    selectedSize: '' // 选中的尺寸
   },
 
   onLoad: function (options) {
@@ -69,6 +72,9 @@ Page({
   loadMyPoints: async function () {
     if (!isLoggedIn()) return;
 
+    // 设置是否是团员
+    this.setData({ isMember: isMember() });
+
     try {
       const result = await pointsApi.getBalance();
       this.setData({ myPoints: result.points || 0 });
@@ -103,6 +109,12 @@ Page({
   // 切换支付方式
   onPayMethodChange: function (e) {
     this.setData({ payMethod: e.currentTarget.dataset.method });
+  },
+
+  // 选择尺寸
+  onSelectSize: function (e) {
+    const size = e.currentTarget.dataset.size;
+    this.setData({ selectedSize: size });
   },
 
   // 选择地址
@@ -270,7 +282,13 @@ Page({
 
   // 确认购买
   confirmBuy: async function () {
-    const { product, quantity, address, payMethod, myPoints } = this.data;
+    const { product, quantity, address, payMethod, myPoints, selectedSize } = this.data;
+
+    // 检查尺寸
+    if (!selectedSize) {
+      showInfo('请选择尺码');
+      return;
+    }
 
     // 检查库存
     if (product.stock < quantity) {
@@ -311,6 +329,7 @@ Page({
         productId: product._id,
         quantity,
         payMethod,
+        size: selectedSize,
         address
       });
 

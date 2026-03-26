@@ -118,6 +118,13 @@
   font-weight: 500;
 }
 
+.product-meta {
+  font-size: 26rpx;
+  color: #999999;
+  display: flex;
+  gap: 8rpx;
+}
+
 .product-quantity {
   font-size: 26rpx;
   color: #999999;

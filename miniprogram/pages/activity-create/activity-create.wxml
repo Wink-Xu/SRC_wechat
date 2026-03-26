@@ -1,195 +1,180 @@
 <!--pages/activity-create/activity-create.wxml-->
 <view class="container">
-  <view class="form-card">
-    <!-- 封面图上传 -->
-    <view class="form-item">
-      <text class="form-label required">活动封面图</text>
-      <view class="image-upload-wrapper">
-        <view class="image-upload" wx:if="{{!formData.cover_image}}" bindtap="chooseImage">
-          <view class="upload-box">
-            <text class="upload-text">上传</text>
+  <!-- 基本信息 -->
+  <view class="form-section">
+    <view class="section-title">基本信息</view>
+    <view class="section-card">
+      <!-- 封面图 -->
+      <view class="form-item">
+        <text class="form-label required">封面图</text>
+        <view class="cover-wrapper">
+          <view class="cover-upload" wx:if="{{!formData.cover_image}}" bindtap="chooseImage">
+            <text class="upload-icon">+</text>
+            <text class="upload-hint">上传封面</text>
           </view>
-        </view>
-        <view class="image-preview" wx:if="{{formData.cover_image}}">
-          <image class="preview-image" src="{{formData.cover_image}}" mode="aspectFill"></image>
-          <view class="image-actions">
-            <button class="btn-reupload" bindtap="chooseImage">重新上传</button>
-            <button class="btn-delete" bindtap="removeImage">删除</button>
+          <view class="cover-preview" wx:if="{{formData.cover_image}}" bindtap="chooseImage">
+            <image class="cover-img" src="{{formData.cover_image}}" mode="aspectFill"></image>
+            <view class="cover-delete" catchtap="removeImage">×</view>
+            <view class="cover-reupload">点击更换</view>
           </view>
         </view>
       </view>
-    </view>
 
-    <view class="form-item">
-      <text class="form-label required">活动标题</text>
-      <input
-        class="form-input"
-        type="text"
-        placeholder="请输入活动标题"
-        value="{{formData.title}}"
-        bindinput="onTitleInput"
-        maxlength="50"
-      />
-    </view>
-
-    <view class="form-item">
-      <text class="form-label">活动描述</text>
-      <textarea
-        class="form-textarea"
-        placeholder="请输入活动描述（选填）"
-        value="{{formData.description}}"
-        bindinput="onDescInput"
-        maxlength="500"
-      ></textarea>
-    </view>
-
-    <view class="form-item">
-      <text class="form-label required">集合地点</text>
-      <view class="location-input-wrapper">
+      <!-- 标题 -->
+      <view class="form-item">
+        <text class="form-label required">活动标题</text>
         <input
-          class="form-input location-input"
+          class="form-input"
           type="text"
-          placeholder="请输入或选择集合地点"
-          value="{{formData.location}}"
-          bindinput="onLocationInput"
-          maxlength="100"
+          placeholder="请输入活动标题"
+          value="{{formData.title}}"
+          bindinput="onTitleInput"
+          maxlength="50"
         />
-        <button class="btn-choose-location" bindtap="chooseLocation">
-          <text>选点</text>
-        </button>
       </view>
-    </view>
 
-    <!-- 跑步类型 -->
-    <view class="form-item">
-      <text class="form-label required">跑步类型</text>
-      <view class="radio-group">
-        <view
-          class="radio-item {{formData.run_type === item.value ? 'active' : ''}}"
-          wx:for="{{runTypes}}"
-          wx:key="value"
-          bindtap="onRunTypeChange"
-          data-value="{{item.value}}"
-        >
-          <view class="radio-inner">
-            <view class="radio-dot {{formData.run_type === item.value ? 'active' : ''}}"></view>
+      <!-- 描述 -->
+      <view class="form-item">
+        <text class="form-label required">活动描述</text>
+        <textarea
+          class="form-textarea"
+          placeholder="请输入活动描述"
+          value="{{formData.description}}"
+          bindinput="onDescInput"
+          maxlength="500"
+        ></textarea>
+      </view>
+
+      <!-- 地点 -->
+      <view class="form-item">
+        <text class="form-label required">集合地点</text>
+        <view class="location-row">
+          <input
+            class="form-input location-input"
+            type="text"
+            placeholder="请输入地点"
+            value="{{formData.location}}"
+            bindinput="onLocationInput"
+            maxlength="100"
+          />
+          <view class="location-btn" bindtap="chooseLocation">
+            <text>选点</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 跑步类型 -->
+      <view class="form-item">
+        <text class="form-label required">跑步类型</text>
+        <view class="type-grid">
+          <view
+            class="type-item {{formData.run_type === item.value ? 'active' : ''}}"
+            wx:for="{{runTypes}}"
+            wx:key="value"
+            bindtap="onRunTypeChange"
+            data-value="{{item.value}}"
+          >
             <text>{{item.label}}</text>
           </view>
         </view>
       </view>
-    </view>
 
-    <!-- Dress Code -->
-    <view class="form-item">
-      <text class="form-label">DressCode</text>
-      <input
-        class="form-input"
-        type="text"
-        placeholder="例如：统一穿跑团队服、主题装扮等"
-        value="{{formData.dress_code}}"
-        bindinput="onDressCodeInput"
-        maxlength="50"
-      />
-    </view>
-
-    <view class="form-item">
-      <text class="form-label required">活动开始时间</text>
-      <picker
-        mode="date"
-        start="{{minDate}}"
-        bindchange="onDateChange"
-      >
-        <view class="form-picker">
-          <text class="{{formData.start_date ? '' : 'placeholder'}}">
-            {{formData.start_date || '请选择活动日期'}}
-          </text>
-        </view>
-      </picker>
-    </view>
-
-    <view class="form-item form-row">
-      <view class="form-item-half">
-        <text class="form-label">开始时间</text>
-        <picker
-          mode="time"
-          bindchange="onStartTimeChange"
-        >
-          <view class="form-picker">
-            <text class="{{formData.start_time ? '' : 'placeholder'}}">
-              {{formData.start_time || '选择时间'}}
-            </text>
-          </view>
-        </picker>
+      <!-- Dress Code -->
+      <view class="form-item">
+        <text class="form-label required">Dress Code</text>
+        <input
+          class="form-input"
+          type="text"
+          placeholder="例如：统一穿跑团队服"
+          value="{{formData.dress_code}}"
+          bindinput="onDressCodeInput"
+          maxlength="50"
+        />
       </view>
-      <view class="form-item-half">
-        <text class="form-label">结束时间</text>
-        <picker
-          mode="time"
-          bindchange="onEndTimeChange"
-        >
-          <view class="form-picker">
-            <text class="{{formData.end_time ? '' : 'placeholder'}}">
-              {{formData.end_time || '选择时间'}}
-            </text>
-          </view>
-        </picker>
-      </view>
-    </view>
-
-    <view class="form-item form-row">
-      <view class="form-item-half">
-        <text class="form-label">报名截止</text>
-        <picker
-          mode="date"
-          start="{{minDate}}"
-          bindchange="onRegistrationDeadlineChange"
-        >
-          <view class="form-picker">
-            <text class="{{formData.registration_deadline_date ? '' : 'placeholder'}}">
-              {{formData.registration_deadline_date || '无'}}
-            </text>
-          </view>
-        </picker>
-      </view>
-      <view class="form-item-half">
-        <text class="form-label">截止时间</text>
-        <picker
-          mode="time"
-          bindchange="onRegistrationDeadlineTimeChange"
-        >
-          <view class="form-picker">
-            <text class="{{formData.registration_deadline_time ? '' : 'placeholder'}}">
-              {{formData.registration_deadline_time || '无'}}
-            </text>
-          </view>
-        </picker>
-      </view>
-    </view>
-
-    <view class="form-item">
-      <text class="form-label required">名额限制</text>
-      <input
-        class="form-input"
-        type="number"
-        placeholder="请输入名额"
-        value="{{formData.quota}}"
-        bindinput="onQuotaInput"
-      />
-    </view>
-
-    <view class="form-item">
-      <text class="form-label required">参与积分</text>
-      <input
-        class="form-input"
-        type="number"
-        placeholder="签到后获得的积分"
-        value="{{formData.points}}"
-        bindinput="onPointsInput"
-      />
     </view>
   </view>
 
-  <button class="btn btn-primary btn-full submit-btn" bindtap="handleSubmit">
-    {{isEdit ? '保存修改' : '创建活动'}}
-  </button>
+  <!-- 时间设置 -->
+  <view class="form-section">
+    <view class="section-title">时间设置</view>
+    <view class="section-card">
+      <view class="form-item">
+        <text class="form-label required">活动时间</text>
+        <datetime-picker
+          title="选择活动时间"
+          value="{{formData.start_datetime}}"
+          bind:change="onStartDatetimeChange"
+        >
+          <view class="picker-row">
+            <text class="{{formData.start_datetime_display ? '' : 'placeholder'}}">
+              {{formData.start_datetime_display || '请选择日期和时间'}}
+            </text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </datetime-picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">报名截止</text>
+        <datetime-picker
+          title="选择报名截止时间"
+          value="{{formData.registration_deadline}}"
+          bind:change="onRegistrationDeadlineChange"
+        >
+          <view class="picker-row">
+            <text class="{{formData.registration_deadline_display ? '' : 'placeholder'}}">
+              {{formData.registration_deadline_display || '不设置截止时间'}}
+            </text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </datetime-picker>
+      </view>
+    </view>
+  </view>
+
+  <!-- 名额与积分 -->
+  <view class="form-section">
+    <view class="section-title">名额与积分</view>
+    <view class="section-card">
+      <view class="form-item inline">
+        <text class="form-label required">名额限制</text>
+        <input
+          class="form-input small"
+          type="number"
+          placeholder="20"
+          value="{{formData.quota}}"
+          bindinput="onQuotaInput"
+        />
+        <text class="input-suffix">人</text>
+      </view>
+
+      <view class="form-item inline">
+        <text class="form-label required">参与积分</text>
+        <input
+          class="form-input small"
+          type="number"
+          placeholder="10"
+          value="{{formData.points}}"
+          bindinput="onPointsInput"
+        />
+        <text class="input-suffix">分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-wrapper">
+    <button class="submit-btn" bindtap="handleSubmit">
+      {{isEdit ? '保存修改' : '创建活动'}}
+    </button>
+  </view>
 </view>
+
+<!-- 封面调整组件 -->
+<cover-adjuster
+  id="coverAdjuster"
+  outputWidth="{{750}}"
+  outputHeight="{{422}}"
+  bind:confirm="onCoverConfirm"
+  bind:cancel="onCoverCancel"
+/>

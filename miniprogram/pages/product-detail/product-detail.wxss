@@ -205,12 +205,34 @@
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  gap: 20rpx;
   border-top: 1rpx solid #F0F0F0;
 }
 
+.btn-contact {
+  width: 160rpx;
+  height: 88rpx;
+  margin: 0;
+  padding: 0;
+  background: #F5F5F5;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-contact::after {
+  border: none;
+}
+
 .buy-btn {
-  width: 100%;
+  flex: 1;
+  height: 88rpx;
   margin: 0;
   background: #1A1A1A;
   color: #FFFFFF;
@@ -342,6 +364,31 @@
   color: #999999;
   display: block;
   margin-bottom: 20rpx;
+}
+
+/* 尺码选择 */
+.size-selector {
+  display: flex;
+  gap: 20rpx;
+}
+
+.size-item {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+  border: 2rpx solid transparent;
+}
+
+.size-item.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
 }
 
 /* 数量控制 */

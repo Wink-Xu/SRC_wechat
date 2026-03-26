@@ -16,11 +16,14 @@ Page({
       longitude: null,
       run_type: 'road', // road | trail | hiking | brand
       dress_code: '',
-      start_date: '',
-      start_time: '',
-      end_time: '',
-      registration_deadline_date: '',
-      registration_deadline_time: '',
+      start_datetime: '', // ISO 格式
+      start_datetime_display: '',
+      start_date: '', // 保留用于提交
+      start_time: '', // 保留用于提交
+      registration_deadline: '', // ISO 格式
+      registration_deadline_display: '',
+      registration_deadline_date: '', // 保留用于提交
+      registration_deadline_time: '', // 保留用于提交
       quota: 20,
       points: 10,
       cover_image: ''
@@ -55,23 +58,26 @@ Page({
       // 解析日期时间
       let startDate = '';
       let startTime = '';
-      let endTime = '';
+      let startDatetime = '';
+      let startDatetimeDisplay = '';
       if (activity.start_time) {
         const startDateTime = activity.start_time instanceof Date ? activity.start_time : new Date(activity.start_time);
         startDate = formatDate(startDateTime, 'YYYY-MM-DD');
         startTime = formatDate(startDateTime, 'HH:mm');
-      }
-      if (activity.end_time) {
-        const endDateTime = activity.end_time instanceof Date ? activity.end_time : new Date(activity.end_time);
-        endTime = formatDate(endDateTime, 'HH:mm');
+        startDatetime = startDateTime.toISOString();
+        startDatetimeDisplay = `${startDate} ${startTime}`;
       }
 
+      let registrationDeadline = '';
+      let registrationDeadlineDisplay = '';
       let registrationDeadlineDate = '';
       let registrationDeadlineTime = '';
       if (activity.registration_deadline) {
         const deadlineDate = activity.registration_deadline instanceof Date ? activity.registration_deadline : new Date(activity.registration_deadline);
         registrationDeadlineDate = formatDate(deadlineDate, 'YYYY-MM-DD');
         registrationDeadlineTime = formatDate(deadlineDate, 'HH:mm');
+        registrationDeadline = deadlineDate.toISOString();
+        registrationDeadlineDisplay = `${registrationDeadlineDate} ${registrationDeadlineTime}`;
       }
 
       this.setData({
@@ -83,9 +89,12 @@ Page({
           longitude: activity.longitude || null,
           run_type: activity.run_type || 'road',
           dress_code: activity.dress_code || '',
+          start_datetime: startDatetime,
+          start_datetime_display: startDatetimeDisplay,
           start_date: startDate,
           start_time: startTime,
-          end_time: endTime,
+          registration_deadline: registrationDeadline,
+          registration_deadline_display: registrationDeadlineDisplay,
           registration_deadline_date: registrationDeadlineDate,
           registration_deadline_time: registrationDeadlineTime,
           quota: activity.quota,
@@ -145,23 +154,38 @@ Page({
     this.setData({ 'formData.dress_code': e.detail.value });
   },
 
-  // 选择活动日期
-  onDateChange: function (e) {
-    this.setData({ 'formData.start_date': e.detail.value });
+  // 选择活动时间（日期时间选择器）
+  onStartDatetimeChange: function (e) {
+    const { value, displayValue } = e.detail;
+    const date = new Date(value);
+    const startDate = formatDate(date, 'YYYY-MM-DD');
+    const startTime = formatDate(date, 'HH:mm');
+
+    this.setData({
+      'formData.start_datetime': value,
+      'formData.start_datetime_display': displayValue,
+      'formData.start_date': startDate,
+      'formData.start_time': startTime
+    });
   },
 
-  // 选择开始时间
-  onStartTimeChange: function (e) {
-    this.setData({ 'formData.start_time': e.detail.value });
-  },
+  // 选择报名截止时间（日期时间选择器）
+  onRegistrationDeadlineChange: function (e) {
+    const { value, displayValue } = e.detail;
+    const date = new Date(value);
+    const deadlineDate = formatDate(date, 'YYYY-MM-DD');
+    const deadlineTime = formatDate(date, 'HH:mm');
 
-  // 选择结束时间
-  onEndTimeChange: function (e) {
-    this.setData({ 'formData.end_time': e.detail.value });
+    this.setData({
+      'formData.registration_deadline': value,
+      'formData.registration_deadline_display': displayValue,
+      'formData.registration_deadline_date': deadlineDate,
+      'formData.registration_deadline_time': deadlineTime
+    });
   },
 
   // 选择报名截止日期
-  onRegistrationDeadlineChange: function (e) {
+  onRegistrationDeadlineChangeOld: function (e) {
     this.setData({ 'formData.registration_deadline_date': e.detail.value });
   },
 
@@ -185,35 +209,50 @@ Page({
     const that = this;
     wx.chooseImage({
       count: 1,
-      sizeType: ['compressed'],
+      sizeType: ['original'],
       sourceType: ['album', 'camera'],
       success: function (res) {
         const tempFilePath = res.tempFilePaths[0];
-
-        // 上传到云存储
-        wx.cloud.uploadFile({
-          cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.png`,
-          filePath: tempFilePath,
-          isPrivate: false,
-          success: function (uploadRes) {
-            that.setData({
-              'formData.cover_image': uploadRes.fileID
-            });
-            showSuccess('封面图上传成功');
-          },
-          fail: function (uploadErr) {
-            console.error('上传图片失败', uploadErr);
-            wx.showToast({
-              title: '上传失败',
-              icon: 'none'
-            });
-          }
-        });
+        // 显示调整器
+        that.adjuster = that.selectComponent('#coverAdjuster');
+        that.adjuster.show(tempFilePath);
+        that.tempImageSrc = tempFilePath;
       },
       fail: function (err) {
         console.error('选择图片失败', err);
       }
     });
+  },
+
+  // 封面调整确认
+  onCoverConfirm: function (e) {
+    const that = this;
+    const { tempFilePath } = e.detail;
+
+    wx.showLoading({ title: '上传中...' });
+
+    wx.cloud.uploadFile({
+      cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`,
+      filePath: tempFilePath,
+      isPrivate: false,
+      success: function (uploadRes) {
+        wx.hideLoading();
+        that.setData({
+          'formData.cover_image': uploadRes.fileID
+        });
+        showSuccess('封面上传成功');
+      },
+      fail: function (uploadErr) {
+        wx.hideLoading();
+        console.error('上传图片失败', uploadErr);
+        wx.showToast({ title: '上传失败', icon: 'none' });
+      }
+    });
+  },
+
+  // 封面调整取消
+  onCoverCancel: function () {
+    // 用户取消
   },
 
   // 删除封面图
@@ -228,8 +267,16 @@ Page({
     const { formData, isEdit, id } = this.data;
 
     // 验证表单
+    if (!formData.cover_image) {
+      showInfo('请上传封面图');
+      return;
+    }
     if (!formData.title.trim()) {
       showInfo('请输入活动标题');
+      return;
+    }
+    if (!formData.description.trim()) {
+      showInfo('请输入活动描述');
       return;
     }
     if (!formData.location.trim()) {
@@ -240,16 +287,12 @@ Page({
       showInfo('请选择跑步类型');
       return;
     }
-    if (!formData.start_date) {
-      showInfo('请选择活动日期');
+    if (!formData.dress_code.trim()) {
+      showInfo('请输入 Dress Code');
       return;
     }
-    if (!formData.start_time) {
-      showInfo('请选择开始时间');
-      return;
-    }
-    if (!formData.end_time) {
-      showInfo('请选择结束时间');
+    if (!formData.start_datetime) {
+      showInfo('请选择活动时间');
       return;
     }
     if (formData.quota <= 0) {
@@ -271,14 +314,13 @@ Page({
       run_type: formData.run_type,
       dress_code: formData.dress_code.trim(),
       start_time: `${formData.start_date} ${formData.start_time}`,
-      end_time: `${formData.start_date} ${formData.end_time}`,
       quota: formData.quota,
       points: formData.points,
       cover_image: formData.cover_image
     };
 
     // 报名截止时间（可选）
-    if (formData.registration_deadline_date && formData.registration_deadline_time) {
+    if (formData.registration_deadline) {
       submitData.registration_deadline = `${formData.registration_deadline_date} ${formData.registration_deadline_time}`;
     }
 
@@ -288,18 +330,12 @@ Page({
         showSuccess('保存成功');
       } else {
         await activityApi.create(submitData);
-        showSuccess('创建成功，返回列表');
+        showSuccess('创建成功');
       }
 
       setTimeout(() => {
-        // 返回列表页，并传递刷新标志
         wx.navigateBack({
-          delta: 1,
-          events: {
-            refresh: function() {
-              console.log('列表已刷新');
-            }
-          }
+          delta: 1
         });
       }, 1500);
     } catch (error) {

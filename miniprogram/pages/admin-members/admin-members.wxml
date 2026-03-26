@@ -47,8 +47,8 @@
         <button class="btn btn-secondary btn-small" data-id="{{item._id}}" bindtap="handleReject">拒绝</button>
       </view>
 
-      <!-- 已批准操作 -->
-      <view class="member-actions" wx:if="{{item.status === 'approved' && isLeader && item.role !== 'leader'}}">
+      <!-- 已批准操作（仅在"已批准"tab且是团长时显示） -->
+      <view class="member-actions" wx:if="{{currentStatus === 'approved' && item.status === 'approved' && isLeader && item.role !== 'leader'}}">
         <button
           class="btn btn-secondary btn-small"
           data-id="{{item._id}}"

@@ -38,7 +38,7 @@ Page({
     try {
       // 获取最新活动
       const activitiesRes = await activityApi.getList({
-        status: 'published',
+        status: 'ongoing',
         limit: 3
       });
 

@@ -5,7 +5,9 @@
     <view class="header-top">
       <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="changeAvatar"></image>
       <view class="user-info">
-        <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+        <view class="nickname-row" bindtap="editNickname">
+          <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+        </view>
         <!-- 临时显示 openid -->
         <text class="openid-text" wx:if="{{openid}}">OpenID: {{openid}}</text>
         <view class="role-tags" wx:if="{{isLoggedIn}}">
@@ -25,8 +27,8 @@
   </view>
 
   <!-- 数据统计卡片 -->
-  <view class="stats-card" wx:if="{{isLoggedIn}}">
-    <view class="stat-item">
+  <view class="stats-card" wx:if="{{isLoggedIn && isMember}}">
+    <view class="stat-item" bindtap="goToMyActivities">
       <text class="stat-value">{{activityCount}}</text>
       <text class="stat-label">活动次数</text>
     </view>
@@ -38,17 +40,17 @@
   </view>
 
   <!-- 功能菜单 - 3 列网格 -->
-  <view class="menu-card" wx:if="{{isLoggedIn}}">
+  <view class="menu-card">
     <view class="menu-grid">
-      <view class="menu-grid-item" bindtap="goToMyActivities">
+      <view class="menu-grid-item" bindtap="goToMyActivities" wx:if="{{isLoggedIn && isMember}}">
         <view class="menu-grid-icon iconfont icon-time"></view>
         <text class="menu-grid-title">我的活动</text>
       </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/orders/orders">
+      <view class="menu-grid-item" bindtap="goToOrders">
         <view class="menu-grid-icon iconfont icon-order"></view>
         <text class="menu-grid-title">我的订单</text>
       </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank">
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank" wx:if="{{isLoggedIn}}">
         <view class="menu-grid-icon iconfont icon-rank"></view>
         <text class="menu-grid-title">排行榜</text>
       </view>
@@ -74,6 +76,7 @@
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-members/admin-members">
         <view class="menu-grid-icon iconfont icon-user"></view>
         <text class="menu-grid-title">成员管理</text>
+        <view class="red-dot" wx:if="{{pendingMembersCount > 0}}"></view>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-activities/admin-activities">
         <view class="menu-grid-icon iconfont icon-activity"></view>

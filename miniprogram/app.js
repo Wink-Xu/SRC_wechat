@@ -102,6 +102,32 @@ App({
     wx.removeStorageSync('userInfo');
   },
 
+  // 刷新用户状态（无需重新登录）
+  refreshUserStatus: async function () {
+    if (!this.globalData.isLoggedIn || !this.globalData.userInfo) {
+      return null;
+    }
+
+    try {
+      const { userApi } = require('./utils/request');
+      const result = await userApi.getUserInfo();
+
+      if (result) {
+        // 合并本地昵称和头像（本地可能更新过）
+        const mergedUser = {
+          ...result,
+          nickname: this.globalData.userInfo.nickname || result.nickname,
+          avatar: this.globalData.userInfo.avatar || result.avatar
+        };
+        this.updateUserInfo(mergedUser);
+        return mergedUser;
+      }
+    } catch (error) {
+      console.error('[刷新用户状态失败]', error);
+    }
+    return null;
+  },
+
   // 处理登录（在 profile 页面调用）
   handleLogin: function () {
     const that = this;
@@ -131,15 +157,11 @@ App({
             console.log('[登录] 云函数返回:', loginResult);
 
             // 登录成功后更新全局用户状态
+            // 直接使用云函数返回的用户数据（保留数据库中的自定义头像昵称）
             const cloudUser = loginResult.data || loginResult;
-            const mergedUser = {
-              ...cloudUser,
-              nickname: userInfo.nickName || cloudUser.nickname,
-              avatar: userInfo.avatarUrl || cloudUser.avatar
-            };
-            console.log('[登录] 更新用户状态:', mergedUser);
-            that.updateUserInfo(mergedUser);
-            resolve(mergedUser);
+            console.log('[登录] 更新用户状态:', cloudUser);
+            that.updateUserInfo(cloudUser);
+            resolve(cloudUser);
           }).catch((err) => {
             console.error('[登录] 云函数调用失败:', err);
             reject(err);

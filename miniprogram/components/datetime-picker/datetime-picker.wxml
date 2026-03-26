@@ -1,0 +1,31 @@
+<!--components/datetime-picker/datetime-picker.wxml-->
+<view class="datetime-picker" bindtap="showPicker">
+  <slot></slot>
+</view>
+
+<!-- 日期时间选择弹窗 -->
+<view class="picker-mask" wx:if="{{showPicker}}" bindtap="hidePicker"></view>
+<view class="picker-popup {{showPicker ? 'show' : ''}}">
+  <view class="picker-header">
+    <text class="picker-cancel" bindtap="hidePicker">取消</text>
+    <text class="picker-title">{{title || '选择日期时间'}}</text>
+    <text class="picker-confirm" bindtap="confirmPicker">确定</text>
+  </view>
+  <picker-view class="picker-view" value="{{pickerValue}}" bindchange="onPickerChange">
+    <picker-view-column>
+      <view class="picker-item" wx:for="{{years}}" wx:key="*this">{{item}}年</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view class="picker-item" wx:for="{{months}}" wx:key="*this">{{item}}月</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view class="picker-item" wx:for="{{days}}" wx:key="*this">{{item}}日</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view class="picker-item" wx:for="{{hours}}" wx:key="*this">{{item}}时</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view class="picker-item" wx:for="{{minutes}}" wx:key="*this">{{item}}分</view>
+    </picker-view-column>
+  </picker-view>
+</view>

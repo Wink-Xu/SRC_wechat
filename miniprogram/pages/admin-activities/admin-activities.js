@@ -394,7 +394,6 @@ Page({
   getStatusText: function (status) {
     const statusMap = {
       draft: '草稿',
-      published: '报名中',
       ongoing: '进行中',
       ended: '已结束',
       cancelled: '已取消'

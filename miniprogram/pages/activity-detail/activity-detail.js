@@ -14,6 +14,7 @@ Page({
     runTypeText: '',
     canUploadPhotos: false,
     isMember: false,
+    registrationClosed: false,
     // 批量删除照片
     isSelectMode: false,
     selectedPhotos: []
@@ -43,6 +44,14 @@ Page({
       // 格式化报名截止时间（精确到分钟）
       if (activity.registration_deadline) {
         activity.formattedRegistrationDeadline = formatDate(activity.registration_deadline, 'MM 月 DD 日 HH:mm');
+      }
+
+      // 检查报名是否已截止
+      let registrationClosed = false;
+      if (activity.registration_deadline) {
+        const deadline = new Date(activity.registration_deadline);
+        const now = new Date();
+        registrationClosed = now > deadline;
       }
 
       // 跑步类型文本
@@ -97,6 +106,7 @@ Page({
         runTypeText,
         canUploadPhotos,
         isMember,
+        registrationClosed,
         loading: false,
         isSelectMode: false,
         selectedPhotos: []
@@ -351,7 +361,7 @@ Page({
           count: 1,
           mediaType: ['image'],
           sourceType: ['album', 'camera'],
-          sizeType: ['compressed'],
+          sizeType: ['original'],
           success: resolve,
           fail: reject
         });
@@ -360,14 +370,29 @@ Page({
       const tempFile = chooseRes.tempFiles[0];
       if (!tempFile) return;
 
-      wx.showLoading({ title: '上传中...' });
+      // 显示封面调整器
+      self.adjuster = self.selectComponent('#coverAdjuster');
+      self.adjuster.show(tempFile.tempFilePath);
+      self.tempCoverSrc = tempFile.tempFilePath;
+    } catch (err) {
+      console.error('选择图片失败', err);
+    }
+  },
 
+  // 封面调整确认
+  onCoverConfirm: async function (e) {
+    const self = this;
+    const { tempFilePath } = e.detail;
+
+    wx.showLoading({ title: '上传中...' });
+
+    try {
       // 上传封面图到云存储
       const cloudPath = `activity_covers/${self.data.id}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
       const uploadRes = await new Promise((resolve, reject) => {
         wx.cloud.uploadFile({
           cloudPath: cloudPath,
-          filePath: tempFile.tempFilePath,
+          filePath: tempFilePath,
           isPrivate: false,
           success: resolve,
           fail: reject
@@ -381,7 +406,7 @@ Page({
       });
 
       wx.hideLoading();
-      wx.showToast({ title: '更换成功', icon: 'success' });
+      showSuccess('更换成功');
 
       // 重新加载活动详情
       self.loadActivity();
@@ -390,6 +415,11 @@ Page({
       console.error('更换封面失败', err);
       wx.showToast({ title: '更换失败', icon: 'none' });
     }
+  },
+
+  // 封面调整取消
+  onCoverCancel: function () {
+    // 用户取消
   },
 
   // 查看报名名单
@@ -514,7 +544,6 @@ Page({
   getStatusText: function (status) {
     const statusMap = {
       draft: '草稿',
-      published: '报名中',
       ongoing: '进行中',
       ended: '已结束',
       cancelled: '已取消'
@@ -526,7 +555,6 @@ Page({
   getStatusClass: function (status) {
     const classMap = {
       draft: 'tag-warning',
-      published: 'tag-primary',
       ongoing: 'tag-success',
       ended: 'tag-secondary',
       cancelled: 'tag-error'

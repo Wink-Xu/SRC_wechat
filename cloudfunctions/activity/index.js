@@ -82,7 +82,7 @@ async function handleCreate(data, wxContext, testOpenid) {
 
     const activity = {
       ...data,
-      status: 'published',
+      status: 'ongoing',
       created_by: user._id,
       registered_count: 0,
       check_in_count: 0,
@@ -222,7 +222,7 @@ async function handlePublish(data, wxContext, testOpenid) {
 
     await db.collection('activities').doc(id).update({
       data: {
-        status: 'published',
+        status: 'ongoing',
         updated_at: db.serverDate()
       }
     });
@@ -471,8 +471,17 @@ async function handleRegister(data, wxContext, testOpenid) {
       return { code: -1, message: '活动不存在' };
     }
 
-    if (activity.status !== 'published') {
+    if (activity.status !== 'ongoing') {
       return { code: -1, message: '活动状态不允许报名' };
+    }
+
+    // 检查报名截止时间
+    if (activity.registration_deadline) {
+      const deadline = new Date(activity.registration_deadline);
+      const now = new Date();
+      if (now > deadline) {
+        return { code: -1, message: '报名已截止' };
+      }
     }
 
     // 检查名额
@@ -716,7 +725,7 @@ async function handleSelfCheckIn(data, wxContext, testOpenid) {
       return { code: -1, message: '活动不存在' };
     }
 
-    if (!['published', 'ongoing'].includes(activity.status)) {
+    if (!['ongoing'].includes(activity.status)) {
       return { code: -1, message: '活动未开始或已结束' };
     }
 

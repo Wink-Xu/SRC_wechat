@@ -20,8 +20,7 @@ const USER_STATUS = {
 // 活动状态
 const ACTIVITY_STATUS = {
   DRAFT: 'draft',         // 草稿
-  PUBLISHED: 'published', // 已发布
-  ONGOING: 'ongoing',     // 进行中
+  ONGOING: 'ongoing',     // 进行中（包含报名中）
   ENDED: 'ended',         // 已结束
   CANCELLED: 'cancelled'  // 已取消
 };
@@ -29,7 +28,6 @@ const ACTIVITY_STATUS = {
 // 活动状态文本
 const ACTIVITY_STATUS_TEXT = {
   draft: '草稿',
-  published: '报名中',
   ongoing: '进行中',
   ended: '已结束',
   cancelled: '已取消'
@@ -38,7 +36,6 @@ const ACTIVITY_STATUS_TEXT = {
 // 活动状态样式
 const ACTIVITY_STATUS_CLASS = {
   draft: 'tag-warning',
-  published: 'tag-primary',
   ongoing: 'tag-success',
   ended: 'tag-secondary',
   cancelled: 'tag-error'

@@ -1,0 +1,51 @@
+<!--components/cover-adjuster/cover-adjuster.wxml-->
+<view class="adjuster-container" wx:if="{{show}}">
+  <!-- 头部 -->
+  <view class="adjuster-header">
+    <view class="header-btn" bindtap="onCancel">
+      <text>取消</text>
+    </view>
+    <view class="header-title">
+      <text>调整封面</text>
+    </view>
+    <view class="header-btn primary" bindtap="onConfirm">
+      <text>完成</text>
+    </view>
+  </view>
+
+  <!-- 内容区 -->
+  <view class="adjuster-body">
+    <!-- movable-area 扩大移动范围 -->
+    <movable-area
+      class="move-area"
+      style="width:{{areaWidth}}px;height:{{areaHeight}}px;"
+    >
+      <movable-view
+        class="move-view"
+        style="width:{{viewWidth}}px;height:{{viewHeight}}px;"
+        direction="all"
+        scale="{{true}}"
+        scale-min="1"
+        scale-max="3"
+        x="{{x}}"
+        y="{{y}}"
+        bindchange="onChange"
+        bindscale="onScale"
+      >
+        <image
+          class="preview-img"
+          src="{{imageSrc}}"
+          mode="widthFix"
+        ></image>
+      </movable-view>
+    </movable-area>
+
+    <!-- 裁剪框 - 位置通过 JS 动态设置 -->
+    <view class="crop-frame" style="top:{{cropTop}}px;height:{{cropHeight}}px;"></view>
+  </view>
+
+  <!-- 提示 -->
+  <view class="adjuster-footer">
+    <text>拖动调整位置，双指缩放调整大小</text>
+  </view>
+</view>

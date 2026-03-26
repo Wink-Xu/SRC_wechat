@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "活动详情",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "cover-adjuster": "/components/cover-adjuster/cover-adjuster"
+  }
 }

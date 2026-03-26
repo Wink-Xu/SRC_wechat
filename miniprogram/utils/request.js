@@ -58,6 +58,7 @@ const callFunction = async (name, action, data = {}, options = {}) => {
 // 用户相关接口
 const userApi = {
   login: (data) => callFunction('user', 'login', data),
+  getUserInfo: (data) => callFunction('user', 'getUserInfo', data, { showLoad: false, showErrorMsg: false }),
   updateProfile: (data) => callFunction('user', 'updateProfile', data),
   applyMembership: (data) => callFunction('user', 'applyMembership', data),
   getMembers: (data) => callFunction('user', 'getMembers', data),

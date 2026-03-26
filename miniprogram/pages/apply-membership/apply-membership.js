@@ -41,7 +41,7 @@ Page({
 
   // 提交申请
   submitApply: async function () {
-    const { nickname, phone } = this.data;
+    const { nickname, phone, avatarUrl } = this.data;
 
     if (!nickname || nickname.trim().length === 0) {
       showInfo('请输入昵称');
@@ -57,6 +57,22 @@ Page({
 
     try {
       const app = getApp();
+      let avatarFileID = avatarUrl;
+
+      // 如果头像是本地临时路径，上传到云存储
+      if (avatarUrl && (avatarUrl.startsWith('http://tmp/') || avatarUrl.startsWith('wxfile://'))) {
+        const uploadResult = await wx.cloud.uploadFile({
+          cloudPath: `user_avatars/${app.globalData.userInfo?._id || Date.now()}/${Date.now()}.png`,
+          filePath: avatarUrl
+        });
+        avatarFileID = uploadResult.fileID;
+      }
+
+      // 先更新头像和昵称
+      await userApi.updateProfile({
+        nickname: nickname.trim(),
+        avatar: avatarFileID
+      });
 
       // 调用云函数申请入团
       await userApi.applyMembership({
@@ -65,12 +81,13 @@ Page({
       });
 
       // 更新本地用户状态为 pending
-      const userInfo = app.globalData.userInfo;
-      if (userInfo) {
-        userInfo.status = 'pending';
-        app.globalData.isPending = true;
-        wx.setStorageSync('userInfo', userInfo);
-      }
+      const userInfo = app.globalData.userInfo || {};
+      userInfo.nickname = nickname.trim();
+      userInfo.avatar = avatarFileID || userInfo.avatar;
+      userInfo.status = 'pending';
+      app.globalData.userInfo = userInfo;
+      app.globalData.isPending = true;
+      wx.setStorageSync('userInfo', userInfo);
 
       showSuccess('申请成功，请等待审核');
 

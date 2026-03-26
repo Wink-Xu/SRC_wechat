@@ -42,6 +42,9 @@
 
     <!-- 底部操作 -->
     <view class="footer-actions">
+      <button class="btn btn-contact" open-type="contact">
+        <text>客服</text>
+      </button>
       <button class="btn btn-primary buy-btn" bindtap="showBuyConfirm">
         立即购买
       </button>
@@ -67,6 +70,20 @@
 
         <!-- 购买数量 -->
         <view class="buy-section">
+          <text class="buy-section-title">尺码</text>
+          <view class="size-selector">
+            <view
+              wx:for="{{sizes}}"
+              wx:key="*this"
+              class="size-item {{selectedSize === item ? 'active' : ''}}"
+              data-size="{{item}}"
+              bindtap="onSelectSize"
+            >{{item}}</view>
+          </view>
+        </view>
+
+        <!-- 购买数量 -->
+        <view class="buy-section">
           <text class="buy-section-title">购买数量</text>
           <view class="quantity-control">
             <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
@@ -79,7 +96,7 @@
         <view class="buy-section">
           <text class="buy-section-title">支付方式</text>
           <view class="pay-methods">
-            <view class="pay-method {{payMethod === 'points' ? 'active' : ''}}" data-method="points" bindtap="onPayMethodChange">
+            <view wx:if="{{isMember && product.points_price}}" class="pay-method {{payMethod === 'points' ? 'active' : ''}}" data-method="points" bindtap="onPayMethodChange">
               <text class="method-name">积分兑换</text>
               <text class="method-value">{{product.points_price}} 积分</text>
             </view>

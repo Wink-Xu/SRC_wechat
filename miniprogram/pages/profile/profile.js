@@ -1,5 +1,5 @@
 // pages/profile/profile.js
-const { userApi, pointsApi, activityApi } = require('../../utils/request');
+const { userApi, pointsApi, activityApi, adminApi } = require('../../utils/request');
 const { formatPhone, showSuccess, showConfirm, showInfo } = require('../../utils/util');
 const app = getApp();
 
@@ -13,7 +13,8 @@ Page({
     isPending: false,   // 是否待审批
     openid: '',         // 临时显示 openid
     points: 0,
-    activityCount: 0
+    activityCount: 0,
+    pendingMembersCount: 0  // 待审核成员数量
   },
 
   onLoad: function () {
@@ -21,13 +22,19 @@ Page({
   },
 
   onShow: function () {
-    this.refreshUserInfo();
+    this.refreshUserInfo(true);
   },
 
   // 刷新用户信息
-  refreshUserInfo: async function () {
+  refreshUserInfo: async function (shouldRefreshStatus) {
     const app = getApp();
     const isLoggedIn = app.globalData.isLoggedIn;
+
+    // 先从服务器刷新用户状态（解决审核通过后需要重新登录的问题）
+    if (shouldRefreshStatus && isLoggedIn) {
+      await app.refreshUserStatus();
+    }
+
     let userInfo = app.globalData.userInfo;
 
     // 处理头像：如果是 cloud:// 开头，需要转换为临时 URL
@@ -80,6 +87,18 @@ Page({
         });
       }
     }
+
+    // 获取待审核成员数量（仅管理员/团长）
+    if (isLoggedIn && (app.globalData.isAdmin || app.globalData.isLeader)) {
+      try {
+        const pendingResult = await adminApi.getPendingMembers({});
+        this.setData({
+          pendingMembersCount: pendingResult.list?.length || 0
+        });
+      } catch (error) {
+        console.error('获取待审核成员失败', error);
+      }
+    }
   },
 
   // 微信授权登录
@@ -119,6 +138,45 @@ Page({
     });
   },
 
+  // 编辑昵称
+  editNickname: function () {
+    const that = this;
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      placeholderText: this.data.userInfo?.nickname || '请输入昵称',
+      success: async function (res) {
+        if (res.confirm && res.content) {
+          const newNickname = res.content.trim();
+          if (!newNickname) {
+            wx.showToast({ title: '昵称不能为空', icon: 'none' });
+            return;
+          }
+
+          try {
+            await userApi.updateProfile({ nickname: newNickname });
+
+            // 更新本地数据
+            const app = getApp();
+            if (app.globalData.userInfo) {
+              app.globalData.userInfo.nickname = newNickname;
+              wx.setStorageSync('userInfo', app.globalData.userInfo);
+            }
+
+            that.setData({
+              'userInfo.nickname': newNickname
+            });
+
+            showSuccess('昵称已更新');
+          } catch (error) {
+            console.error('更新昵称失败', error);
+            wx.showToast({ title: '更新失败', icon: 'none' });
+          }
+        }
+      }
+    });
+  },
+
   // 跳转到我的活动页面
   goToMyActivities: function () {
     console.log('goToMyActivities 被调用，isLoggedIn:', this.data.isLoggedIn);
@@ -132,6 +190,20 @@ Page({
     console.log('准备跳转到 /pages/my-activities/my-activities');
     wx.navigateTo({
       url: '/pages/my-activities/my-activities'
+    });
+  },
+
+  // 跳转到我的订单页面（需要登录）
+  goToOrders: function () {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/orders/orders'
     });
   },
 

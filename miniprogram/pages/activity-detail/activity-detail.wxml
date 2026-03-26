@@ -16,7 +16,7 @@
 
   <block wx:elif="{{activity}}">
     <!-- 正在报名的活动：显示完整信息 -->
-    <block wx:if="{{activity.status === 'published' || activity.status === 'ongoing'}}">
+    <block wx:if="{{activity.status === 'ongoing'}}">
       <!-- 封面图头部 -->
       <view class="cover-header">
         <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
@@ -91,8 +91,15 @@
 
       <!-- 底部操作区 -->
       <view class="footer-actions">
+        <!-- 报名已截止 -->
+        <block wx:if="{{registrationClosed && !isRegistered}}">
+          <view class="registration-closed">
+            <text>报名已截止</text>
+          </view>
+        </block>
+
         <!-- 未报名用户显示报名按钮 -->
-        <block wx:if="{{!isRegistered}}">
+        <block wx:elif="{{!isRegistered}}">
           <button class="btn-register" bindtap="handleRegister">立即报名</button>
         </block>
 
@@ -174,3 +181,12 @@
     </block>
   </block>
 </view>
+
+<!-- 封面调整组件 -->
+<cover-adjuster
+  id="coverAdjuster"
+  outputWidth="{{750}}"
+  outputHeight="{{422}}"
+  bind:confirm="onCoverConfirm"
+  bind:cancel="onCoverCancel"
+/>

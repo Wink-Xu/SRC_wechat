@@ -43,6 +43,17 @@ page {
   margin-bottom: 16rpx;
 }
 
+.nickname-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.nickname-row .nickname {
+  margin-bottom: 0;
+}
+
 .openid-text {
   font-size: 20rpx;
   color: #999999;
@@ -144,6 +155,7 @@ page {
 }
 
 .menu-grid-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -162,6 +174,16 @@ page {
   font-size: 24rpx;
   color: #1A1A1A;
   text-align: center;
+}
+
+.red-dot {
+  position: absolute;
+  top: 8rpx;
+  right: 60rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background: #FF4444;
+  border-radius: 50%;
 }
 
 /* 申请/待审批提示卡片 */

@@ -58,12 +58,14 @@ page {
 /* ========== 封面图头部 ========== */
 .cover-header {
   position: relative;
-  height: 440rpx;
+  /* 16:9 比例 */
+  height: 0;
+  padding-bottom: 56.25%;
   overflow: hidden;
 }
 
 .past-cover {
-  height: 360rpx;
+  /* 往期活动也保持 16:9 */
 }
 
 .cover-actions {
@@ -87,6 +89,9 @@ page {
 }
 
 .cover-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -447,6 +452,18 @@ page {
 
 .btn-cancel-register::after {
   border: none;
+}
+
+.registration-closed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx;
+  background: #F5F5F5;
+  border-radius: 46rpx;
+  color: #999999;
+  font-size: 30rpx;
+  font-weight: 500;
 }
 
 .checked-in-badge {

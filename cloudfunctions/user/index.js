@@ -37,6 +37,8 @@ exports.main = async (event, context) => {
       return handleSetRole(data, wxContext, openid);
     case 'kickOut':
       return handleKickOut(data, wxContext, openid);
+    case 'getUserInfo':
+      return handleGetUserInfo(data, wxContext, openid);
     case 'cleanupAllData':
       return handleCleanupAllData(data, wxContext, openid);
     default:
@@ -46,7 +48,7 @@ exports.main = async (event, context) => {
 
 // 登录
 async function handleLogin(data, wxContext, openid) {
-  const { code } = data;
+  const { nickName, avatarUrl } = data;
 
   try {
     // 查询用户是否存在
@@ -58,24 +60,35 @@ async function handleLogin(data, wxContext, openid) {
       // 用户已存在
       const user = userResult.data[0];
 
+      const updateData = {
+        updated_at: db.serverDate()
+      };
+
+      // 只有当数据库中没有昵称/头像时，才用微信传入的更新（避免覆盖自定义设置）
+      // 微信现在返回的是默认信息，不应该覆盖用户已设置的内容
+
       // 检查是否是团长 openid，如果是则自动设置为团长
       if (openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE') {
         if (user.role !== 'leader') {
-          // 更新为团长
-          await db.collection('users').doc(user._id).update({
-            data: {
-              role: 'leader',
-              updated_at: db.serverDate()
-            }
-          });
-          user.role = 'leader';
+          updateData.role = 'leader';
           console.log('[自动团长] 用户已自动设置为团长:', openid);
         }
       }
 
+      // 只有在有更新时才执行 update
+      const needUpdate = Object.keys(updateData).length > 1; // 除了 updated_at 还有其他字段
+      if (needUpdate) {
+        await db.collection('users').doc(user._id).update({
+          data: updateData
+        });
+      }
+
+      // 返回数据库中的用户数据（保留自定义的头像昵称）
+      const updatedUser = { ...user, ...updateData };
+
       return {
         code: 0,
-        data: user,
+        data: updatedUser,
         message: '登录成功'
       };
     }
@@ -83,8 +96,8 @@ async function handleLogin(data, wxContext, openid) {
     // 新用户，创建记录
     const newUser = {
       openid,
-      nickname: '微信用户',
-      avatar: '',
+      nickname: nickName || '微信用户',
+      avatar: avatarUrl || '',
       phone: '',
       role: openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE' ? 'leader' : 'member',
       // 团长 openid 直接批准，其他用户是游客状态
@@ -116,20 +129,50 @@ async function handleUpdateProfile(data, wxContext, openid) {
   const { nickname, avatar } = data;
 
   try {
+    // 只更新传入的字段，避免覆盖其他字段
+    const updateData = {
+      updated_at: db.serverDate()
+    };
+
+    if (nickname !== undefined) {
+      updateData.nickname = nickname;
+    }
+    if (avatar !== undefined) {
+      updateData.avatar = avatar;
+    }
+
     await db.collection('users').where({
       openid
     }).update({
-      data: {
-        nickname: nickname || '',
-        avatar: avatar || '',
-        updated_at: db.serverDate()
-      }
+      data: updateData
     });
 
     return { code: 0, message: '更新成功' };
   } catch (error) {
     console.error('更新资料失败', error);
     return { code: -1, message: '更新失败' };
+  }
+}
+
+// 获取当前用户信息（用于刷新身份）
+async function handleGetUserInfo(data, wxContext, openid) {
+  try {
+    const userResult = await db.collection('users').where({
+      openid
+    }).get();
+
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+
+    return {
+      code: 0,
+      data: userResult.data[0],
+      message: '获取成功'
+    };
+  } catch (error) {
+    console.error('获取用户信息失败', error);
+    return { code: -1, message: '获取失败' };
   }
 }
 

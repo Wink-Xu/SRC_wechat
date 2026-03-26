@@ -1,0 +1,45 @@
+<!--components/image-cropper/image-cropper.wxml-->
+<view class="cropper-container" wx:if="{{show}}">
+  <!-- 图片显示区域 -->
+  <view class="cropper-body">
+    <!-- 图片 -->
+    <image
+      class="cropper-image"
+      src="{{imageSrc}}"
+      style="width:{{imageWidth}}px;height:{{imageHeight}}px;"
+    ></image>
+
+    <!-- 裁剪框 -->
+    <view
+      class="crop-box"
+      style="left:{{cropX}}px;top:{{cropY}}px;width:{{cropWidth}}px;height:{{cropHeight}}px;"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    >
+      <!-- 裁剪框边框 -->
+      <view class="crop-border"></view>
+      <!-- 调整大小手柄 -->
+      <view class="crop-handle"></view>
+    </view>
+
+    <!-- 遮罩层 -->
+    <view class="crop-mask top" style="height:{{cropY}}px;"></view>
+    <view class="crop-mask bottom" style="top:{{cropY + cropHeight}}px;"></view>
+    <view class="crop-mask left" style="top:{{cropY}}px;height:{{cropHeight}}px;width:{{cropX}}px;"></view>
+    <view class="crop-mask right" style="top:{{cropY}}px;height:{{cropHeight}}px;left:{{cropX + cropWidth}}px;"></view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="cropper-actions">
+    <view class="action-btn" bindtap="onCancel">
+      <text>取消</text>
+    </view>
+    <view class="action-tips">
+      <text>拖动框移动，拖动角调整大小</text>
+    </view>
+    <view class="action-btn primary" bindtap="onConfirm">
+      <text>确定</text>
+    </view>
+  </view>
+</view>

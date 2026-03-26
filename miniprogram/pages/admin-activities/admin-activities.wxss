@@ -38,32 +38,27 @@
   border-radius: 16rpx;
   font-size: 22rpx;
   font-weight: 500;
-  background: #F5F5F5;
+  background: transparent;
   color: #666666;
 }
 
 .status-draft {
-  background: #F5F5F5;
+  background: transparent;
   color: #CC7722;
 }
 
-.status-published {
-  background: #F5F5F5;
-  color: #2E7D32;
-}
-
 .status-ongoing {
-  background: #F5F5F5;
+  background: transparent;
   color: #1A1A1A;
 }
 
 .status-ended {
-  background: #F5F5F5;
+  background: transparent;
   color: #999999;
 }
 
 .status-cancelled {
-  background: #F5F5F5;
+  background: transparent;
   color: #F44336;
 }
 
@@ -87,9 +82,9 @@
 }
 
 .btn-warning {
-  background: #FFFFFF;
-  color: #CC7722;
-  border: 1rpx solid #CC7722;
+  background: #CC7722;
+  color: #FFFFFF;
+  border: none;
   border-radius: 32rpx;
   font-weight: 600;
 }
@@ -103,9 +98,9 @@
 }
 
 .btn-danger {
-  background: #FFFFFF;
-  color: #F44336;
-  border: 1rpx solid #F44336;
+  background: #F44336;
+  color: #FFFFFF;
+  border: none;
   border-radius: 32rpx;
   font-weight: 600;
 }

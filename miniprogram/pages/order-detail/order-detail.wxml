@@ -31,6 +31,8 @@
         <view class="product-info">
           <text class="product-name">{{order.product_name}}</text>
           <view class="product-meta">
+            <text wx:if="{{order.size}}">尺码: {{order.size}}</text>
+            <text wx:if="{{order.size}}"> | </text>
             <text>x{{order.quantity}}</text>
           </view>
         </view>

@@ -81,7 +81,7 @@ Page({
       activityApi.getList({
         page,
         limit: pageSize,
-        status: 'published,ongoing'
+        status: 'ongoing'
       }, { showLoad: false }),
       activityApi.getList({
         page,
@@ -252,7 +252,7 @@ Page({
         activityApi.getList({
           page: this._preloadedPage,
           limit: this.data.pageSize,
-          status: 'published,ongoing'
+          status: 'ongoing'
         }, { showLoad: false }),
         activityApi.getList({
           page: this._preloadedPage,
@@ -292,7 +292,6 @@ Page({
   getStatusText: function (status) {
     const statusMap = {
       draft: '草稿',
-      published: '报名中',
       ongoing: '进行中',
       ended: '已结束',
       cancelled: '已取消'
@@ -304,7 +303,6 @@ Page({
   getStatusClass: function (status) {
     const classMap = {
       draft: 'tag-warning',
-      published: 'tag-primary',
       ongoing: 'tag-success',
       ended: 'tag-secondary',
       cancelled: 'tag-error'

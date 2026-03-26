@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "创建活动"
+  "navigationBarTitleText": "创建活动",
+  "usingComponents": {
+    "datetime-picker": "/components/datetime-picker/datetime-picker",
+    "cover-adjuster": "/components/cover-adjuster/cover-adjuster"
+  }
 }

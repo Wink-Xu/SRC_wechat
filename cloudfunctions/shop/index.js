@@ -95,20 +95,25 @@ async function handleGetProductDetail(data, openid) {
 
 // 创建订单
 async function handleCreateOrder(data, openid) {
-  const { productId, quantity, payMethod, address } = data;
+  const { productId, quantity, payMethod, size, address } = data;
 
   try {
-    // 获取当前用户
+    // 获取当前用户（允许游客和团员购买）
     const userResult = await db.collection('users').where({
-      openid,
-      status: 'approved'
+      openid
     }).get();
 
     if (userResult.data.length === 0) {
-      return { code: -1, message: '您还不是正式团员' };
+      return { code: -1, message: '用户不存在，请先登录' };
     }
 
-    const userId = userResult.data[0]._id;
+    const user = userResult.data[0];
+    const userId = user._id;
+
+    // 游客只能使用微信支付，团员可以使用积分
+    if (user.status !== 'approved' && payMethod === 'points') {
+      return { code: -1, message: '只有团员可以使用积分兑换，请申请入团' };
+    }
 
     // 获取商品
     const productResult = await db.collection('products').doc(productId).get();
@@ -137,6 +142,7 @@ async function handleCreateOrder(data, openid) {
       product_name: product.name,
       product_image: product.image,
       quantity,
+      size: size || '',
       total_points: totalPoints,
       total_cash: totalCash,
       pay_method: payMethod,
