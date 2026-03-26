@@ -617,15 +617,13 @@ async function handleGetCheckInQrCode(data, wxContext, testOpenid) {
       return { code: -1, message: '活动不存在' };
     }
 
-    // 生成小程序码
-    // scene 参数最长 32 位，使用活动 ID
-    const scene = actualActivityId;
-
     try {
-      const qrResult = await cloud.openapi.wxacode.getUnlimited({
-        scene: scene,
-        page: 'pages/scan-checkin/scan-checkin',
-        width: 430
+      // 生成小程序码（体验版）
+      // 使用 wxacode.get 可以指定 env_version 为体验版
+      const qrResult = await cloud.openapi.wxacode.get({
+        path: `pages/scan-checkin/scan-checkin?scene=${actualActivityId}`,
+        width: 430,
+        env_version: 'trial'  // 关键：生成体验版二维码
       });
 
       // 上传到云存储

@@ -52,7 +52,8 @@
       "Bash(which gh:*)",
       "Bash(git remote:*)",
       "Bash(/Applications/wechatwebdevtools.app/Contents/MacOS/cli upload:*)",
-      "WebFetch(domain:cloud.weixin.qq.com)"
+      "WebFetch(domain:cloud.weixin.qq.com)",
+      "Bash(git push:*)"
     ]
   }
 }
