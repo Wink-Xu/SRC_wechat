@@ -635,11 +635,20 @@ async function handleGetCheckInQrCode(data, wxContext, testOpenid) {
         fileContent: qrResult.buffer
       });
 
+      // 获取临时访问 URL
+      const tempUrlResult = await cloud.getTempFileURL({
+        fileList: [uploadResult.fileID]
+      });
+
+      const qrCodeUrl = tempUrlResult.fileList[0] && tempUrlResult.fileList[0].tempFileURL
+        ? tempUrlResult.fileList[0].tempFileURL
+        : uploadResult.fileID;
+
       return {
         code: 0,
         data: {
           activity_id: actualActivityId,
-          qr_code: uploadResult.fileID,
+          qr_code: qrCodeUrl,
           check_in_count: activity.check_in_count || 0
         }
       };
@@ -690,7 +699,7 @@ async function handleSelfCheckIn(data, wxContext, testOpenid) {
       return { code: -1, message: '活动不存在' };
     }
 
-    if (activity.status !== 'ongoing') {
+    if (!['published', 'ongoing'].includes(activity.status)) {
       return { code: -1, message: '活动未开始或已结束' };
     }
 

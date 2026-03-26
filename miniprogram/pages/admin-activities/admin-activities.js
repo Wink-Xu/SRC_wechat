@@ -38,6 +38,13 @@ Page({
     }
   },
 
+  onUnload: function () {
+    if (this._checkInTimer) {
+      clearInterval(this._checkInTimer);
+      this._checkInTimer = null;
+    }
+  },
+
   // 刷新活动列表
   refreshActivities: async function () {
     this.setData({
@@ -231,6 +238,11 @@ Page({
         checkInCount: result.check_in_count || 0,
         showCheckInQr: true
       });
+
+      // 启动定时刷新签到人数（每5秒）
+      this._checkInTimer = setInterval(() => {
+        this.refreshCheckInCount(id);
+      }, 5000);
     } catch (error) {
       console.error('获取签到码失败', error);
       wx.showToast({
@@ -240,8 +252,23 @@ Page({
     }
   },
 
+  // 刷新签到人数
+  refreshCheckInCount: async function (activityId) {
+    try {
+      const result = await activityApi.getCheckInQrCode({ id: activityId });
+      this.setData({ checkInCount: result.check_in_count || 0 });
+    } catch (error) {
+      console.error('刷新签到人数失败', error);
+    }
+  },
+
   // 关闭签到码弹窗
   closeCheckInQrCode: function () {
+    // 清除定时器
+    if (this._checkInTimer) {
+      clearInterval(this._checkInTimer);
+      this._checkInTimer = null;
+    }
     this.setData({
       showCheckInQr: false
     });

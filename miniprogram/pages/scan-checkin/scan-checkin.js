@@ -48,7 +48,7 @@ Page({
       const activity = result.activity;
 
       // 检查活动状态
-      if (activity.status !== 'ongoing') {
+      if (!['published', 'ongoing'].includes(activity.status)) {
         this.setData({
           loading: false,
           error: '活动未开始或已结束，无法签到'
