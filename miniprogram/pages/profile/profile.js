@@ -53,27 +53,31 @@ Page({
       isLeader: app.globalData.isLeader,
       isMember: app.globalData.isMember,
       isPending: userInfo && userInfo.status === 'pending',
-      openid: userInfo?.openid || '', // 显示 openid
-      points: 0,
-      activityCount: 0
+      openid: userInfo?.openid || '' // 显示 openid
     });
 
     // 获取积分和活动次数（仅团员）
     if (isLoggedIn && app.globalData.isMember) {
       try {
-        const pointsResult = await pointsApi.getBalance();
-        this.setData({ points: pointsResult.points || 0 });
+        // 并行获取积分和活动次数
+        const [pointsResult, activityResult] = await Promise.all([
+          pointsApi.getBalance(),
+          activityApi.getList({ registered: true })
+        ]);
 
-        // 获取活动次数（已签到的活动数量）
-        const activityResult = await activityApi.getList({ registered: true });
         const activities = activityResult.list || [];
-
-        // 筛选已签到的活动
         const checkedInCount = activities.filter(activity => activity.user_checked_in).length;
 
-        this.setData({ activityCount: checkedInCount });
+        this.setData({
+          points: pointsResult.points || 0,
+          activityCount: checkedInCount
+        });
       } catch (error) {
         console.error('获取积分失败', error);
+        this.setData({
+          points: 0,
+          activityCount: 0
+        });
       }
     }
   },

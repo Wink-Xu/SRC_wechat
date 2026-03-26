@@ -770,6 +770,8 @@ async function handleFinishActivityWithCheckIn(data, wxContext, testOpenid) {
   const { activityId, id } = data;
   const actualActivityId = activityId || id;
 
+  console.log('[结束活动] 开始处理，活动ID:', actualActivityId);
+
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
@@ -784,6 +786,8 @@ async function handleFinishActivityWithCheckIn(data, wxContext, testOpenid) {
     if (!activity) {
       return { code: -1, message: '活动不存在' };
     }
+
+    console.log('[结束活动] 活动信息:', activity.title, '积分:', activity.points);
 
     // 更新活动状态
     await db.collection('activities').doc(actualActivityId).update({
@@ -800,52 +804,74 @@ async function handleFinishActivityWithCheckIn(data, wxContext, testOpenid) {
       points_awarded: false
     }).get();
 
+    console.log('[结束活动] 查询到的签到用户数:', checkInUsers.data.length);
+    console.log('[结束活动] 签到用户详情:', JSON.stringify(checkInUsers.data.map(r => ({
+      _id: r._id,
+      user_id: r.user_id,
+      status: r.status,
+      points_awarded: r.points_awarded
+    }))));
+
     const points = activity.points || 20;
     let awardedCount = 0;
+    let errorCount = 0;
 
     // 给每个已签到的用户发放积分
     for (const reg of checkInUsers) {
-      // 给用户增加积分
-      await db.collection('users').doc(reg.user_id).update({
-        data: {
-          points: _.inc(points)
-        }
-      });
+      try {
+        console.log('[结束活动] 处理用户:', reg.user_id);
 
-      // 记录积分日志
-      await db.collection('point_logs').add({
-        data: {
-          user_id: reg.user_id,
-          points,
-          type: 'activity_checkin',
-          related_id: actualActivityId,
-          remark: `活动签到：${activity.title}`,
-          created_at: db.serverDate()
-        }
-      });
+        // 给用户增加积分
+        await db.collection('users').doc(reg.user_id).update({
+          data: {
+            points: _.inc(points)
+          }
+        });
+        console.log('[结束活动] 用户积分更新成功:', reg.user_id);
 
-      // 标记积分已发放
-      await db.collection('registrations').doc(reg._id).update({
-        data: {
-          points_awarded: true
-        }
-      });
+        // 记录积分日志
+        await db.collection('point_logs').add({
+          data: {
+            user_id: reg.user_id,
+            points,
+            type: 'activity_checkin',
+            related_id: actualActivityId,
+            remark: `活动签到：${activity.title}`,
+            created_at: db.serverDate()
+          }
+        });
+        console.log('[结束活动] 积分日志记录成功:', reg.user_id);
 
-      awardedCount++;
+        // 标记积分已发放
+        await db.collection('registrations').doc(reg._id).update({
+          data: {
+            points_awarded: true
+          }
+        });
+
+        awardedCount++;
+        console.log('[结束活动] 用户处理完成:', reg.user_id);
+      } catch (userError) {
+        console.error('[结束活动] 处理用户失败:', reg.user_id, userError);
+        errorCount++;
+      }
     }
+
+    console.log('[结束活动] 处理完成，成功:', awardedCount, '失败:', errorCount);
 
     return {
       code: 0,
       data: {
         success: true,
         awarded_count: awardedCount,
+        error_count: errorCount,
         points_per_person: points
       },
-      message: '活动已结束，积分已发放'
+      message: `活动已结束，成功发放 ${awardedCount} 人积分`
     };
   } catch (error) {
     console.error('结束活动失败', error);
-    return { code: -1, message: '结束活动失败' };
+    return { code: -1, message: '结束活动失败: ' + error.message };
   }
 }
 
