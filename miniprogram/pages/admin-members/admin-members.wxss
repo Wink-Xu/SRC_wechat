@@ -137,3 +137,31 @@
 .empty-text {
   color: #999999;
 }
+
+/* 按钮样式 */
+.btn {
+  padding: 16rpx 32rpx;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.btn-small {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+}
+
+.btn-primary {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  background: #F5F5F5;
+  color: #333333;
+}
+
+.btn-danger {
+  background: #FF4D4F;
+  color: #FFFFFF;
+}

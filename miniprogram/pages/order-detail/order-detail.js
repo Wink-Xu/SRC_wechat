@@ -28,6 +28,18 @@ Page({
       order.cashPriceYuan = order.total_cash ? formatMoney(order.total_cash) : '';
       order.statusText = this.getStatusText(order.status);
 
+      // 转换商品图片 fileID 为临时 URL
+      if (order.product_image && order.product_image.startsWith('cloud://')) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: [order.product_image]
+          });
+          order.display_product_image = tempUrlResult.fileList[0]?.tempURL || order.product_image;
+        } catch (err) {
+          console.error('获取商品图片临时链接失败', err);
+        }
+      }
+
       this.setData({
         order,
         loading: false

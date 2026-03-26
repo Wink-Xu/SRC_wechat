@@ -68,12 +68,40 @@ Page({
 
       const result = await userApi.getMembers(params);
 
-      const members = (result.list || []).map(item => ({
-        ...item,
-        formattedTime: formatDate(item.created_at, 'YYYY-MM-DD'),
-        formattedPhone: formatPhone(item.phone),
-        roleText: this.getRoleText(item.role)
-      }));
+      // 收集需要转换的头像 fileID
+      const rawMembers = result.list || [];
+      const avatarFileIDs = rawMembers
+        .filter(item => item.avatar && item.avatar.startsWith('cloud://'))
+        .map(item => item.avatar);
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (avatarFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: avatarFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取头像临时链接失败', err);
+        }
+      }
+
+      const members = rawMembers.map(item => {
+        const processed = {
+          ...item,
+          formattedTime: formatDate(item.created_at, 'YYYY-MM-DD'),
+          formattedPhone: formatPhone(item.phone),
+          roleText: this.getRoleText(item.role)
+        };
+        // 转换头像
+        if (item.avatar && item.avatar.startsWith('cloud://') && tempUrlMap[item.avatar]) {
+          processed.displayAvatar = tempUrlMap[item.avatar];
+        }
+        return processed;
+      });
 
       this.setData({
         members: page === 1 ? members : [...this.data.members, ...members],
@@ -120,7 +148,7 @@ Page({
     if (!confirm) return;
 
     try {
-      await userApi.approveMember({ userId: id, action: 'approve' });
+      await userApi.approveMember({ userId: id, approveAction: 'approve' });
       showSuccess('已批准');
       this.refreshMembers();
     } catch (error) {
@@ -136,7 +164,7 @@ Page({
     if (!confirm) return;
 
     try {
-      await userApi.approveMember({ userId: id, action: 'reject' });
+      await userApi.approveMember({ userId: id, approveAction: 'reject' });
       showSuccess('已拒绝');
       this.refreshMembers();
     } catch (error) {
@@ -161,6 +189,22 @@ Page({
       this.refreshMembers();
     } catch (error) {
       console.error('设置失败', error);
+    }
+  },
+
+  // 踢出团队
+  handleKickOut: async function (e) {
+    const { id } = e.currentTarget.dataset;
+
+    const confirm = await showConfirm('踢出团队', '确定要将该成员踢出团队吗？此操作不可恢复。');
+    if (!confirm) return;
+
+    try {
+      await userApi.kickOut({ userId: id });
+      showSuccess('已踢出团队');
+      this.refreshMembers();
+    } catch (error) {
+      console.error('踢出失败', error);
     }
   },
 

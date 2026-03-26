@@ -29,7 +29,7 @@
       wx:key="_id"
     >
       <view class="member-info">
-        <image class="member-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+        <image class="member-avatar" src="{{item.displayAvatar || item.avatar || '/images/default-avatar.png'}}"></image>
         <view class="member-text">
           <view class="member-header">
             <text class="member-name">{{item.nickname}}</text>
@@ -56,6 +56,13 @@
           bindtap="handleSetAdmin"
         >
           {{item.role === 'admin' ? '取消管理员' : '设为管理员'}}
+        </button>
+        <button
+          class="btn btn-danger btn-small"
+          data-id="{{item._id}}"
+          bindtap="handleKickOut"
+        >
+          踢出团队
         </button>
       </view>
     </view>

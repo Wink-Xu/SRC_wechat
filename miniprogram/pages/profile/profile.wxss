@@ -43,6 +43,14 @@ page {
   margin-bottom: 16rpx;
 }
 
+.openid-text {
+  font-size: 20rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 16rpx;
+  word-break: break-all;
+}
+
 .role-tags {
   display: flex;
   flex-wrap: wrap;

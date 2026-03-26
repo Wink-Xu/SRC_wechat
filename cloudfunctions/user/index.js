@@ -8,32 +8,44 @@ cloud.init({
 const db = cloud.database();
 const _ = db.command;
 
+// ============================================
+// 团长配置 - 将以下 openid 替换为实际团长的微信 openid
+// ============================================
+const LEADER_OPENID = 'oh2Vh7J6cD2DFe_eQQJ3f2f2BFVM';
+// ============================================
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const { action, ...data } = event;
 
+  // 获取当前用户 openid
+  const openid = wxContext.OPENID;
+
   switch (action) {
     case 'login':
-      return handleLogin(data, wxContext);
+      return handleLogin(data, wxContext, openid);
     case 'updateProfile':
-      return handleUpdateProfile(data, wxContext);
+      return handleUpdateProfile(data, wxContext, openid);
     case 'applyMembership':
-      return handleApplyMembership(data, wxContext);
+      return handleApplyMembership(data, wxContext, openid);
     case 'getMembers':
-      return handleGetMembers(data, wxContext);
+      return handleGetMembers(data, wxContext, openid);
     case 'approveMember':
-      return handleApproveMember(data, wxContext);
+      return handleApproveMember(data, wxContext, openid);
     case 'setRole':
-      return handleSetRole(data, wxContext);
+      return handleSetRole(data, wxContext, openid);
+    case 'kickOut':
+      return handleKickOut(data, wxContext, openid);
+    case 'cleanupAllData':
+      return handleCleanupAllData(data, wxContext, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
 };
 
 // 登录
-async function handleLogin(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleLogin(data, wxContext, openid) {
   const { code } = data;
 
   try {
@@ -45,6 +57,22 @@ async function handleLogin(data, wxContext) {
     if (userResult.data.length > 0) {
       // 用户已存在
       const user = userResult.data[0];
+
+      // 检查是否是团长 openid，如果是则自动设置为团长
+      if (openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE') {
+        if (user.role !== 'leader') {
+          // 更新为团长
+          await db.collection('users').doc(user._id).update({
+            data: {
+              role: 'leader',
+              updated_at: db.serverDate()
+            }
+          });
+          user.role = 'leader';
+          console.log('[自动团长] 用户已自动设置为团长:', openid);
+        }
+      }
+
       return {
         code: 0,
         data: user,
@@ -58,8 +86,9 @@ async function handleLogin(data, wxContext) {
       nickname: '微信用户',
       avatar: '',
       phone: '',
-      role: 'member',     // 默认设置为团员
-      status: 'pending',  // 需要申请审核
+      role: openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE' ? 'leader' : 'member',
+      // 团长 openid 直接批准，其他用户是游客状态
+      status: openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE' ? 'approved' : 'guest',
       points: 0,
       created_at: db.serverDate(),
       updated_at: db.serverDate()
@@ -83,8 +112,7 @@ async function handleLogin(data, wxContext) {
 }
 
 // 更新用户资料
-async function handleUpdateProfile(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleUpdateProfile(data, wxContext, openid) {
   const { nickname, avatar } = data;
 
   try {
@@ -106,8 +134,7 @@ async function handleUpdateProfile(data, wxContext) {
 }
 
 // 申请入团
-async function handleApplyMembership(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleApplyMembership(data, wxContext, openid) {
   const { nickname, phone } = data;
 
   try {
@@ -131,7 +158,7 @@ async function handleApplyMembership(data, wxContext) {
 }
 
 // 获取成员列表
-async function handleGetMembers(data, wxContext) {
+async function handleGetMembers(data, wxContext, openid) {
   const { page = 1, limit = 20, status } = data;
 
   try {
@@ -170,9 +197,8 @@ async function handleGetMembers(data, wxContext) {
 }
 
 // 审批成员
-async function handleApproveMember(data, wxContext) {
-  const { userId, action } = data;
-  const openid = wxContext.OPENID;
+async function handleApproveMember(data, wxContext, openid) {
+  const { userId, approveAction } = data;
 
   try {
     // 检查权限
@@ -186,7 +212,7 @@ async function handleApproveMember(data, wxContext) {
     }
 
     // 更新用户状态
-    const newStatus = action === 'approve' ? 'approved' : 'rejected';
+    const newStatus = approveAction === 'approve' ? 'approved' : 'rejected';
     await db.collection('users').doc(userId).update({
       data: {
         status: newStatus,
@@ -194,7 +220,7 @@ async function handleApproveMember(data, wxContext) {
       }
     });
 
-    return { code: 0, message: action === 'approve' ? '已批准' : '已拒绝' };
+    return { code: 0, message: approveAction === 'approve' ? '已批准' : '已拒绝' };
   } catch (error) {
     console.error('审批失败', error);
     return { code: -1, message: '审批失败' };
@@ -202,9 +228,8 @@ async function handleApproveMember(data, wxContext) {
 }
 
 // 设置角色
-async function handleSetRole(data, wxContext) {
+async function handleSetRole(data, wxContext, openid) {
   const { userId, role } = data;
-  const openid = wxContext.OPENID;
 
   try {
     // 检查权限（只有团长可以设置管理员）
@@ -229,5 +254,107 @@ async function handleSetRole(data, wxContext) {
   } catch (error) {
     console.error('设置角色失败', error);
     return { code: -1, message: '设置失败' };
+  }
+}
+
+// 踢出团队（仅团长可用）
+async function handleKickOut(data, wxContext, openid) {
+  const { userId } = data;
+
+  try {
+    // 检查权限（仅团长可操作）
+    const leaderResult = await db.collection('users').where({
+      openid,
+      role: 'leader'
+    }).get();
+
+    if (leaderResult.data.length === 0) {
+      return { code: -1, message: '只有团长可以操作' };
+    }
+
+    // 检查目标用户是否存在且不是团长
+    const targetUser = await db.collection('users').doc(userId).get();
+    if (!targetUser.data) {
+      return { code: -1, message: '用户不存在' };
+    }
+    if (targetUser.data.role === 'leader') {
+      return { code: -1, message: '不能踢出团长' };
+    }
+
+    // 删除用户记录
+    await db.collection('users').doc(userId).remove();
+
+    console.log('[踢出团队] 已踢出用户:', userId);
+    return { code: 0, message: '已踢出团队' };
+  } catch (error) {
+    console.error('踢出团队失败', error);
+    return { code: -1, message: '操作失败' };
+  }
+}
+
+// 清空所有数据（仅团长可用）
+async function handleCleanupAllData(data, wxContext, openid) {
+  try {
+    // 检查权限（仅团长可操作）
+    const leaderResult = await db.collection('users').where({
+      openid,
+      role: 'leader'
+    }).get();
+
+    if (leaderResult.data.length === 0) {
+      return { code: -1, message: '只有团长可以操作' };
+    }
+
+    // 保存当前用户，清空后恢复
+    const currentUser = leaderResult.data[0];
+    const currentUserId = currentUser._id;
+
+    const collections = ['activities', 'products', 'orders', 'point_logs'];
+    const results = {};
+
+    for (const collection of collections) {
+      const coll = db.collection(collection);
+      const count = await coll.count();
+      const total = count.total;
+
+      if (total > 0) {
+        // 分批删除，每批 1000 条
+        const batchSize = 1000;
+        const batches = Math.ceil(total / batchSize);
+
+        for (let i = 0; i < batches; i++) {
+          const batch = await coll.limit(batchSize).skip(i * batchSize).get();
+          const deletePromises = batch.data.map(item => coll.doc(item._id).remove());
+          await Promise.all(deletePromises);
+        }
+      }
+
+      results[collection] = { deleted: total };
+      console.log(`[清空数据] ${collection}: 删除 ${total} 条`);
+    }
+
+    // 删除除当前团长外的所有用户
+    const usersToDelete = await db.collection('users')
+      .where({
+        openid: _.neq(openid)
+      })
+      .get();
+
+    const deleteUserPromises = usersToDelete.data.map(user =>
+      db.collection('users').doc(user._id).remove()
+    );
+    await Promise.all(deleteUserPromises);
+
+    results.users = { deleted: usersToDelete.data.length, kept: 1 };
+    console.log(`[清空数据] users: 删除 ${usersToDelete.data.length} 条，保留 1 条（当前团长）`);
+
+    return {
+      code: 0,
+      message: '数据已清空',
+      data: results
+    };
+  } catch (error) {
+    console.error('清空数据失败', error);
+    return { code: -1, message: '清空失败：' + error.message };
   }
 }

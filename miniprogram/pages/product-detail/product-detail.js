@@ -11,7 +11,8 @@ Page({
     quantity: 1,
     myPoints: 0,
     address: null,
-    payMethod: 'points' // points | wechat
+    payMethod: 'wechat', // points | wechat
+    showBuyModal: false // 购买确认弹窗
   },
 
   onLoad: function (options) {
@@ -33,6 +34,22 @@ Page({
       const result = await shopApi.getProductDetail({ id: this.data.id });
       const product = result.product;
       product.cashPriceYuan = product.cash_price ? formatMoney(product.cash_price) : null;
+
+      // 处理图片：将 fileID 转换为临时 URL
+      let displayImages = product.images || [];
+      if (displayImages.length > 0 && displayImages[0] && displayImages[0].startsWith('cloud://')) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: displayImages
+          });
+          product.displayImages = tempUrlResult.fileList.map(file => file.tempFileURL || file.fileID);
+        } catch (photoErr) {
+          console.error('获取商品图片临时链接失败', photoErr);
+          product.displayImages = displayImages;
+        }
+      } else {
+        product.displayImages = displayImages;
+      }
 
       this.setData({
         product,
@@ -231,9 +248,86 @@ Page({
   // 预览细节图片
   previewDetailImage: function (e) {
     const { index } = e.currentTarget.dataset;
+    const images = this.data.product.displayImages || this.data.product.images || [];
     wx.previewImage({
-      current: index,
-      urls: this.data.product.images
+      current: images[index],
+      urls: images
     });
+  },
+
+  // 显示购买确认弹窗
+  showBuyConfirm: function () {
+    this.setData({ showBuyModal: true });
+  },
+
+  // 隐藏购买确认弹窗
+  hideBuyConfirm: function () {
+    this.setData({ showBuyModal: false });
+  },
+
+  // 空操作（防止冒泡）
+  noop: function () {},
+
+  // 确认购买
+  confirmBuy: async function () {
+    const { product, quantity, address, payMethod, myPoints } = this.data;
+
+    // 检查库存
+    if (product.stock < quantity) {
+      showInfo('库存不足');
+      return;
+    }
+
+    // 检查地址
+    if (!address) {
+      showInfo('请选择收货地址');
+      return;
+    }
+
+    // 检查积分支付
+    if (payMethod === 'points') {
+      const totalPoints = product.points_price * quantity;
+      if (myPoints < totalPoints) {
+        showInfo('积分不足');
+        return;
+      }
+    }
+
+    const confirm = await showConfirm(
+      '确认购买',
+      payMethod === 'points'
+        ? `将使用 ${product.points_price * quantity} 积分兑换`
+        : `将支付 ¥${(product.cash_price * quantity / 100).toFixed(2)}`
+    );
+
+    if (!confirm) return;
+
+    try {
+      // 隐藏弹窗
+      this.hideBuyConfirm();
+
+      // 创建订单
+      const orderResult = await shopApi.createOrder({
+        productId: product._id,
+        quantity,
+        payMethod,
+        address
+      });
+
+      const orderId = orderResult.orderId;
+
+      if (payMethod === 'points') {
+        // 积分支付
+        await shopApi.payOrderByPoints({ orderId });
+        showSuccess('兑换成功');
+        this.goToOrderDetail(orderId);
+      } else {
+        // 微信支付
+        const payResult = await shopApi.payOrderByWechat({ orderId });
+        this.doWechatPay(payResult, orderId);
+      }
+    } catch (error) {
+      console.error('下单失败', error);
+    }
   }
 });

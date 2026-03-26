@@ -37,7 +37,7 @@
       </view>
 
       <view class="order-product">
-        <image class="product-image" src="{{item.product_image || '/images/default-product.png'}}"></image>
+        <image class="product-image" src="{{item.display_product_image || item.product_image || '/images/default-product.png'}}"></image>
         <view class="product-info">
           <text class="product-name">{{item.product_name}}</text>
           <text class="product-quantity">x{{item.quantity}}</text>

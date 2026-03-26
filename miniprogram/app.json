@@ -19,10 +19,7 @@
     "pages/admin-members/admin-members",
     "pages/admin-activities/admin-activities",
     "pages/admin-products/admin-products",
-    "pages/admin-orders/admin-orders",
-    "pages/debug/debug",
-    "pages/debug-db/debug-db",
-    "pages/test-panel/test-panel"
+    "pages/admin-orders/admin-orders"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -38,21 +35,15 @@
     "list": [
       {
         "pagePath": "pages/activities/activities",
-        "text": "活动",
-        "iconPath": "images/activity.png",
-        "selectedIconPath": "images/activity-active.png"
+        "text": "活动"
       },
       {
         "pagePath": "pages/shop/shop",
-        "text": "周边",
-        "iconPath": "images/shop.png",
-        "selectedIconPath": "images/shop-active.png"
+        "text": "周边"
       },
       {
         "pagePath": "pages/profile/profile",
-        "text": "我的",
-        "iconPath": "images/profile.png",
-        "selectedIconPath": "images/profile-active.png"
+        "text": "我的"
       }
     ]
   },

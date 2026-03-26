@@ -11,34 +11,37 @@ const _ = db.command;
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
-  const { action, ...data } = event;
+  const { action, testOpenid, ...data } = event;
+
+  // 获取当前用户 openid：优先使用 testOpenid（测试用户），否则使用真实 openid
+  const openid = testOpenid || wxContext.OPENID;
 
   switch (action) {
     case 'getProductList':
-      return handleGetProductList(data, wxContext);
+      return handleGetProductList(data, openid);
     case 'getProductDetail':
-      return handleGetProductDetail(data, wxContext);
+      return handleGetProductDetail(data, openid);
     case 'createOrder':
-      return handleCreateOrder(data, wxContext);
+      return handleCreateOrder(data, openid);
     case 'payOrderByPoints':
-      return handlePayOrderByPoints(data, wxContext);
+      return handlePayOrderByPoints(data, openid);
     case 'payOrderByWechat':
-      return handlePayOrderByWechat(data, wxContext);
+      return handlePayOrderByWechat(data, openid);
     case 'getOrders':
-      return handleGetOrders(data, wxContext);
+      return handleGetOrders(data, openid);
     case 'getOrderDetail':
-      return handleGetOrderDetail(data, wxContext);
+      return handleGetOrderDetail(data, openid);
     case 'cancelOrder':
-      return handleCancelOrder(data, wxContext);
+      return handleCancelOrder(data, openid);
     case 'confirmReceipt':
-      return handleConfirmReceipt(data, wxContext);
+      return handleConfirmReceipt(data, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
 };
 
 // 获取商品列表
-async function handleGetProductList(data, wxContext) {
+async function handleGetProductList(data, openid) {
   const { page = 1, limit = 10, all } = data;
 
   try {
@@ -75,7 +78,7 @@ async function handleGetProductList(data, wxContext) {
 }
 
 // 获取商品详情
-async function handleGetProductDetail(data, wxContext) {
+async function handleGetProductDetail(data, openid) {
   const { id } = data;
 
   try {
@@ -91,8 +94,7 @@ async function handleGetProductDetail(data, wxContext) {
 }
 
 // 创建订单
-async function handleCreateOrder(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleCreateOrder(data, openid) {
   const { productId, quantity, payMethod, address } = data;
 
   try {
@@ -159,8 +161,7 @@ async function handleCreateOrder(data, wxContext) {
 }
 
 // 积分支付
-async function handlePayOrderByPoints(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handlePayOrderByPoints(data, openid) {
   const { orderId } = data;
 
   try {
@@ -229,15 +230,14 @@ async function handlePayOrderByPoints(data, wxContext) {
 }
 
 // 微信支付
-async function handlePayOrderByWechat(data, wxContext) {
+async function handlePayOrderByWechat(data, openid) {
   // 微信支付需要配置商户号等信息
-  // 这里只返回模拟数据，实际使用时需要对接微信支付API
+  // 这里只返回模拟数据，实际使用时需要对接微信支付 API
   return { code: -1, message: '微信支付功能待配置' };
 }
 
 // 获取订单列表
-async function handleGetOrders(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleGetOrders(data, openid) {
   const { page = 1, limit = 10, status } = data;
 
   try {
@@ -277,8 +277,7 @@ async function handleGetOrders(data, wxContext) {
 }
 
 // 获取订单详情
-async function handleGetOrderDetail(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleGetOrderDetail(data, openid) {
   const { id } = data;
 
   try {
@@ -303,8 +302,7 @@ async function handleGetOrderDetail(data, wxContext) {
 }
 
 // 取消订单
-async function handleCancelOrder(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleCancelOrder(data, openid) {
   const { orderId } = data;
 
   try {
@@ -337,8 +335,7 @@ async function handleCancelOrder(data, wxContext) {
 }
 
 // 确认收货
-async function handleConfirmReceipt(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleConfirmReceipt(data, openid) {
   const { orderId } = data;
 
   try {

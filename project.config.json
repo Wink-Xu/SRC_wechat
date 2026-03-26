@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
-  "cloudfunctionTemplateRoot": "",
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "setting": {
     "urlCheck": false,
     "es6": true,
@@ -47,7 +47,7 @@
     "tabSize": 2
   },
   "compileType": "miniprogram",
-  "libVersion": "2.25.3",
+  "libVersion": "3.15.0",
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
     "ignore": [],

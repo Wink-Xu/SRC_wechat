@@ -1,14 +1,5 @@
 // app.js
-const mockData = require('./utils/mock-data');
-
 App({
-  // 云函数模式开关：true=使用本地模拟数据，false=使用云函数
-  USE_MOCK: false,
-
-  // 当前角色（仅 Mock 模式有效）
-  // 'guest' - 游客 | 'member' - 团员 | 'leader' - 团长 | 'admin' - 管理员 | 'pending' - 待审批
-  CURRENT_ROLE: 'admin',
-
   globalData: {
     userInfo: null,
     isLoggedIn: false,
@@ -19,26 +10,18 @@ App({
   },
 
   onLaunch: function () {
-    // Mock 模式下不初始化云开发
-    if (this.USE_MOCK) {
-      console.log('[Mock Mode] 使用本地模拟数据，不初始化云开发');
-      // Mock 模式下默认为游客模式，可以浏览内容
-      this.setMockRole(this.CURRENT_ROLE);
-      console.log('[Mock Mode] 默认为游客模式，可以浏览内容');
+    // 初始化云开发
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云开发');
     } else {
-      // 初始化云开发
-      if (!wx.cloud) {
-        console.error('请使用 2.2.3 或以上的基础库以使用云开发');
-      } else {
-        wx.cloud.init({
-          env: 'cloud1-2gyhe7s5efa4155f', // 云开发环境 ID
-          traceUser: true
-        });
-      }
-
-      // 检查登录状态
-      this.checkLoginStatus();
+      wx.cloud.init({
+        env: 'cloud1-2gyhe7s5efa4155f', // 云开发环境 ID
+        traceUser: true
+      });
     }
+
+    // 检查登录状态
+    this.checkLoginStatus();
   },
 
   // 当小程序从微信主界面扫码进入时处理
@@ -84,25 +67,6 @@ App({
     }
   },
 
-  // Mock 模式切换角色
-  setMockRole: function(role) {
-    if (!this.USE_MOCK) return;
-
-    // 游客模式也设置用户信息
-    if (role === 'guest') {
-      const users = mockData.users;
-      const user = users.guest;
-      this.updateUserInfo(user);
-      console.log('[Mock Mode] 游客模式，可以浏览内容', user);
-      return;
-    }
-
-    const users = mockData.users;
-    const user = users[role] || users.member;
-    this.updateUserInfo(user);
-    console.log('[Mock Mode] 切换角色为：' + role, user);
-  },
-
   // 检查登录状态
   checkLoginStatus: function () {
     const userInfo = wx.getStorageSync('userInfo');
@@ -140,12 +104,12 @@ App({
 
   // 处理登录（在 profile 页面调用）
   handleLogin: function () {
+    const that = this;
     return new Promise((resolve, reject) => {
-      // Mock 模式下直接返回模拟用户
-      if (this.USE_MOCK) {
-        const mockUser = mockData.currentUser;
-        this.updateUserInfo(mockUser);
-        resolve(mockUser);
+      // 检查云开发是否已初始化
+      if (!wx.cloud) {
+        console.error('云开发未初始化');
+        reject(new Error('云开发未初始化'));
         return;
       }
 
@@ -155,16 +119,34 @@ App({
         lang: 'zh_CN',
         success: (res) => {
           const userInfo = res.userInfo;
+          console.log('[登录] 获取到微信用户信息:', userInfo);
+
           // 调用云函数登录
           const { userApi } = require('./utils/request');
           userApi.login({
             nickName: userInfo.nickName,
             avatarUrl: userInfo.avatarUrl,
             gender: userInfo.gender
-          }).then(resolve).catch(reject);
+          }).then((loginResult) => {
+            console.log('[登录] 云函数返回:', loginResult);
+
+            // 登录成功后更新全局用户状态
+            const cloudUser = loginResult.data || loginResult;
+            const mergedUser = {
+              ...cloudUser,
+              nickname: userInfo.nickName || cloudUser.nickname,
+              avatar: userInfo.avatarUrl || cloudUser.avatar
+            };
+            console.log('[登录] 更新用户状态:', mergedUser);
+            that.updateUserInfo(mergedUser);
+            resolve(mergedUser);
+          }).catch((err) => {
+            console.error('[登录] 云函数调用失败:', err);
+            reject(err);
+          });
         },
         fail: (err) => {
-          console.error('getUserProfile fail', err);
+          console.error('[登录] getUserProfile fail', err);
           reject(err);
         }
       });

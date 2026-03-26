@@ -60,8 +60,37 @@ Page({
       const isMember = userInfo && userInfo.status === 'approved';
       const canUploadPhotos = userInfo && (userInfo.role === 'admin' || userInfo.role === 'leader');
 
+      // 处理照片：将 fileID 转换为临时 URL（解决体验用户看不到照片的问题）
+      let displayPhotos = activity.photos || [];
+      if (displayPhotos.length > 0 && displayPhotos[0].startsWith('cloud://')) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: displayPhotos
+          });
+          // 使用临时 URL 显示照片
+          displayPhotos = tempUrlResult.fileList.map(file => file.tempFileURL || file.fileID);
+        } catch (photoErr) {
+          console.error('获取照片临时链接失败', photoErr);
+          // 如果获取失败，继续使用 fileID
+          displayPhotos = activity.photos;
+        }
+      }
+
+      // 处理封面图
+      let displayCoverImage = activity.cover_image;
+      if (displayCoverImage && displayCoverImage.startsWith('cloud://')) {
+        try {
+          const coverUrlResult = await wx.cloud.getTempFileURL({
+            fileList: [displayCoverImage]
+          });
+          displayCoverImage = coverUrlResult.fileList[0]?.tempURL || displayCoverImage;
+        } catch (coverErr) {
+          console.error('获取封面临时链接失败', coverErr);
+        }
+      }
+
       this.setData({
-        activity,
+        activity: { ...activity, photos: displayPhotos, cover_image: displayCoverImage },
         isRegistered: result.isRegistered,
         registration: result.registration,
         participants: result.participants || [],
@@ -176,6 +205,7 @@ Page({
           wx.cloud.uploadFile({
             cloudPath: cloudPath,
             filePath: file.tempFilePath,
+            isPrivate: false,
             success: res => resolve(res.fileID),
             fail: reject
           });
@@ -338,6 +368,7 @@ Page({
         wx.cloud.uploadFile({
           cloudPath: cloudPath,
           filePath: tempFile.tempFilePath,
+          isPrivate: false,
           success: resolve,
           fail: reject
         });

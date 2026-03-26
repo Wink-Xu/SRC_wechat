@@ -41,16 +41,10 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 
 **使用示例：**
 ```bash
-# 部署 test-user 云函数
+# 部署 user 云函数
 /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
   --env "cloud1-2gyhe7s5efa4155f" \
-  --names "test-user" \
-  --project "/Users/xu/Documents/SRC_wechat"
-
-# 部署 test-data 云函数
-/Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
-  --env "cloud1-2gyhe7s5efa4155f" \
-  --names "test-data" \
+  --names "user" \
   --project "/Users/xu/Documents/SRC_wechat"
 ```
 
@@ -96,15 +90,11 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 │   ├── components/                 # 组件
 │   └── app.js                      # 小程序入口
 ├── cloudfunctions/                 # 云函数目录
-│   ├── test-user/                  # 测试用户管理
-│   ├── test-data/                  # 测试数据管理
 │   ├── user/                       # 用户管理
 │   ├── activity/                   # 活动管理
 │   ├── admin/                      # 管理后台
 │   ├── points/                     # 积分管理
 │   ├── shop/                       # 商城管理
-│   ├── debug/                      # 调试工具
-│   └── init/                       # 初始化工具
 ├── project.config.json             # 项目配置
 └── CLAUDE.md                       # 本配置文件
 ```
@@ -115,15 +105,11 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 
 | 云函数 | 用途 | 部署优先级 |
 |--------|------|-----------|
-| test-user | 测试用户管理 | 高 - 用于开发测试 |
-| test-data | 测试数据管理 | 高 - 用于开发测试 |
-| user | 用户登录、审批、角色 | 高 - 核心功能 |
+| user | 用户登录、审批、角色（含团长自动配置） | 高 - 核心功能 |
 | activity | 活动创建、报名、签到 | 高 - 核心功能 |
 | points | 积分管理 | 中 |
 | shop | 商城商品、订单 | 中 |
 | admin | 管理后台 | 中 |
-| debug | 调试工具 | 低 |
-| init | 初始化工具 | 低 |
 
 ---
 
@@ -177,35 +163,28 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
    const db = cloud.database();
 
    exports.main = async (event, context) => {
-     // event.action 区分不同操作
-     switch (event.action) {
-       case 'createTestUsers': return await createTestUsers(event);
+     const wxContext = cloud.getWXContext();
+     const { action } = event;
+
+     switch (action) {
+       case 'login': return await handleLogin(data, wxContext, openid);
        // ...
-       default: return { code: 400, message: '未知操作' };
+       default: return { code: -1, message: '未知操作' };
      }
    };
    ```
 
 ---
 
-## 测试工具
+## 团长配置
 
-### 测试用户列表
+在 `cloudfunctions/user/index.js` 中配置团长 openid：
 
-| ID | 角色 | 用途 |
-|----|------|------|
-| leader | 团长 | 测试最高权限功能 |
-| admin | 管理员 | 测试管理功能 |
-| member1-3 | 团员 | 测试普通用户功能 |
-| pending | 待审批 | 测试审核流程 |
-| guest | 游客 | 测试未登录状态 |
+```javascript
+const LEADER_OPENID = 'YOUR_LEADER_OPENID_HERE'; // 替换为实际团长 openid
+```
 
-### 快速切换用户
-
-在小程序中：
-1. 进入"我的"页面
-2. 点击"🛠️ 测试工具面板"
-3. 点击任意用户卡片切换身份
+当用户登录时，如果 openid 匹配团长配置，会自动设置为团长角色。
 
 ---
 
@@ -219,3 +198,29 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 
 ### Q: 小程序编译报错 "Unexpected token"
 **A**: 检查函数定义语法，确保使用 `name: async function () {}` 格式
+
+---
+
+## 上传体验版流程
+
+### 方法一：CLI 命令上传（推荐）
+
+```bash
+/Applications/wechatwebdevtools.app/Contents/MacOS/cli upload \
+  --project "/Users/xu/Documents/SRC_wechat" \
+  --version "1.0.0" \
+  --desc "版本描述"
+```
+
+### 方法二：开发者工具手动上传
+
+1. 点击开发者工具右上角 **"上传"** 按钮
+2. 填写版本号和描述
+3. 点击上传
+
+### 上传后设置体验版
+
+1. 打开 **微信公众平台** (mp.weixin.qq.com)
+2. 进入 **管理** → **版本管理**
+3. 找到刚上传的版本，点击 **"选为体验版"**
+4. 生成二维码，发给体验用户扫码测试

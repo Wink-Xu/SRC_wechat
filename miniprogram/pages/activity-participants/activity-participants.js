@@ -23,9 +23,38 @@ Page({
     try {
       const result = await activityApi.getDetail({ id: this.data.id });
 
+      // 收集需要转换的头像 fileID
+      const participants = result.participants || [];
+      const avatarFileIDs = participants
+        .filter(p => p.avatar && p.avatar.startsWith('cloud://'))
+        .map(p => p.avatar);
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (avatarFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: avatarFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取头像临时链接失败', err);
+        }
+      }
+
+      // 转换头像
+      const processedParticipants = participants.map(p => {
+        if (p.avatar && p.avatar.startsWith('cloud://') && tempUrlMap[p.avatar]) {
+          return { ...p, displayAvatar: tempUrlMap[p.avatar] };
+        }
+        return p;
+      });
+
       this.setData({
         activity: result.activity,
-        participants: result.participants || [],
+        participants: processedParticipants,
         loading: false
       });
 

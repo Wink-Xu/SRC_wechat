@@ -58,22 +58,18 @@ Page({
     try {
       const app = getApp();
 
-      if (app.USE_MOCK) {
-        // Mock 模式下直接更新用户信息
-        const result = {
-          ...app.globalData.userInfo,
-          nickname: nickname.trim(),
-          phone: phone.trim(),
-          avatar: this.data.avatarUrl,
-          status: 'pending'
-        };
-        app.updateUserInfo(result);
-        console.log('[Mock Mode] 模拟入团申请');
-      } else {
-        await userApi.applyMembership({
-          nickname: nickname.trim(),
-          phone: phone.trim()
-        });
+      // 调用云函数申请入团
+      await userApi.applyMembership({
+        nickname: nickname.trim(),
+        phone: phone.trim()
+      });
+
+      // 更新本地用户状态为 pending
+      const userInfo = app.globalData.userInfo;
+      if (userInfo) {
+        userInfo.status = 'pending';
+        app.globalData.isPending = true;
+        wx.setStorageSync('userInfo', userInfo);
       }
 
       showSuccess('申请成功，请等待审核');

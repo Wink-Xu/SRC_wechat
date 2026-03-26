@@ -60,11 +60,56 @@ Page({
     try {
       const result = await shopApi.getProductList({ page, limit: pageSize, all: true });
 
-      const products = (result.list || []).map(item => ({
-        ...item,
-        cashPriceYuan: item.cash_price ? formatMoney(item.cash_price) : null,
-        statusText: item.status === 'available' ? '上架' : '下架'
-      }));
+      // 收集需要转换的图片 fileID
+      const allProducts = result.list || [];
+      const imageFileIDs = [];
+      allProducts.forEach(item => {
+        if (item.images && item.images.length > 0) {
+          item.images.forEach(img => {
+            if (img && img.startsWith('cloud://')) {
+              imageFileIDs.push(img);
+            }
+          });
+        }
+        if (item.image && item.image.startsWith('cloud://')) {
+          imageFileIDs.push(item.image);
+        }
+      });
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (imageFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: imageFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取商品图片临时链接失败', err);
+        }
+      }
+
+      const products = allProducts.map(item => {
+        // 转换 images 数组中的 fileID
+        let convertedImages = item.images || [];
+        if (convertedImages.length > 0) {
+          convertedImages = convertedImages.map(img => {
+            if (img && img.startsWith('cloud://') && tempUrlMap[img]) {
+              return tempUrlMap[img];
+            }
+            return img;
+          });
+        }
+
+        return {
+          ...item,
+          images: convertedImages,  // 直接替换为转换后的 URL
+          cashPriceYuan: item.cash_price ? formatMoney(item.cash_price) : null,
+          statusText: item.status === 'available' ? '上架' : '下架'
+        };
+      });
 
       this.setData({
         products: page === 1 ? products : [...this.data.products, ...products],
@@ -168,37 +213,27 @@ Page({
       success: (res) => {
         console.log('[选择图片] 选择的图片:', res.tempFilePaths);
         const tempFilePaths = res.tempFilePaths;
-        // Mock 模式下直接使用临时路径
-        if (app.USE_MOCK) {
-          const newImages = currentImages.concat(tempFilePaths);
-          console.log('[选择图片] 新图片数组:', newImages);
-          this.setData({
-            'formData.images': newImages
-          });
-          showSuccess(`已选择 ${tempFilePaths.length} 张图片`);
-        } else {
-          // 真实模式上传到云存储
-          wx.showLoading({ title: '上传中...' });
-          const uploadPromises = tempFilePaths.map((path) => {
-            const cloudPath = `products/${Date.now()}-${Math.random().toString(36).substr(2)}.jpg`;
-            return wx.cloud.uploadFile({ cloudPath, filePath: path });
-          });
+        // 上传到云存储
+        wx.showLoading({ title: '上传中...' });
+        const uploadPromises = tempFilePaths.map((path) => {
+          const cloudPath = `products/${Date.now()}-${Math.random().toString(36).substr(2)}.jpg`;
+          return wx.cloud.uploadFile({ cloudPath, filePath: path, isPrivate: false });
+        });
 
-          Promise.all(uploadPromises)
-            .then((results) => {
-              wx.hideLoading();
-              const fileIDs = results.map((res) => res.fileID);
-              const newImages = currentImages.concat(fileIDs);
-              this.setData({
-                'formData.images': newImages
-              });
-              showSuccess(`上传成功 ${results.length} 张图片`);
-            })
-            .catch(() => {
-              wx.hideLoading();
-              showInfo('图片上传失败');
+        Promise.all(uploadPromises)
+          .then((results) => {
+            wx.hideLoading();
+            const fileIDs = results.map((res) => res.fileID);
+            const newImages = currentImages.concat(fileIDs);
+            this.setData({
+              'formData.images': newImages
             });
-        }
+            showSuccess(`上传成功 ${results.length} 张图片`);
+          })
+          .catch(() => {
+            wx.hideLoading();
+            showInfo('图片上传失败');
+          });
       },
       fail: () => {
         showInfo('图片选择失败');

@@ -23,7 +23,7 @@
       data-id="{{item._id}}"
     >
       <view class="cover-image">
-        <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+        <image class="cover-img" src="{{item.display_cover_image || item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
       </view>
       <view class="past-info">
         <text class="past-title">{{item.title}}</text>
@@ -47,7 +47,7 @@
       data-id="{{item._id}}"
     >
       <view class="cover-image">
-        <image class="cover-img" src="{{item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+        <image class="cover-img" src="{{item.display_cover_image || item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
       </view>
       <view class="past-info">
         <text class="past-title">{{item.title}}</text>

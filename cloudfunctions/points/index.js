@@ -11,28 +11,29 @@ const _ = db.command;
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
-  const { action, ...data } = event;
+  const { action, testOpenid, ...data } = event;
+
+  // 获取当前用户 openid：优先使用 testOpenid（测试用户），否则使用真实 openid
+  const openid = testOpenid || wxContext.OPENID;
 
   switch (action) {
     case 'getBalance':
-      return handleGetBalance(data, wxContext);
+      return handleGetBalance(data, openid);
     case 'getLogs':
-      return handleGetLogs(data, wxContext);
+      return handleGetLogs(data, openid);
     case 'getRanking':
-      return handleGetRanking(data, wxContext);
+      return handleGetRanking(data, openid);
     case 'addPoints':
-      return handleAddPoints(data, wxContext);
+      return handleAddPoints(data, openid);
     case 'deductPoints':
-      return handleDeductPoints(data, wxContext);
+      return handleDeductPoints(data, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
 };
 
 // 获取积分余额
-async function handleGetBalance(data, wxContext) {
-  const openid = wxContext.OPENID;
-
+async function handleGetBalance(data, openid) {
   try {
     const userResult = await db.collection('users').where({ openid }).get();
 
@@ -53,8 +54,7 @@ async function handleGetBalance(data, wxContext) {
 }
 
 // 获取积分记录
-async function handleGetLogs(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleGetLogs(data, openid) {
   const { page = 1, limit = 20 } = data;
 
   try {
@@ -93,13 +93,12 @@ async function handleGetLogs(data, wxContext) {
 }
 
 // 获取积分榜
-async function handleGetRanking(data, wxContext) {
-  const openid = wxContext.OPENID;
-
+async function handleGetRanking(data, openid) {
   try {
     // 获取当前用户
     const userResult = await db.collection('users').where({ openid }).get();
     const currentUserId = userResult.data.length > 0 ? userResult.data[0]._id : null;
+    const currentUserPoints = userResult.data.length > 0 ? (userResult.data[0].points || 0) : 0;
 
     // 获取排行榜
     const listResult = await db.collection('users')
@@ -122,7 +121,7 @@ async function handleGetRanking(data, wxContext) {
       const rankResult = await db.collection('users')
         .where({
           status: 'approved',
-          points: _.gt(userResult.data[0].points || 0)
+          points: _.gt(currentUserPoints)
         })
         .count();
       myRank = rankResult.total + 1;
@@ -142,8 +141,7 @@ async function handleGetRanking(data, wxContext) {
 }
 
 // 增加积分（管理员操作）
-async function handleAddPoints(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleAddPoints(data, openid) {
   const { userId, points, remark } = data;
 
   try {
@@ -183,8 +181,7 @@ async function handleAddPoints(data, wxContext) {
 }
 
 // 扣除积分
-async function handleDeductPoints(data, wxContext) {
-  const openid = wxContext.OPENID;
+async function handleDeductPoints(data, openid) {
   const { userId, points, remark } = data;
 
   try {

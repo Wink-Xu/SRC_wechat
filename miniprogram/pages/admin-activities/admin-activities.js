@@ -63,11 +63,39 @@ Page({
 
       console.log('[AdminActivities] API 返回结果:', result);
 
-      const activities = (result.list || []).map(item => ({
-        ...item,
-        formattedTime: formatDate(item.start_time, 'MM-DD HH:mm'),
-        statusText: this.getStatusText(item.status)
-      }));
+      // 收集需要转换的封面图 fileID
+      const allActivities = result.list || [];
+      const coverImageFileIDs = allActivities
+        .filter(item => item.cover_image && item.cover_image.startsWith('cloud://'))
+        .map(item => item.cover_image);
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (coverImageFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: coverImageFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取封面临时链接失败', err);
+        }
+      }
+
+      const activities = allActivities.map(item => {
+        let coverImage = item.cover_image;
+        if (item.cover_image && item.cover_image.startsWith('cloud://') && tempUrlMap[item.cover_image]) {
+          coverImage = tempUrlMap[item.cover_image];
+        }
+        return {
+          ...item,
+          cover_image: coverImage,
+          formattedTime: formatDate(item.start_time, 'MM-DD HH:mm'),
+          statusText: this.getStatusText(item.status)
+        };
+      });
 
       console.log('[AdminActivities] 格式化后的活动数量:', activities.length);
 
@@ -152,14 +180,40 @@ Page({
     const confirm = await showConfirm('结束活动', '活动结束后，系统将自动给已签到的团员发放积分。确认结束？');
     if (!confirm) return;
 
+    wx.showLoading({ title: '结束中...' });
+
     try {
       const result = await activityApi.finishActivityWithCheckIn({ activityId: id });
-      showSuccess(`活动已结束，共发放 ${result.awarded_count} 人 ${result.points_per_person} 积分`);
+
+      wx.hideLoading();
+
+      console.log('[结束活动] 返回结果:', result);
+
+      // 检查是否有错误信息（云函数可能在 data 中返回 message 表示错误）
+      if (result && result.message && result.success !== true) {
+        wx.showToast({
+          title: result.message,
+          icon: 'none'
+        });
+        return;
+      }
+
+      // 检查是否成功
+      if (!result || result.success === false) {
+        wx.showToast({
+          title: '结束活动失败',
+          icon: 'none'
+        });
+        return;
+      }
+
+      showSuccess(`活动已结束，共发放 ${result.awarded_count || 0} 人 ${result.points_per_person || 0} 积分`);
       this.refreshActivities();
     } catch (error) {
+      wx.hideLoading();
       console.error('结束活动失败', error);
       wx.showToast({
-        title: '结束活动失败',
+        title: error?.errMsg || error?.message || '结束活动失败',
         icon: 'none'
       });
     }

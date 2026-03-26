@@ -3,9 +3,11 @@
   <!-- 用户信息头部 -->
   <view class="header-section">
     <view class="header-top">
-      <image class="user-avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="changeAvatar"></image>
       <view class="user-info">
         <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
+        <!-- 临时显示 openid -->
+        <text class="openid-text" wx:if="{{openid}}">OpenID: {{openid}}</text>
         <view class="role-tags" wx:if="{{isLoggedIn}}">
           <text class="role-tag" wx:if="{{isLeader}}">团长</text>
           <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
@@ -104,12 +106,5 @@
   <!-- 未登录提示 -->
   <view class="login-overlay" wx:if="{{!isLoggedIn}}">
     <button class="btn-login" bindtap="handleLogin">立即登录</button>
-  </view>
-
-  <!-- 测试工具面板入口 -->
-  <view class="debug-section">
-    <view class="btn-debug btn-test-panel" bindtap="goToTestPanel">
-      <text>🛠️ 测试工具面板</text>
-    </view>
   </view>
 </view>

@@ -23,10 +23,38 @@ Page({
     try {
       const result = await pointsApi.getRanking();
 
-      const ranking = (result.list || []).map((item, index) => ({
-        ...item,
-        rank: index + 1
-      }));
+      // 收集需要转换的头像 fileID
+      const rawRanking = result.list || [];
+      const avatarFileIDs = rawRanking
+        .filter(item => item.avatar && item.avatar.startsWith('cloud://'))
+        .map(item => item.avatar);
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (avatarFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: avatarFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取头像临时链接失败', err);
+        }
+      }
+
+      // 格式化并转换头像
+      const ranking = rawRanking.map((item, index) => {
+        const processed = {
+          ...item,
+          rank: index + 1
+        };
+        if (item.avatar && item.avatar.startsWith('cloud://') && tempUrlMap[item.avatar]) {
+          processed.displayAvatar = tempUrlMap[item.avatar];
+        }
+        return processed;
+      });
 
       this.setData({
         ranking,

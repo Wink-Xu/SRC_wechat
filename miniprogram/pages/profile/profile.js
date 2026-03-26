@@ -11,7 +11,7 @@ Page({
     isLeader: false,
     isMember: false,    // 是否是团员（已批准）
     isPending: false,   // 是否待审批
-    useMock: false,
+    openid: '',         // 临时显示 openid
     points: 0,
     activityCount: 0
   },
@@ -28,7 +28,23 @@ Page({
   refreshUserInfo: async function () {
     const app = getApp();
     const isLoggedIn = app.globalData.isLoggedIn;
-    const userInfo = app.globalData.userInfo;
+    let userInfo = app.globalData.userInfo;
+
+    // 处理头像：如果是 cloud:// 开头，需要转换为临时 URL
+    if (userInfo && userInfo.avatar && userInfo.avatar.startsWith('cloud://')) {
+      try {
+        const tempUrlResult = await wx.cloud.getTempFileURL({
+          fileList: [userInfo.avatar]
+        });
+        if (tempUrlResult.fileList[0]?.tempURL) {
+          userInfo = { ...userInfo, displayAvatar: tempUrlResult.fileList[0].tempURL };
+        }
+      } catch (err) {
+        console.error('获取头像临时链接失败', err);
+      }
+    } else if (userInfo && userInfo.avatar) {
+      userInfo = { ...userInfo, displayAvatar: userInfo.avatar };
+    }
 
     this.setData({
       isLoggedIn,
@@ -37,7 +53,7 @@ Page({
       isLeader: app.globalData.isLeader,
       isMember: app.globalData.isMember,
       isPending: userInfo && userInfo.status === 'pending',
-      useMock: app.USE_MOCK,
+      openid: userInfo?.openid || '', // 显示 openid
       points: 0,
       activityCount: 0
     });
@@ -135,20 +151,6 @@ Page({
     wx.navigateTo({ url: path });
   },
 
-  // 跳转到调试页面（角色切换）
-  goToDebug: function () {
-    wx.navigateTo({
-      url: '/pages/debug/debug'
-    });
-  },
-
-  // 跳转到测试工具面板
-  goToTestPanel: function () {
-    wx.navigateTo({
-      url: '/pages/test-panel/test-panel'
-    });
-  },
-
   // 退出登录
   handleLogout: async function () {
     const confirm = await showConfirm('退出登录', '确定要退出登录吗？');
@@ -165,5 +167,66 @@ Page({
     });
 
     showSuccess('已退出登录');
+  },
+
+  // 修改头像
+  changeAvatar: async function () {
+    const that = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        const tempFilePath = res.tempFilePaths[0];
+
+        wx.showLoading({ title: '上传中...' });
+
+        // 上传到云存储
+        wx.cloud.uploadFile({
+          cloudPath: `user_avatars/${that.data.userInfo._id || Date.now()}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.png`,
+          filePath: tempFilePath,
+          isPrivate: false,
+          success: async function (uploadRes) {
+            // 更新用户头像
+            try {
+              const { userApi } = require('../../utils/request');
+              await userApi.updateProfile({
+                avatar: uploadRes.fileID
+              });
+
+              // 更新全局用户信息
+              const app = getApp();
+              if (app.globalData.userInfo) {
+                app.globalData.userInfo.avatar = uploadRes.fileID;
+              }
+
+              wx.hideLoading();
+              showSuccess('头像更新成功');
+
+              // 刷新页面
+              that.refreshUserInfo();
+            } catch (error) {
+              wx.hideLoading();
+              console.error('更新头像失败', error);
+              wx.showToast({
+                title: '更新失败',
+                icon: 'none'
+              });
+            }
+          },
+          fail: function (uploadErr) {
+            wx.hideLoading();
+            console.error('上传图片失败', uploadErr);
+            wx.showToast({
+              title: '上传失败',
+              icon: 'none'
+            });
+          }
+        });
+      },
+      fail: function (err) {
+        console.error('选择图片失败', err);
+      }
+    });
   }
 });

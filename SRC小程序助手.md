@@ -271,28 +271,44 @@ SRC_wechat/
 - Node.js 14+
 - 已开通微信云开发
 
+### 首次部署
+
+#### 1. 初始化数据库（仅需执行一次）
+
+**方式一：云开发控制台手动创建**
+
+1. 打开微信开发者工具 → 云开发 → 数据库
+2. 创建以下集合：
+   - `users` - 用户信息
+   - `activities` - 活动信息
+   - `registrations` - 报名信息
+   - `products` - 商品信息
+   - `orders` - 订单信息
+   - `point_logs` - 积分记录
+
+**方式二：运行初始化云函数**
+
+1. 部署 `init` 云函数
+2. 在云开发控制台 → 云函数 → init → 测试界面调用一次
+
+#### 2. 部署云函数
+
+```bash
+# 部署所有云函数
+/Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
+  --env "cloud1-2gyhe7s5efa4155f" \
+  --names "user activity points shop admin" \
+  --project "/Users/xu/Documents/SRC_wechat"
+```
+
+或在开发者工具中右键每个云函数 → 上传并部署（云端安装依赖）
+
 ### 本地开发
 
 1. 克隆项目到本地
 2. 用微信开发者工具打开项目
-3. 配置云开发环境
-4. 部署云函数
-5. 编译运行
-
-### 云函数部署
-
-```bash
-# 部署单个云函数
-/Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
-  --env "cloud1-2gyhe7s5efa4155f" \
-  --names "activity" \
-  --project "/Users/xu/Documents/SRC_wechat"
-
-# 查看云函数列表
-/Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions list \
-  --env "cloud1-2gyhe7s5efa4155f" \
-  --project "/Users/xu/Documents/SRC_wechat"
-```
+3. 确保数据库集合已创建
+4. 编译运行
 
 ### 代码规范
 

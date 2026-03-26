@@ -25,7 +25,7 @@
         wx:key="_id"
       >
         <text class="participant-index">{{index + 1}}</text>
-        <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+        <image class="participant-avatar" src="{{item.displayAvatar || item.avatar || '/images/default-avatar.png'}}"></image>
         <text class="participant-name">{{item.nickname}}</text>
         <view class="participant-status">
           <text wx:if="{{item.status === 'checked_in'}}" class="status-badge checked-in">已签到</text>

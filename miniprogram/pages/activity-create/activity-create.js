@@ -190,19 +190,11 @@ Page({
       success: function (res) {
         const tempFilePath = res.tempFilePaths[0];
 
-        // Mock 模式下直接使用临时路径显示图片
-        if (app.USE_MOCK) {
-          that.setData({
-            'formData.cover_image': tempFilePath
-          });
-          showSuccess('封面图上传成功');
-          return;
-        }
-
-        // 非 Mock 模式：上传到云存储
+        // 上传到云存储
         wx.cloud.uploadFile({
           cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.png`,
           filePath: tempFilePath,
+          isPrivate: false,
           success: function (uploadRes) {
             that.setData({
               'formData.cover_image': uploadRes.fileID

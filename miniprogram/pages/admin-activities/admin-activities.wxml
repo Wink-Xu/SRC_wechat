@@ -55,7 +55,7 @@
           bindtap="cancelActivity"
         >取消</button>
         <button
-          wx:if="{{item.status === 'ended'}}"
+          wx:if="{{item.status === 'ended' || item.status === 'cancelled'}}"
           class="btn btn-danger btn-small"
           data-id="{{item._id}}"
           bindtap="deleteActivity"

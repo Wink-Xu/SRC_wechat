@@ -8,19 +8,19 @@
     <!-- 前三名 -->
     <view class="top-three" wx:if="{{ranking.length > 0}}">
       <view class="top-item second" wx:if="{{ranking[1]}}">
-        <image class="top-avatar" src="{{ranking[1].avatar || '/images/default-avatar.png'}}"></image>
+        <image class="top-avatar" src="{{ranking[1].displayAvatar || ranking[1].avatar || '/images/default-avatar.png'}}"></image>
         <text class="top-name">{{ranking[1].nickname}}</text>
         <text class="top-points">{{ranking[1].points}} 积分</text>
         <view class="top-badge">2</view>
       </view>
       <view class="top-item first" wx:if="{{ranking[0]}}">
-        <image class="top-avatar" src="{{ranking[0].avatar || '/images/default-avatar.png'}}"></image>
+        <image class="top-avatar" src="{{ranking[0].displayAvatar || ranking[0].avatar || '/images/default-avatar.png'}}"></image>
         <text class="top-name">{{ranking[0].nickname}}</text>
         <text class="top-points">{{ranking[0].points}} 积分</text>
         <view class="top-badge">1</view>
       </view>
       <view class="top-item third" wx:if="{{ranking[2]}}">
-        <image class="top-avatar" src="{{ranking[2].avatar || '/images/default-avatar.png'}}"></image>
+        <image class="top-avatar" src="{{ranking[2].displayAvatar || ranking[2].avatar || '/images/default-avatar.png'}}"></image>
         <text class="top-name">{{ranking[2].nickname}}</text>
         <text class="top-points">{{ranking[2].points}} 积分</text>
         <view class="top-badge">3</view>
@@ -31,7 +31,7 @@
     <view class="rank-list" wx:if="{{ranking.length > 3}}">
       <view class="rank-item" wx:for="{{ranking}}" wx:key="_id" wx:if="{{item.rank > 3}}">
         <text class="rank-num">{{item.rank}}</text>
-        <image class="rank-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+        <image class="rank-avatar" src="{{item.displayAvatar || item.avatar || '/images/default-avatar.png'}}"></image>
         <text class="rank-name">{{item.nickname}}</text>
         <text class="rank-points">{{item.points}} 积分</text>
       </view>

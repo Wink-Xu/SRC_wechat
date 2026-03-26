@@ -7,7 +7,7 @@
   <block wx:elif="{{product}}">
     <!-- 商品图片轮播 -->
     <swiper class="product-swiper" indicator-dots="{{true}}" autoplay="{{false}}" circular="{{true}}">
-      <swiper-item wx:for="{{product.images || []}}" wx:key="index">
+      <swiper-item wx:for="{{product.displayImages}}" wx:key="index">
         <image class="product-image" src="{{item}}" mode="aspectFill"></image>
       </swiper-item>
     </swiper>
@@ -34,71 +34,81 @@
       <text class="desc-text" wx:if="{{product.description}}">{{product.description}}</text>
       <!-- 商品细节图片 -->
       <view class="detail-images" wx:if="{{product.images.length > 1}}">
-        <view class="detail-image-item" wx:for="{{product.images}}" wx:key="index">
+        <view class="detail-image-item" wx:for="{{product.displayImages}}" wx:key="index">
           <image class="detail-image" src="{{item}}" mode="widthFix" bindtap="previewDetailImage" data-index="{{index}}"></image>
         </view>
       </view>
     </view>
 
-    <!-- 数量选择 -->
-    <view class="quantity-section">
-      <text class="section-title">购买数量</text>
-      <view class="quantity-control">
-        <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
-        <text class="quantity-value">{{quantity}}</text>
-        <view class="quantity-btn {{quantity >= product.stock ? 'disabled' : ''}}" bindtap="increaseQuantity">+</view>
-      </view>
-    </view>
-
-    <!-- 支付方式 -->
-    <view class="pay-method-section">
-      <text class="section-title">支付方式</text>
-      <view class="pay-methods">
-        <view
-          class="pay-method {{payMethod === 'points' ? 'active' : ''}}"
-          data-method="points"
-          bindtap="onPayMethodChange"
-          wx:if="{{product.points_price}}"
-        >
-          <text class="method-name">积分兑换</text>
-          <text class="method-value">{{product.points_price * quantity}} 积分</text>
-          <text class="method-tip" wx:if="{{myPoints < product.points_price * quantity}}">积分不足</text>
-        </view>
-        <view
-          class="pay-method {{payMethod === 'wechat' ? 'active' : ''}}"
-          data-method="wechat"
-          bindtap="onPayMethodChange"
-          wx:if="{{product.cash_price}}"
-        >
-          <text class="method-name">微信支付</text>
-          <text class="method-value">¥{{product.cashPriceYuan * quantity}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 收货地址 -->
-    <view class="address-section" bindtap="selectAddress">
-      <text class="section-title">收货地址</text>
-      <view wx:if="{{address}}" class="address-info">
-        <text class="address-name">{{address.name}} {{address.phone}}</text>
-        <text class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
-      </view>
-      <view wx:else class="address-empty">
-        <text>请选择收货地址</text>
-        <text class="arrow">></text>
-      </view>
-    </view>
-
     <!-- 底部操作 -->
     <view class="footer-actions">
-      <view class="total-info">
-        <text class="total-label">合计:</text>
-        <text class="total-value" wx:if="{{payMethod === 'points'}}">{{product.points_price * quantity}} 积分</text>
-        <text class="total-value" wx:else>¥{{product.cashPriceYuan * quantity}}</text>
-      </view>
-      <button class="btn btn-primary buy-btn" bindtap="handleSubmit">
-        {{payMethod === 'points' ? '立即兑换' : '立即购买'}}
+      <button class="btn btn-primary buy-btn" bindtap="showBuyConfirm">
+        立即购买
       </button>
+    </view>
+
+    <!-- 购买确认弹窗 -->
+    <view class="buy-modal {{showBuyModal ? 'show' : ''}}" bindtap="hideBuyConfirm" wx:if="{{product}}">
+      <view class="buy-mask" bindtap="hideBuyConfirm"></view>
+      <view class="buy-content" catchtap="noop">
+        <view class="buy-header">
+          <text class="buy-title">确认购买</text>
+          <text class="buy-close" bindtap="hideBuyConfirm">×</text>
+        </view>
+
+        <!-- 商品信息 -->
+        <view class="buy-product">
+          <image class="buy-product-img" src="{{product.displayImages[0] || '/images/default-product.png'}}" mode="aspectFill"></image>
+          <view class="buy-product-info">
+            <text class="buy-product-name">{{product.name}}</text>
+            <text class="buy-product-price">¥{{product.cashPriceYuan}}</text>
+          </view>
+        </view>
+
+        <!-- 购买数量 -->
+        <view class="buy-section">
+          <text class="buy-section-title">购买数量</text>
+          <view class="quantity-control">
+            <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
+            <text class="quantity-value">{{quantity}}</text>
+            <view class="quantity-btn {{quantity >= product.stock ? 'disabled' : ''}}" bindtap="increaseQuantity">+</view>
+          </view>
+        </view>
+
+        <!-- 支付方式 -->
+        <view class="buy-section">
+          <text class="buy-section-title">支付方式</text>
+          <view class="pay-methods">
+            <view class="pay-method {{payMethod === 'points' ? 'active' : ''}}" data-method="points" bindtap="onPayMethodChange">
+              <text class="method-name">积分兑换</text>
+              <text class="method-value">{{product.points_price}} 积分</text>
+            </view>
+            <view class="pay-method {{payMethod === 'wechat' ? 'active' : ''}}" data-method="wechat" bindtap="onPayMethodChange">
+              <text class="method-name">微信支付</text>
+              <text class="method-value">¥{{product.cashPriceYuan}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 收货地址 -->
+        <view class="buy-section" bindtap="selectAddress">
+          <text class="buy-section-title">收货地址</text>
+          <view wx:if="{{address}}" class="address-info">
+            <text class="address-name">{{address.name}} {{address.phone}}</text>
+            <text class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
+          </view>
+          <view wx:else class="address-empty">
+            <text>请选择收货地址</text>
+            <text class="arrow">></text>
+          </view>
+        </view>
+
+        <!-- 底部按钮 -->
+        <view class="buy-footer">
+          <button class="buy-cancel-btn" bindtap="hideBuyConfirm">取消</button>
+          <button class="buy-confirm-btn" bindtap="confirmBuy">确认购买</button>
+        </view>
+      </view>
     </view>
   </block>
 </view>

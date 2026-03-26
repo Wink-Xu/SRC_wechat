@@ -63,11 +63,39 @@ Page({
 
       const result = await shopApi.getOrders(params);
 
-      const orders = (result.list || []).map(item => ({
-        ...item,
-        formattedTime: formatDate(item.created_at, 'MM-DD HH:mm'),
-        statusText: this.getStatusText(item.status)
-      }));
+      // 收集需要转换的商品图片 fileID
+      const allOrders = result.list || [];
+      const imageFileIDs = allOrders
+        .filter(item => item.product_image && item.product_image.startsWith('cloud://'))
+        .map(item => item.product_image);
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (imageFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: imageFileIDs
+          });
+          tempUrlResult.fileList.forEach(file => {
+            tempUrlMap[file.fileID] = file.tempFileURL;
+          });
+        } catch (err) {
+          console.error('获取订单商品图片临时链接失败', err);
+        }
+      }
+
+      const orders = allOrders.map(item => {
+        const processed = {
+          ...item,
+          formattedTime: formatDate(item.created_at, 'MM-DD HH:mm'),
+          statusText: this.getStatusText(item.status)
+        };
+        // 转换商品图片
+        if (item.product_image && item.product_image.startsWith('cloud://') && tempUrlMap[item.product_image]) {
+          processed.display_product_image = tempUrlMap[item.product_image];
+        }
+        return processed;
+      });
 
       this.setData({
         orders: page === 1 ? orders : [...this.data.orders, ...orders],
