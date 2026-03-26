@@ -60,6 +60,12 @@
           data-id="{{item._id}}"
           bindtap="deleteActivity"
         >删除</button>
+        <button
+          wx:if="{{item.status === 'ended'}}"
+          class="btn btn-success btn-small"
+          data-id="{{item._id}}"
+          bindtap="restartActivity"
+        >重启活动</button>
       </view>
     </view>
 

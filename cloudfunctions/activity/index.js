@@ -60,6 +60,8 @@ exports.main = async (event, context) => {
       return handleGetCheckInQrCode(data, wxContext, testOpenid);
     case 'finishActivityWithCheckIn':
       return handleFinishActivityWithCheckIn(data, wxContext, testOpenid);
+    case 'restartActivity':
+      return handleRestartActivity(data, wxContext, testOpenid);
     case 'uploadPhotos':
       return handleUploadPhotos(data, wxContext, testOpenid);
     case 'updateCoverImage':
@@ -857,6 +859,95 @@ async function handleFinishActivityWithCheckIn(data, wxContext, testOpenid) {
   } catch (error) {
     console.error('[结束活动] 失败:', error);
     return { code: -1, message: '结束活动失败: ' + (error.message || error) };
+  }
+}
+
+// 重启活动（撤销积分发放）
+async function handleRestartActivity(data, wxContext, testOpenid) {
+  const { activityId, id } = data;
+  const actualActivityId = activityId || id;
+
+  try {
+    const user = await getUser(wxContext.OPENID, testOpenid);
+
+    if (!user || !['admin', 'leader'].includes(user.role)) {
+      return { code: -1, message: '没有权限' };
+    }
+
+    // 获取活动
+    const activityResult = await db.collection('activities').doc(actualActivityId).get();
+    const activity = activityResult.data;
+
+    if (!activity) {
+      return { code: -1, message: '活动不存在' };
+    }
+
+    if (activity.status !== 'ended') {
+      return { code: -1, message: '只有已结束的活动才能重启' };
+    }
+
+    // 获取已发放积分的签到记录
+    const awardedUsers = await db.collection('registrations').where({
+      activity_id: actualActivityId,
+      status: 'checked_in',
+      points_awarded: true
+    }).get();
+
+    const points = activity.points || 20;
+    let revokedCount = 0;
+
+    // 撤销积分
+    for (const reg of awardedUsers.data) {
+      try {
+        // 扣回用户积分
+        await db.collection('users').doc(reg.user_id).update({
+          data: {
+            points: _.inc(-points)
+          }
+        });
+
+        // 删除积分日志
+        await db.collection('point_logs').where({
+          user_id: reg.user_id,
+          related_id: actualActivityId,
+          type: 'activity_checkin'
+        }).remove();
+
+        // 重置积分发放标记
+        await db.collection('registrations').doc(reg._id).update({
+          data: {
+            points_awarded: false
+          }
+        });
+
+        revokedCount++;
+      } catch (userError) {
+        console.error('[重启活动] 撤销积分失败:', reg.user_id, userError.message);
+      }
+    }
+
+    // 更新活动状态为进行中
+    await db.collection('activities').doc(actualActivityId).update({
+      data: {
+        status: 'ongoing',
+        updated_at: db.serverDate()
+      }
+    });
+
+    console.log('[重启活动] 完成，撤销积分人数:', revokedCount);
+
+    return {
+      code: 0,
+      data: {
+        success: true,
+        revoked_count: revokedCount,
+        points_per_person: points
+      },
+      message: '活动已重启，已撤销 ' + revokedCount + ' 人的积分'
+    };
+  } catch (error) {
+    console.error('[重启活动] 失败:', error);
+    return { code: -1, message: '重启活动失败: ' + (error.message || error) };
   }
 }
 

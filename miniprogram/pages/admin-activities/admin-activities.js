@@ -216,6 +216,39 @@ Page({
     }
   },
 
+  // 重启活动
+  restartActivity: async function (e) {
+    const { id } = e.currentTarget.dataset;
+
+    const confirm = await showConfirm('重启活动', '重启将撤销已发放的积分，活动恢复为进行中状态。确认重启？');
+    if (!confirm) return;
+
+    wx.showLoading({ title: '重启中...' });
+
+    try {
+      const result = await activityApi.restartActivity({ activityId: id });
+
+      wx.hideLoading();
+
+      if (result && result.success) {
+        showSuccess(`活动已重启，已撤销 ${result.revoked_count || 0} 人积分`);
+        this.refreshActivities();
+      } else {
+        wx.showToast({
+          title: '重启失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      wx.hideLoading();
+      console.error('重启活动失败', error);
+      wx.showToast({
+        title: error?.message || '重启失败',
+        icon: 'none'
+      });
+    }
+  },
+
   // 显示签到码
   showCheckInQrCode: async function (e) {
     const { id } = e.currentTarget.dataset;

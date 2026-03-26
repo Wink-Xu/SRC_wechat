@@ -83,6 +83,7 @@ const activityApi = {
   selfCheckIn: (data) => callFunction('activity', 'selfCheckIn', data),
   getCheckInQrCode: (data) => callFunction('activity', 'getCheckInQrCode', data, { showLoad: false }),
   finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data, { showErrorMsg: false }),
+  restartActivity: (data) => callFunction('activity', 'restartActivity', data),
   uploadPhotos: (data) => callFunction('activity', 'uploadPhotos', data)
 };
 
