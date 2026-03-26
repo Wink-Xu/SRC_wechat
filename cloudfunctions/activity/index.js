@@ -279,7 +279,7 @@ async function handleDelete(data, wxContext, testOpenid) {
 
 // 获取活动列表
 async function handleGetList(data, wxContext, testOpenid) {
-  const { page = 1, limit = 20, status, registered, createdByMe, all } = data;
+  const { page = 1, limit = 20, status, registered, createdByMe, all, myActivities } = data;
 
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
@@ -290,7 +290,7 @@ async function handleGetList(data, wxContext, testOpenid) {
     // 全部模式（用于管理后台）
     if (!all) {
       // 状态筛选
-      if (status) {
+      if (status && status !== 'all') {
         const statusList = status.split(',');
         query = query.where({ status: _.in(statusList) });
       }
@@ -328,7 +328,7 @@ async function handleGetList(data, wxContext, testOpenid) {
       .limit(limit)
       .get();
 
-    // 获取每个活动的报名人数
+    // 获取每个活动的报名人数和用户状态
     const activities = listResult.data;
     for (const activity of activities) {
       const regCount = await db.collection('registrations').where({
@@ -336,6 +336,22 @@ async function handleGetList(data, wxContext, testOpenid) {
         status: _.in(['registered', 'checked_in'])
       }).count();
       activity.registered_count = regCount.total;
+
+      // 获取当前用户在该活动的状态
+      if (userId) {
+        const userRegResult = await db.collection('registrations').where({
+          activity_id: activity._id,
+          user_id: userId
+        }).get();
+
+        if (userRegResult.data.length > 0) {
+          activity.user_status = userRegResult.data[0].status;
+          activity.user_checked_in = userRegResult.data[0].status === 'checked_in';
+        } else {
+          activity.user_status = null;
+          activity.user_checked_in = false;
+        }
+      }
     }
 
     return {

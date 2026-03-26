@@ -65,18 +65,13 @@ Page({
         this.setData({ points: pointsResult.points || 0 });
 
         // 获取活动次数（已签到的活动数量）
-        const activityResult = await activityApi.getList({ status: 'all' });
+        const activityResult = await activityApi.getList({ registered: true });
         const activities = activityResult.list || [];
-        const userId = app.globalData.userInfo?._id;
 
         // 筛选已签到的活动
-        const checkedInActivities = activities.filter(activity => {
-          const registrations = activity.participants || [];
-          const userRegistration = registrations.find(r => r.user_id === userId);
-          return userRegistration && userRegistration.check_in_status === 'checked_in';
-        });
+        const checkedInCount = activities.filter(activity => activity.user_checked_in).length;
 
-        this.setData({ activityCount: checkedInActivities.length });
+        this.setData({ activityCount: checkedInCount });
       } catch (error) {
         console.error('获取积分失败', error);
       }

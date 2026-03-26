@@ -21,24 +21,12 @@ Page({
     this.setData({ loading: true });
 
     try {
-      // 获取所有活动
-      const result = await activityApi.getList({ status: 'all' });
+      // 获取已报名的活动
+      const result = await activityApi.getList({ registered: true });
       const activities = result.list || [];
 
-      // 获取当前用户的报名记录
-      const userId = app.globalData.userInfo?._id;
-      if (!userId) {
-        this.setData({ checkedInActivities: [], loading: false });
-        return;
-      }
-
       // 筛选出已签到的活动
-      let checkedInActivities = activities.filter(activity => {
-        // 检查是否有报名记录且已签到
-        const registrations = activity.participants || [];
-        const userRegistration = registrations.find(r => r.user_id === userId);
-        return userRegistration && userRegistration.check_in_status === 'checked_in';
-      });
+      let checkedInActivities = activities.filter(activity => activity.user_checked_in);
 
       // 收集需要转换的封面图 fileID
       const coverImageFileIDs = checkedInActivities
