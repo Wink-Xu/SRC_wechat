@@ -196,31 +196,21 @@ Page({
 
       console.log('[结束活动] 返回结果:', result);
 
-      // 检查是否有错误信息（云函数可能在 data 中返回 message 表示错误）
-      if (result && result.message && result.success !== true) {
-        wx.showToast({
-          title: result.message,
-          icon: 'none'
-        });
-        return;
-      }
-
-      // 检查是否成功
-      if (!result || result.success === false) {
+      // 成功
+      if (result && result.success) {
+        showSuccess(`活动已结束，共发放 ${result.awarded_count || 0} 人 ${result.points_per_person || 0} 积分`);
+        this.refreshActivities();
+      } else {
         wx.showToast({
           title: '结束活动失败',
           icon: 'none'
         });
-        return;
       }
-
-      showSuccess(`活动已结束，共发放 ${result.awarded_count || 0} 人 ${result.points_per_person || 0} 积分`);
-      this.refreshActivities();
     } catch (error) {
       wx.hideLoading();
       console.error('结束活动失败', error);
       wx.showToast({
-        title: error?.errMsg || error?.message || '结束活动失败',
+        title: error?.message || '结束活动失败',
         icon: 'none'
       });
     }
