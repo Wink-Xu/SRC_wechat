@@ -21,7 +21,7 @@
       </view>
       <view class="activity-info">
         <text class="info-text">{{item.formattedTime}} | {{item.location}}</text>
-        <text class="info-text">报名: {{item.registered_count || 0}}/{{item.quota}}人</text>
+        <text class="info-text">签到: {{item.check_in_count || 0}}/{{item.registered_count || 0}}人</text>
       </view>
       <view class="activity-actions">
         <button
