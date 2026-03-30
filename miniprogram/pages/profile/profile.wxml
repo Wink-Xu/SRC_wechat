@@ -3,7 +3,7 @@
   <!-- 用户信息头部 -->
   <view class="header-section">
     <view class="header-top">
-      <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="changeAvatar"></image>
+      <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="previewAvatar" bindlongpress="changeAvatar"></image>
       <view class="user-info">
         <view class="nickname-row" bindtap="editNickname">
           <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
@@ -33,7 +33,7 @@
       <text class="stat-label">活动次数</text>
     </view>
     <view class="stat-divider"></view>
-    <view class="stat-item">
+    <view class="stat-item" bindtap="goToPoints">
       <text class="stat-value">{{points}}</text>
       <text class="stat-label">我的积分</text>
     </view>
@@ -111,3 +111,12 @@
     <button class="btn-login" bindtap="handleLogin">立即登录</button>
   </view>
 </view>
+
+<!-- 头像裁剪组件 -->
+<cover-adjuster
+  id="avatarAdjuster"
+  outputWidth="{{300}}"
+  outputHeight="{{300}}"
+  bind:confirm="onAvatarConfirm"
+  bind:cancel="onAvatarCancel"
+/>

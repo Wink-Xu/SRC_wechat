@@ -162,6 +162,48 @@
     </view>
   </view>
 
+  <!-- 报名设置 -->
+  <view class="form-section">
+    <view class="section-title">报名设置</view>
+    <view class="section-card">
+      <!-- 报名权限 -->
+      <view class="form-item">
+        <text class="form-label">报名权限</text>
+        <view class="switch-row">
+          <text class="switch-label">仅团员可报名</text>
+          <switch checked="{{formData.member_only}}" bindchange="onMemberOnlyChange" color="#1A1A1A" />
+        </view>
+        <text class="form-hint" wx:if="{{!formData.member_only}}">关闭后，游客也可报名（需填写手机号）</text>
+      </view>
+
+      <!-- 报名费用 -->
+      <view class="form-item">
+        <text class="form-label">报名费用</text>
+        <view class="fee-type-grid">
+          <view
+            class="fee-type-item {{formData.registration_fee_type === '' ? 'active' : ''}}"
+            bindtap="onFeeTypeChange"
+            data-value=""
+          >
+            <text>免费</text>
+          </view>
+          <view
+            class="fee-type-item {{formData.registration_fee_type === 'points' ? 'active' : ''}}"
+            bindtap="showPointsModal"
+          >
+            <text>{{formData.registration_fee_type === 'points' && formData.registration_fee ? formData.registration_fee + '积分' : '积分'}}</text>
+          </view>
+          <view
+            class="fee-type-item {{formData.registration_fee_type === 'cash' ? 'active' : ''}}"
+            bindtap="showCashModal"
+          >
+            <text>{{formData.registration_fee_type === 'cash' && formData.registration_fee ? '¥' + formData.registration_fee_yuan : '现金'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 提交按钮 -->
   <view class="submit-wrapper">
     <button class="submit-btn" bindtap="handleSubmit">
@@ -178,3 +220,53 @@
   bind:confirm="onCoverConfirm"
   bind:cancel="onCoverCancel"
 />
+
+<!-- 积分输入弹窗 -->
+<view class="fee-modal" wx:if="{{showPointsInputModal}}">
+  <view class="fee-modal-mask" bindtap="closeFeeModal"></view>
+  <view class="fee-modal-content">
+    <view class="fee-modal-header">
+      <text class="fee-modal-title">设置积分</text>
+      <text class="fee-modal-close" bindtap="closeFeeModal">×</text>
+    </view>
+    <view class="fee-modal-body">
+      <text class="fee-modal-hint">报名需要消耗的积分数量</text>
+      <input
+        class="fee-input"
+        type="number"
+        placeholder="请输入积分"
+        value="{{tempFeeValue}}"
+        bindinput="onTempFeeInput"
+      />
+    </view>
+    <view class="fee-modal-footer">
+      <button class="fee-cancel-btn" bindtap="closeFeeModal">取消</button>
+      <button class="fee-confirm-btn" bindtap="confirmPointsFee">确定</button>
+    </view>
+  </view>
+</view>
+
+<!-- 现金输入弹窗 -->
+<view class="fee-modal" wx:if="{{showCashInputModal}}">
+  <view class="fee-modal-mask" bindtap="closeFeeModal"></view>
+  <view class="fee-modal-content">
+    <view class="fee-modal-header">
+      <text class="fee-modal-title">设置费用</text>
+      <text class="fee-modal-close" bindtap="closeFeeModal">×</text>
+    </view>
+    <view class="fee-modal-body">
+      <text class="fee-modal-hint">报名需要支付的金额（元）</text>
+      <input
+        class="fee-input"
+        type="digit"
+        placeholder="请输入金额"
+        value="{{tempFeeValue}}"
+        bindinput="onTempFeeInput"
+      />
+    </view>
+    <view class="fee-modal-footer">
+      <button class="fee-cancel-btn" bindtap="closeFeeModal">取消</button>
+      <button class="fee-confirm-btn" bindtap="confirmCashFee">确定</button>
+    </view>
+  </view>
+</view>

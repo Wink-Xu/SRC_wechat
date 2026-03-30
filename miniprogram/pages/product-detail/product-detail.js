@@ -38,21 +38,63 @@ Page({
       const product = result.product;
       product.cashPriceYuan = product.cash_price ? formatMoney(product.cash_price) : null;
 
-      // 处理图片：将 fileID 转换为临时 URL
-      let displayImages = product.images || [];
-      if (displayImages.length > 0 && displayImages[0] && displayImages[0].startsWith('cloud://')) {
+      // 收集需要转换的图片 fileID
+      const imageFileIDs = [];
+      // 封面图
+      if (product.cover_image && product.cover_image.startsWith('cloud://')) {
+        imageFileIDs.push(product.cover_image);
+      }
+      // 详情图
+      if (product.images && product.images.length > 0) {
+        product.images.forEach(img => {
+          if (img && img.startsWith('cloud://')) {
+            imageFileIDs.push(img);
+          }
+        });
+      }
+
+      // 批量转换 fileID 为临时 URL
+      let tempUrlMap = {};
+      if (imageFileIDs.length > 0) {
         try {
           const tempUrlResult = await wx.cloud.getTempFileURL({
-            fileList: displayImages
+            fileList: imageFileIDs
           });
-          product.displayImages = tempUrlResult.fileList.map(file => file.tempFileURL || file.fileID);
+          tempUrlResult.fileList.forEach(file => {
+            if (file.status === 0 && file.tempFileURL) {
+              tempUrlMap[file.fileID] = file.tempFileURL;
+            }
+          });
         } catch (photoErr) {
           console.error('获取商品图片临时链接失败', photoErr);
-          product.displayImages = displayImages;
         }
-      } else {
-        product.displayImages = displayImages;
       }
+
+      // 构建显示图片列表：封面图优先，然后是详情图
+      let displayImages = [];
+      // 先添加封面图
+      if (product.cover_image) {
+        if (product.cover_image.startsWith('cloud://') && tempUrlMap[product.cover_image]) {
+          displayImages.push(tempUrlMap[product.cover_image]);
+          product.displayCover = tempUrlMap[product.cover_image];
+        } else {
+          displayImages.push(product.cover_image);
+          product.displayCover = product.cover_image;
+        }
+      }
+      // 再添加详情图
+      if (product.images && product.images.length > 0) {
+        product.images.forEach(img => {
+          if (img) {
+            if (img.startsWith('cloud://') && tempUrlMap[img]) {
+              displayImages.push(tempUrlMap[img]);
+            } else {
+              displayImages.push(img);
+            }
+          }
+        });
+      }
+      product.displayImages = displayImages;
 
       this.setData({
         product,

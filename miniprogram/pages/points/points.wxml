@@ -26,6 +26,7 @@
       <view class="log-item" wx:for="{{logs}}" wx:key="_id">
         <view class="log-info">
           <text class="log-type">{{item.typeText}}</text>
+          <text class="log-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
           <text class="log-time">{{item.formattedTime}}</text>
         </view>
         <text class="log-points {{item.points > 0 ? 'positive' : 'negative'}}">

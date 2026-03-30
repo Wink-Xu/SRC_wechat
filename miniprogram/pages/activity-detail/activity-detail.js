@@ -17,7 +17,10 @@ Page({
     registrationClosed: false,
     // 批量删除照片
     isSelectMode: false,
-    selectedPhotos: []
+    selectedPhotos: [],
+    // 游客报名手机号
+    showPhoneModal: false,
+    guestPhone: ''
   },
 
   onLoad: function (options) {
@@ -40,6 +43,11 @@ Page({
       activity.formattedEndTime = formatDate(activity.end_time, 'HH:mm');
       activity.statusText = this.getStatusText(activity.status);
       activity.statusClass = this.getStatusClass(activity.status);
+
+      // 格式化报名费用（现金转元）
+      if (activity.registration_fee_type === 'cash' && activity.registration_fee) {
+        activity.registration_fee_yuan = (activity.registration_fee / 100).toFixed(2);
+      }
 
       // 格式化报名截止时间（精确到分钟）
       if (activity.registration_deadline) {
@@ -103,6 +111,7 @@ Page({
         isRegistered: result.isRegistered,
         registration: result.registration,
         participants: result.participants || [],
+        checkedInParticipants: (result.participants || []).filter(p => p.check_in_status === 'checked_in'),
         runTypeText,
         canUploadPhotos,
         isMember,
@@ -140,18 +149,19 @@ Page({
       return;
     }
 
-    // 检查是否是团员（已批准）
-    if (app.globalData.userInfo.status !== 'approved') {
+    const { activity, isMember } = this.data;
+
+    // 检查是否仅团员报名
+    if (activity.member_only && !isMember) {
       if (app.globalData.userInfo.status === 'pending') {
         wx.showToast({
-          title: '您的申请正在审核中，请耐心等待',
+          title: '您的申请正在审核中',
           icon: 'none'
         });
       } else {
-        // 游客状态，引导去申请
         wx.showModal({
           title: '提示',
-          content: '您还不是团员，是否立即申请入团？',
+          content: '此活动仅限团员报名，是否申请入团？',
           success: (res) => {
             if (res.confirm) {
               wx.navigateTo({ url: '/pages/apply-membership/apply-membership' });
@@ -162,16 +172,83 @@ Page({
       return;
     }
 
-    const confirm = await showConfirm('确认报名', '确定要报名参加此活动吗？');
-    if (!confirm) return;
+    // 游客报名需要填写手机号
+    if (!isMember) {
+      this.setData({ showPhoneModal: true, guestPhone: '' });
+      return;
+    }
+
+    // 确认报名
+    await this.doRegister();
+  },
+
+  // 执行报名
+  doRegister: async function (phone) {
+    const { activity, isMember } = this.data;
+
+    // 收费活动确认
+    if (activity.registration_fee_type === 'points' && activity.registration_fee > 0) {
+      const confirm = await showConfirm(
+        '确认报名',
+        `此活动需要 ${activity.registration_fee} 积分报名，确认支付吗？`
+      );
+      if (!confirm) return;
+    } else if (activity.registration_fee_type === 'cash' && activity.registration_fee > 0) {
+      const confirm = await showConfirm(
+        '确认报名',
+        `此活动需要支付 ¥${activity.registration_fee}，确认报名吗？`
+      );
+      if (!confirm) return;
+      // TODO: 微信支付流程
+      showInfo('微信支付功能开发中');
+      return;
+    } else {
+      const confirm = await showConfirm('确认报名', '确定要报名参加此活动吗？');
+      if (!confirm) return;
+    }
 
     try {
-      await activityApi.register({ activityId: this.data.id });
+      const params = { activityId: this.data.id };
+      if (!isMember && phone) {
+        params.phone = phone;
+      }
+
+      await activityApi.register(params);
       showSuccess('报名成功');
+      this.setData({ showPhoneModal: false });
       this.loadActivity();
     } catch (error) {
       console.error('报名失败', error);
+      if (error.requirePhone) {
+        this.setData({ showPhoneModal: true });
+      } else if (error.requirePoints) {
+        wx.showModal({
+          title: '积分不足',
+          content: `报名需要 ${error.requirePoints} 积分，您当前积分不足`,
+          showCancel: false
+        });
+      }
     }
+  },
+
+  // 输入手机号
+  onPhoneInput: function (e) {
+    this.setData({ guestPhone: e.detail.value });
+  },
+
+  // 确认手机号
+  confirmPhone: async function () {
+    const { guestPhone } = this.data;
+    if (!guestPhone || guestPhone.length !== 11) {
+      showInfo('请输入正确的手机号');
+      return;
+    }
+    await this.doRegister(guestPhone);
+  },
+
+  // 取消手机号输入
+  cancelPhoneInput: function () {
+    this.setData({ showPhoneModal: false });
   },
 
   // 取消报名
@@ -560,5 +637,39 @@ Page({
       cancelled: 'tag-error'
     };
     return classMap[status] || '';
+  },
+
+  // 预览参与者头像
+  previewParticipantAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const participants = this.data.participants;
+    const avatarUrls = participants
+      .filter(p => p.avatar)
+      .map(p => p.avatar);
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = participants[index]?.avatar || avatarUrls[0];
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
+  },
+
+  // 预览已签到团员头像
+  previewCheckedInAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const checkedInParticipants = this.data.checkedInParticipants;
+    const avatarUrls = checkedInParticipants
+      .filter(p => p.avatar)
+      .map(p => p.avatar);
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = checkedInParticipants[index]?.avatar || avatarUrls[0];
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
   }
 });

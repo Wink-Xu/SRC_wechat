@@ -79,6 +79,11 @@ Page({
 
     const imageFileIDs = [];
     allProducts.forEach(item => {
+      // 封面图
+      if (item.cover_image && item.cover_image.startsWith('cloud://')) {
+        imageFileIDs.push(item.cover_image);
+      }
+      // 详情图
       if (item.images && item.images.length > 0) {
         item.images.forEach(img => {
           if (img && img.startsWith('cloud://')) {
@@ -130,6 +135,13 @@ Page({
         ...item,
         cashPriceYuan: item.cash_price ? formatMoney(item.cash_price) : null
       };
+      // 封面图转换
+      if (item.cover_image && item.cover_image.startsWith('cloud://') && tempUrlMap[item.cover_image]) {
+        processed.displayCover = tempUrlMap[item.cover_image];
+      } else if (item.cover_image) {
+        processed.displayCover = item.cover_image;
+      }
+      // 详情图转换
       if (item.images && item.images.length > 0) {
         processed.displayImages = item.images.map(img => {
           if (img && img.startsWith('cloud://') && tempUrlMap[img]) {

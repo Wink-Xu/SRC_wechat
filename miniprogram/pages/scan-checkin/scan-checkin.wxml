@@ -7,7 +7,6 @@
   <block wx:elif="{{error}}">
     <!-- 错误状态 -->
     <view class="error-box">
-      <text class="error-icon">⚠️</text>
       <text class="error-text">{{error}}</text>
       <button class="btn-back" bindtap="goBack">返回</button>
     </view>
@@ -22,19 +21,19 @@
 
       <view class="activity-info">
         <view class="info-item">
-          <text class="info-icon">⏰</text>
+          <image class="info-icon" src="/images/time.png" mode="aspectFit"></image>
           <text class="info-text">{{activity.formattedTime}}</text>
         </view>
         <view class="info-item">
-          <text class="info-icon">📍</text>
+          <image class="info-icon" src="/images/location.png" mode="aspectFit"></image>
           <text class="info-text">{{activity.location}}</text>
         </view>
         <view class="info-item">
-          <text class="info-icon">🏃</text>
+          <image class="info-icon" src="/images/activity.png" mode="aspectFit"></image>
           <text class="info-text">{{activity.runTypeText || '路跑'}}</text>
         </view>
         <view class="info-item">
-          <text class="info-icon">🏆</text>
+          <image class="info-icon" src="/images/points.png" mode="aspectFit"></image>
           <text class="info-text">完成可获得 {{activity.points}} 积分</text>
         </view>
       </view>
@@ -45,17 +44,15 @@
       <block wx:if="{{hasCheckedIn}}">
         <!-- 已签到 -->
         <view class="checked-in-box">
-          <text class="checked-icon">✅</text>
+          <image class="checked-icon" src="/images/check.png" mode="aspectFit"></image>
           <text class="checked-title">您已签到</text>
           <text class="checked-desc">活动结束后将自动获得 {{activity.points}} 积分</text>
         </view>
-        <button class="btn-back" bindtap="goBack">返回</button>
       </block>
 
       <block wx:elif="{{!isRegistered}}">
         <!-- 未报名 -->
         <view class="not-registered-box">
-          <text class="warning-icon">📋</text>
           <text class="warning-title">您未报名此活动</text>
           <text class="warning-desc">请先报名后再签到</text>
         </view>

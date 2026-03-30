@@ -229,6 +229,72 @@
   border-color: #1A1A1A;
 }
 
+/* 封面图上传 */
+.cover-upload-area {
+  width: 100%;
+}
+
+.cover-preview-box {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.cover-preview-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-reupload-hint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12rpx;
+  background: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+
+.cover-upload-btn {
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+  position: relative;
+  border: 2rpx dashed #CCCCCC;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover-upload-btn .upload-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  font-size: 48rpx;
+  color: #CCCCCC;
+}
+
+.cover-upload-btn .upload-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 16rpx);
+  font-size: 24rpx;
+  color: #999999;
+}
+
 .image-upload {
   width: 100%;
 }

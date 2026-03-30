@@ -172,34 +172,72 @@ page {
 }
 
 .past-info {
-  position: relative;
   padding: 24rpx;
 }
 
-/* 进行中标签 - 显示在信息区域右下角 */
-.corner-tag {
-  position: absolute;
-  bottom: 24rpx;
-  right: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 6rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #FFFFFF;
-  background: #1A1A1A;
+.past-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
 }
 
-.corner-tag.ended {
-  background: #999999;
+.meta-count {
+  font-size: 24rpx;
+  color: var(--text-light);
+}
+
+/* 日期行 - 时间左对齐，状态标签右对齐 */
+.date-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+/* 状态标签 - 行内显示 */
+.status-tag {
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.status-tag.ongoing {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.status-tag.ended {
+  background: #F5F5F5;
+  color: #999999;
 }
 
 .past-title {
-  display: block;
   font-size: 30rpx;
   font-weight: 500;
   color: #1A1A1A;
-  margin-bottom: 12rpx;
   line-height: 1.4;
+}
+
+/* 标题行 - 标题和报名人数同一行 */
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.title-row .past-title {
+  flex: 1;
+  margin-bottom: 0;
+  margin-right: 16rpx;
+}
+
+.title-row .meta-count {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1A1A1A;
 }
 
 .past-date {

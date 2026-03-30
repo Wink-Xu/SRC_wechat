@@ -197,6 +197,35 @@ page {
   margin-left: 8rpx;
 }
 
+/* 报名条件标签 */
+.registration-condition {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8rpx;
+}
+
+.condition-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.condition-tag.member-only {
+  background: #F5F5F5;
+  color: #1A1A1A;
+}
+
+.condition-tag.fee {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.condition-tag.free {
+  background: #F5F5F5;
+  color: #2E7D32;
+}
+
 /* ========== 活动详情卡片 ========== */
 .section-card {
   background: #FFFFFF;
@@ -482,4 +511,135 @@ page {
   width: 44rpx;
   height: 44rpx;
   margin-right: 12rpx;
+}
+
+/* ========== 已签到团员（往期活动） ========== */
+.checked-in-count {
+  font-size: 24rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+.checked-in-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.checked-in-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx 16rpx 16rpx;
+  background: #F8F8F8;
+  border-radius: 32rpx;
+}
+
+.checked-in-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.checked-in-name {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+/* ========== 游客报名手机号弹窗 ========== */
+.phone-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.phone-modal-content {
+  position: relative;
+  width: 85%;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.phone-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.phone-modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.phone-modal-close {
+  font-size: 48rpx;
+  color: #999999;
+  line-height: 1;
+}
+
+.phone-modal-body {
+  padding: 40rpx 32rpx;
+}
+
+.phone-modal-hint {
+  font-size: 26rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 24rpx;
+}
+
+.phone-input {
+  height: 88rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+}
+
+.phone-modal-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 32rpx 32rpx;
+}
+
+.phone-cancel-btn {
+  flex: 1;
+  height: 88rpx;
+  background: #F5F5F5;
+  color: #666666;
+  font-size: 30rpx;
+  border-radius: 44rpx;
+  border: none;
+  font-weight: 500;
+}
+
+.phone-confirm-btn {
+  flex: 1;
+  height: 88rpx;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  border-radius: 44rpx;
+  border: none;
+  font-weight: 500;
 }

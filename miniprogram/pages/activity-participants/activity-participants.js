@@ -65,5 +65,22 @@ Page({
       console.error('加载报名名单失败', error);
       this.setData({ loading: false });
     }
+  },
+
+  // 预览头像
+  previewAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const participants = this.data.participants;
+    const avatarUrls = participants
+      .filter(p => p.displayAvatar || p.avatar)
+      .map(p => p.displayAvatar || p.avatar);
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = participants[index]?.displayAvatar || participants[index]?.avatar || avatarUrls[0];
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
   }
 });

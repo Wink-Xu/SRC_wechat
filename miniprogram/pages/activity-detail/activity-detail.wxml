@@ -66,6 +66,16 @@
           <text class="info-label">报名人数</text>
           <text class="info-value"><text class="highlight">{{activity.registered_count || 0}}</text>/{{activity.quota}}人</text>
         </view>
+        <!-- 报名条件 -->
+        <view class="info-cell" wx:if="{{activity.registration_fee_type || activity.member_only}}">
+          <text class="info-label">报名条件</text>
+          <view class="info-value registration-condition">
+            <text wx:if="{{activity.member_only}}" class="condition-tag member-only">仅团员</text>
+            <text wx:if="{{activity.registration_fee_type === 'points'}}" class="condition-tag fee">{{activity.registration_fee}}积分</text>
+            <text wx:elif="{{activity.registration_fee_type === 'cash'}}" class="condition-tag fee">¥{{activity.registration_fee_yuan || activity.registration_fee}}</text>
+            <text wx:else class="condition-tag free">免费</text>
+          </view>
+        </view>
       </view>
 
       <!-- 已报名团员 -->
@@ -79,7 +89,7 @@
         </view>
         <view class="participants-list" wx:if="{{participants.length > 0}}">
           <view class="participant-item" wx:for="{{participants}}" wx:for-limit="6" wx:key="_id">
-            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" bindtap="previewParticipantAvatar" data-index="{{index}}"></image>
             <text class="participant-name">{{item.nickname}}</text>
             <text class="status-dot {{item.status === 'checked_in' ? 'checked-in' : ''}}" wx:if="{{item.status}}"></text>
           </view>
@@ -178,6 +188,20 @@
           <text>暂无照片</text>
         </view>
       </view>
+
+      <!-- 已签到团员 -->
+      <view class="section-card" wx:if="{{checkedInParticipants.length > 0}}">
+        <view class="card-header-simple">
+          <text class="card-title">已签到团员</text>
+          <text class="checked-in-count">{{checkedInParticipants.length}}人</text>
+        </view>
+        <view class="checked-in-list">
+          <view class="checked-in-item" wx:for="{{checkedInParticipants}}" wx:key="_id">
+            <image class="checked-in-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" bindtap="previewCheckedInAvatar" data-index="{{index}}"></image>
+            <text class="checked-in-name">{{item.nickname}}</text>
+          </view>
+        </view>
+      </view>
     </block>
   </block>
 </view>
@@ -190,3 +214,29 @@
   bind:confirm="onCoverConfirm"
   bind:cancel="onCoverCancel"
 />
+
+<!-- 游客报名手机号弹窗 -->
+<view class="phone-modal" wx:if="{{showPhoneModal}}">
+  <view class="phone-modal-mask" bindtap="cancelPhoneInput"></view>
+  <view class="phone-modal-content">
+    <view class="phone-modal-header">
+      <text class="phone-modal-title">填写手机号</text>
+      <text class="phone-modal-close" bindtap="cancelPhoneInput">×</text>
+    </view>
+    <view class="phone-modal-body">
+      <text class="phone-modal-hint">游客报名需填写手机号以便联系</text>
+      <input
+        class="phone-input"
+        type="number"
+        placeholder="请输入手机号"
+        maxlength="11"
+        value="{{guestPhone}}"
+        bindinput="onPhoneInput"
+      />
+    </view>
+    <view class="phone-modal-footer">
+      <button class="phone-cancel-btn" bindtap="cancelPhoneInput">取消</button>
+      <button class="phone-confirm-btn" bindtap="confirmPhone">确认报名</button>
+    </view>
+  </view>
+</view>

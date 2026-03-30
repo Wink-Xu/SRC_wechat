@@ -90,8 +90,14 @@
 .log-type {
   font-size: 30rpx;
   color: #1A1A1A;
-  margin-bottom: 8rpx;
+  margin-bottom: 4rpx;
   font-weight: 500;
+}
+
+.log-remark {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 4rpx;
 }
 
 .log-time {

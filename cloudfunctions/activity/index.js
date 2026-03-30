@@ -448,20 +448,17 @@ async function handleGetDetail(data, wxContext, testOpenid) {
 
 // 报名活动
 async function handleRegister(data, wxContext, testOpenid) {
-  const { activityId } = data;
+  const { activityId, phone } = data;
 
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
     if (!user) {
-      return { code: -1, message: '用户不存在' };
-    }
-
-    if (user.status !== 'approved') {
-      return { code: -1, message: '您还不是正式团员' };
+      return { code: -1, message: '用户不存在，请先登录' };
     }
 
     const userId = user._id;
+    const isMember = user.status === 'approved';
 
     // 检查活动
     const activityResult = await db.collection('activities').doc(activityId).get();
@@ -484,6 +481,16 @@ async function handleRegister(data, wxContext, testOpenid) {
       }
     }
 
+    // 检查报名权限
+    if (activity.member_only && !isMember) {
+      return { code: -1, message: '此活动仅限团员报名' };
+    }
+
+    // 游客报名需要填写手机号
+    if (!isMember && !phone) {
+      return { code: -1, message: '请填写手机号', requirePhone: true };
+    }
+
     // 检查名额
     if (activity.registered_count >= activity.quota) {
       return { code: -1, message: '名额已满' };
@@ -500,16 +507,48 @@ async function handleRegister(data, wxContext, testOpenid) {
       return { code: -1, message: '您已报名' };
     }
 
-    // 创建报名记录
-    await db.collection('registrations').add({
-      data: {
-        activity_id: activityId,
-        user_id: userId,
-        status: 'registered',
-        check_in_status: 'registered',
-        points_awarded: false,
-        created_at: db.serverDate()
+    // 处理收费报名
+    if (activity.registration_fee_type === 'points' && activity.registration_fee > 0) {
+      // 检查积分是否足够
+      if (!user.points || user.points < activity.registration_fee) {
+        return { code: -1, message: '积分不足', requirePoints: activity.registration_fee };
       }
+
+      // 扣除积分
+      await db.collection('users').doc(userId).update({
+        data: { points: _.inc(-activity.registration_fee) }
+      });
+
+      // 记录积分日志
+      await db.collection('point_logs').add({
+        data: {
+          user_id: userId,
+          points: -activity.registration_fee,
+          type: 'activity_registration',
+          related_id: activityId,
+          remark: '报名活动：' + activity.title,
+          created_at: db.serverDate()
+        }
+      });
+    }
+
+    // 创建报名记录
+    const registrationData = {
+      activity_id: activityId,
+      user_id: userId,
+      status: 'registered',
+      check_in_status: 'registered',
+      points_awarded: false,
+      created_at: db.serverDate()
+    };
+
+    // 游客报名记录手机号
+    if (!isMember && phone) {
+      registrationData.guest_phone = phone;
+    }
+
+    await db.collection('registrations').add({
+      data: registrationData
     });
 
     // 更新报名人数

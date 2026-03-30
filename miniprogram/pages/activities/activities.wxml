@@ -26,9 +26,14 @@
         <image class="cover-img" src="{{item.display_cover_image || item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
       </view>
       <view class="past-info">
-        <text class="past-title">{{item.title}}</text>
-        <text class="past-date">{{item.formattedTime}}</text>
-        <text class="corner-tag">进行中</text>
+        <view class="title-row">
+          <text class="past-title">{{item.title}}</text>
+          <text class="meta-count">{{item.registered_count || 0}}/{{item.quota}}人</text>
+        </view>
+        <view class="date-row">
+          <text class="past-date">{{item.formattedTime}}</text>
+          <text class="status-tag ongoing">进行中</text>
+        </view>
       </view>
     </view>
   </view>
@@ -51,8 +56,10 @@
       </view>
       <view class="past-info">
         <text class="past-title">{{item.title}}</text>
-        <text class="past-date">{{item.formattedTime}}</text>
-        <text class="corner-tag ended">已结束</text>
+        <view class="date-row">
+          <text class="past-date">{{item.formattedTime}}</text>
+          <text class="status-tag ended">已结束</text>
+        </view>
       </view>
     </view>
   </view>

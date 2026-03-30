@@ -26,7 +26,12 @@ Page({
       registration_deadline_time: '', // 保留用于提交
       quota: 20,
       points: 10,
-      cover_image: ''
+      cover_image: '',
+      // 报名设置
+      member_only: false,      // 是否仅团员报名
+      registration_fee_type: '', // '' | 'points' | 'cash'
+      registration_fee: 0,       // 报名费用
+      registration_fee_yuan: ''  // 现金显示用（元）
     },
     runTypes: [
       { value: 'road', label: '路跑' },
@@ -34,7 +39,11 @@ Page({
       { value: 'hiking', label: '徒步' },
       { value: 'brand', label: '品牌合作跑' }
     ],
-    minDate: new Date().toISOString().split('T')[0]
+    minDate: new Date().toISOString().split('T')[0],
+    // 弹窗控制
+    showPointsInputModal: false,
+    showCashInputModal: false,
+    tempFeeValue: ''
   },
 
   onLoad: function (options) {
@@ -99,7 +108,14 @@ Page({
           registration_deadline_time: registrationDeadlineTime,
           quota: activity.quota,
           points: activity.points,
-          cover_image: activity.cover_image || ''
+          cover_image: activity.cover_image || '',
+          // 报名设置
+          member_only: activity.member_only || false,
+          registration_fee_type: activity.registration_fee_type || '',
+          registration_fee: activity.registration_fee || 0,
+          registration_fee_yuan: activity.registration_fee_type === 'cash' && activity.registration_fee
+            ? (activity.registration_fee / 100).toFixed(2)
+            : ''
         }
       });
     } catch (error) {
@@ -204,6 +220,88 @@ Page({
     this.setData({ 'formData.points': parseInt(e.detail.value) || 0 });
   },
 
+  // 切换仅团员报名
+  onMemberOnlyChange: function (e) {
+    this.setData({ 'formData.member_only': e.detail.value });
+  },
+
+  // 切换报名费用类型
+  // 切换免费
+  onFeeTypeChange: function (e) {
+    const { value } = e.currentTarget.dataset;
+    this.setData({
+      'formData.registration_fee_type': value,
+      'formData.registration_fee': 0
+    });
+  },
+
+  // 显示积分输入弹窗
+  showPointsModal: function () {
+    this.setData({
+      showPointsInputModal: true,
+      tempFeeValue: this.data.formData.registration_fee_type === 'points' ? String(this.data.formData.registration_fee) : ''
+    });
+  },
+
+  // 显示现金输入弹窗
+  showCashModal: function () {
+    const currentValue = this.data.formData.registration_fee_type === 'cash' && this.data.formData.registration_fee
+      ? (this.data.formData.registration_fee / 100).toFixed(2)
+      : '';
+    this.setData({
+      showCashInputModal: true,
+      tempFeeValue: currentValue
+    });
+  },
+
+  // 关闭弹窗
+  closeFeeModal: function () {
+    this.setData({
+      showPointsInputModal: false,
+      showCashInputModal: false,
+      tempFeeValue: ''
+    });
+  },
+
+  // 临时金额输入
+  onTempFeeInput: function (e) {
+    this.setData({ tempFeeValue: e.detail.value });
+  },
+
+  // 确认积分
+  confirmPointsFee: function () {
+    const fee = parseInt(this.data.tempFeeValue) || 0;
+    if (fee <= 0) {
+      showInfo('请输入有效的积分数量');
+      return;
+    }
+    this.setData({
+      'formData.registration_fee_type': 'points',
+      'formData.registration_fee': fee,
+      showPointsInputModal: false,
+      tempFeeValue: ''
+    });
+  },
+
+  // 确认现金
+  confirmCashFee: function () {
+    const fee = parseFloat(this.data.tempFeeValue) || 0;
+    if (fee <= 0) {
+      showInfo('请输入有效的金额');
+      return;
+    }
+    // 转换为分存储
+    this.setData({
+      'formData.registration_fee_type': 'cash',
+      'formData.registration_fee': Math.round(fee * 100),
+      'formData.registration_fee_yuan': fee.toFixed(2),
+      showCashInputModal: false,
+      tempFeeValue: ''
+    });
+  },
+
+  // 输入报名费用
+  
   // 选择封面图
   chooseImage: function () {
     const that = this;
@@ -316,7 +414,11 @@ Page({
       start_time: `${formData.start_date} ${formData.start_time}`,
       quota: formData.quota,
       points: formData.points,
-      cover_image: formData.cover_image
+      cover_image: formData.cover_image,
+      // 报名设置
+      member_only: formData.member_only,
+      registration_fee_type: formData.registration_fee_type,
+      registration_fee: formData.registration_fee_type ? formData.registration_fee : 0
     };
 
     // 报名截止时间（可选）

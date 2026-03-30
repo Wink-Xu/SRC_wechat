@@ -11,7 +11,7 @@
     </view>
 
     <view class="product-card" wx:for="{{products}}" wx:key="_id">
-      <image class="product-image" src="{{item.images[0] || item.image || '/images/default-product.png'}}"></image>
+      <image class="product-image" src="{{item.cover_image || item.images[0] || item.image || '/images/default-product.png'}}"></image>
       <view class="product-info">
         <text class="product-name">{{item.name}}</text>
         <view class="product-price">
@@ -65,7 +65,20 @@
           <textarea class="form-textarea" placeholder="请输入商品描述" value="{{formData.description}}" data-field="description" bindinput="onInputChange"></textarea>
         </view>
         <view class="form-item">
-          <text class="form-label">商品图片</text>
+          <text class="form-label">封面图</text>
+          <view class="cover-upload-area">
+            <view wx:if="{{formData.cover_image}}" class="cover-preview-box" bindtap="chooseCoverImage">
+              <image class="cover-preview-img" src="{{formData.cover_image}}" mode="aspectFill"></image>
+              <view class="cover-reupload-hint">点击更换</view>
+            </view>
+            <view wx:else class="cover-upload-btn" bindtap="chooseCoverImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-hint">上传封面</text>
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">商品详情图</text>
           <view class="image-upload">
             <!-- 图片预览网格 -->
             <view wx:if="{{formData.images.length > 0}}" class="image-preview-list">
@@ -102,3 +115,12 @@
     </view>
   </view>
 </view>
+
+<!-- 封面调整组件 -->
+<cover-adjuster
+  id="coverAdjuster"
+  outputWidth="{{750}}"
+  outputHeight="{{422}}"
+  bind:confirm="onCoverConfirm"
+  bind:cancel="onCoverCancel"
+/>

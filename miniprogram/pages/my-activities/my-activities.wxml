@@ -22,16 +22,10 @@
       </view>
       <view class="activity-info">
         <text class="activity-title">{{item.title}}</text>
-        <view class="activity-meta">
-          <image class="meta-icon" src="/images/time.png"></image>
+        <view class="activity-meta-row">
           <text class="meta-text">{{item.formattedTime}}</text>
-        </view>
-        <view class="activity-meta">
-          <image class="meta-icon" src="/images/location.png"></image>
+          <text class="meta-divider">|</text>
           <text class="meta-text">{{item.location}}</text>
-        </view>
-        <view class="checkin-badge">
-          <text>已签到</text>
         </view>
       </view>
     </view>

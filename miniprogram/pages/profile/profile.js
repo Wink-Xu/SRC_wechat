@@ -193,6 +193,20 @@ Page({
     });
   },
 
+  // 跳转到积分详情页面
+  goToPoints: function () {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/points/points'
+    });
+  },
+
   // 跳转到我的订单页面（需要登录）
   goToOrders: function () {
     if (!this.data.isLoggedIn) {
@@ -240,64 +254,87 @@ Page({
     showSuccess('已退出登录');
   },
 
+  // 预览头像
+  previewAvatar: function () {
+    const avatar = this.data.userInfo?.displayAvatar || this.data.userInfo?.avatar;
+    if (avatar) {
+      wx.previewImage({
+        current: avatar,
+        urls: [avatar]
+      });
+    }
+  },
+
   // 修改头像
   changeAvatar: async function () {
     const that = this;
-    wx.chooseImage({
+    wx.chooseMedia({
       count: 1,
+      mediaType: ['image'],
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: function (res) {
-        const tempFilePath = res.tempFilePaths[0];
+        const tempFile = res.tempFiles[0];
+        if (!tempFile) return;
 
-        wx.showLoading({ title: '上传中...' });
-
-        // 上传到云存储
-        wx.cloud.uploadFile({
-          cloudPath: `user_avatars/${that.data.userInfo._id || Date.now()}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.png`,
-          filePath: tempFilePath,
-          isPrivate: false,
-          success: async function (uploadRes) {
-            // 更新用户头像
-            try {
-              const { userApi } = require('../../utils/request');
-              await userApi.updateProfile({
-                avatar: uploadRes.fileID
-              });
-
-              // 更新全局用户信息
-              const app = getApp();
-              if (app.globalData.userInfo) {
-                app.globalData.userInfo.avatar = uploadRes.fileID;
-              }
-
-              wx.hideLoading();
-              showSuccess('头像更新成功');
-
-              // 刷新页面
-              that.refreshUserInfo();
-            } catch (error) {
-              wx.hideLoading();
-              console.error('更新头像失败', error);
-              wx.showToast({
-                title: '更新失败',
-                icon: 'none'
-              });
-            }
-          },
-          fail: function (uploadErr) {
-            wx.hideLoading();
-            console.error('上传图片失败', uploadErr);
-            wx.showToast({
-              title: '上传失败',
-              icon: 'none'
-            });
-          }
-        });
+        // 显示封面调整器
+        that.avatarAdjuster = that.selectComponent('#avatarAdjuster');
+        that.avatarAdjuster.show(tempFile.tempFilePath);
       },
       fail: function (err) {
         console.error('选择图片失败', err);
       }
     });
+  },
+
+  // 头像裁剪确认
+  onAvatarConfirm: async function (e) {
+    const self = this;
+    const { tempFilePath } = e.detail;
+
+    wx.showLoading({ title: '上传中...' });
+
+    try {
+      // 上传头像到云存储
+      const cloudPath = `user_avatars/${self.data.userInfo._id || Date.now()}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
+      const uploadRes = await new Promise((resolve, reject) => {
+        wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: tempFilePath,
+          isPrivate: false,
+          success: resolve,
+          fail: reject
+        });
+      });
+
+      // 更新用户头像
+      await userApi.updateProfile({
+        avatar: uploadRes.fileID
+      });
+
+      // 更新全局用户信息
+      const app = getApp();
+      if (app.globalData.userInfo) {
+        app.globalData.userInfo.avatar = uploadRes.fileID;
+      }
+
+      wx.hideLoading();
+      showSuccess('头像更新成功');
+
+      // 刷新页面
+      self.refreshUserInfo();
+    } catch (error) {
+      wx.hideLoading();
+      console.error('更新头像失败', error);
+      wx.showToast({
+        title: '更新失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  // 头像裁剪取消
+  onAvatarCancel: function () {
+    // 用户取消
   }
 });

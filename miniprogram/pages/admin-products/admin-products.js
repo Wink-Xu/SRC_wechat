@@ -15,7 +15,8 @@ Page({
     formData: {
       name: '',
       description: '',
-      images: [],  // 改为数组支持多张图片
+      cover_image: '',  // 封面图
+      images: [],  // 详情图
       points_price: '',
       cash_price: '',
       stock: ''
@@ -64,6 +65,11 @@ Page({
       const allProducts = result.list || [];
       const imageFileIDs = [];
       allProducts.forEach(item => {
+        // 封面图
+        if (item.cover_image && item.cover_image.startsWith('cloud://')) {
+          imageFileIDs.push(item.cover_image);
+        }
+        // 详情图
         if (item.images && item.images.length > 0) {
           item.images.forEach(img => {
             if (img && img.startsWith('cloud://')) {
@@ -92,6 +98,12 @@ Page({
       }
 
       const products = allProducts.map(item => {
+        // 转换封面图
+        let displayCover = item.cover_image;
+        if (item.cover_image && item.cover_image.startsWith('cloud://') && tempUrlMap[item.cover_image]) {
+          displayCover = tempUrlMap[item.cover_image];
+        }
+
         // 转换 images 数组中的 fileID
         let convertedImages = item.images || [];
         if (convertedImages.length > 0) {
@@ -105,6 +117,7 @@ Page({
 
         return {
           ...item,
+          cover_image: displayCover,  // 转换后的封面图
           images: convertedImages,  // 直接替换为转换后的 URL
           cashPriceYuan: item.cash_price ? formatMoney(item.cash_price) : null,
           statusText: item.status === 'available' ? '上架' : '下架'
@@ -144,6 +157,7 @@ Page({
       formData: {
         name: '',
         description: '',
+        cover_image: '',
         images: [],
         points_price: '',
         cash_price: '',
@@ -169,6 +183,7 @@ Page({
         formData: {
           name: product.name,
           description: product.description || '',
+          cover_image: product.cover_image || '',
           images: images,
           points_price: product.points_price ? String(product.points_price) : '',
           cash_price: product.cash_price ? String(product.cash_price / 100) : '',
@@ -190,6 +205,67 @@ Page({
   // 阻止事件冒泡
   stopTap: function () {
     // 阻止点击弹窗内容时关闭
+  },
+
+  // 选择封面图
+  chooseCoverImage: function () {
+    const self = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        const tempFile = res.tempFiles[0];
+        if (!tempFile) return;
+
+        // 显示封面调整器
+        self.coverAdjuster = self.selectComponent('#coverAdjuster');
+        self.coverAdjuster.show(tempFile.tempFilePath);
+      },
+      fail: function (err) {
+        console.error('选择封面图失败', err);
+      }
+    });
+  },
+
+  // 封面调整确认
+  onCoverConfirm: async function (e) {
+    const self = this;
+    const { tempFilePath } = e.detail;
+
+    wx.showLoading({ title: '上传中...' });
+
+    try {
+      // 上传封面图到云存储
+      const cloudPath = `product_covers/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
+      const uploadRes = await new Promise((resolve, reject) => {
+        wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: tempFilePath,
+          isPrivate: false,
+          success: resolve,
+          fail: reject
+        });
+      });
+
+      wx.hideLoading();
+
+      self.setData({
+        'formData.cover_image': uploadRes.fileID
+      });
+
+      showSuccess('封面上传成功');
+    } catch (err) {
+      wx.hideLoading();
+      console.error('上传封面图失败', err);
+      wx.showToast({ title: '上传失败', icon: 'none' });
+    }
+  },
+
+  // 封面调整取消
+  onCoverCancel: function () {
+    // 用户取消
   },
 
   // 选择图片（支持多张）
@@ -284,7 +360,8 @@ Page({
     const data = {
       name: formData.name.trim(),
       description: formData.description.trim(),
-      images: formData.images,  // 使用 images 数组
+      cover_image: formData.cover_image,  // 封面图
+      images: formData.images,  // 详情图
       points_price: formData.points_price ? parseInt(formData.points_price) : null,
       cash_price: formData.cash_price ? Math.round(parseFloat(formData.cash_price) * 100) : null,
       stock: parseInt(formData.stock),

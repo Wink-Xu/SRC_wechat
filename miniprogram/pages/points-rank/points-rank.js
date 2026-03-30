@@ -65,5 +65,22 @@ Page({
       console.error('加载排行榜失败', error);
       this.setData({ loading: false });
     }
+  },
+
+  // 预览头像
+  previewAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const ranking = this.data.ranking;
+    const avatarUrls = ranking
+      .filter(item => item.displayAvatar || item.avatar)
+      .map(item => item.displayAvatar || item.avatar);
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = ranking[index]?.displayAvatar || ranking[index]?.avatar || avatarUrls[0];
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
   }
 });

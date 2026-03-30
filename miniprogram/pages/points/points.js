@@ -106,7 +106,9 @@ Page({
   // 获取类型文本
   getTypeText: function (type) {
     const typeMap = {
+      activity_checkin: '活动签到',
       activity: '活动签到',
+      activity_registration: '活动报名',
       exchange: '兑换商品',
       admin: '管理员调整'
     };
