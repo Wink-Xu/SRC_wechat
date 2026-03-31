@@ -42,7 +42,7 @@
   <view class="checkout-bar" wx:if="{{cart.length > 0}}">
     <view class="total-info">
       <text class="total-label">合计</text>
-      <text class="total-price">￥{{cart.reduce((sum, item) => sum + item.price * item.quantity, 0) / 100}}</text>
+      <text class="total-price">￥{{cartTotal / 100}}</text>
     </view>
     <button class="checkout-btn" bindtap="checkout" loading="{{loading}}">结算</button>
   </view>

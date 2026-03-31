@@ -4,6 +4,7 @@ const { coffeeApi } = require('../../utils/request');
 Page({
   data: {
     cart: [],
+    cartTotal: 0,
     balance: { americano: 0, any: 0 },
     paymentType: 'cash',
     loading: false
@@ -18,6 +19,13 @@ Page({
   loadCart: function () {
     const cart = wx.getStorageSync('coffee_cart') || [];
     this.setData({ cart });
+    this.updateCartTotal();
+  },
+
+  // 更新总价
+  updateCartTotal: function () {
+    const total = this.data.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    this.setData({ cartTotal: total });
   },
 
   // 加载余额
@@ -36,6 +44,7 @@ Page({
     const cart = [...this.data.cart];
     cart[index].quantity += 1;
     this.setData({ cart });
+    this.updateCartTotal();
     wx.setStorageSync('coffee_cart', cart);
   },
 
@@ -49,6 +58,7 @@ Page({
       cart.splice(index, 1);
     }
     this.setData({ cart });
+    this.updateCartTotal();
     wx.setStorageSync('coffee_cart', cart);
   },
 
@@ -58,6 +68,7 @@ Page({
     const cart = [...this.data.cart];
     cart.splice(index, 1);
     this.setData({ cart });
+    this.updateCartTotal();
     wx.setStorageSync('coffee_cart', cart);
   },
 
