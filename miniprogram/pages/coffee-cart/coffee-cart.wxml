@@ -1,0 +1,49 @@
+<!--pages/coffee-cart/coffee-cart.wxml-->
+<view class="container">
+  <!-- 购物车列表 -->
+  <view class="cart-list" wx:if="{{cart.length > 0}}">
+    <view class="cart-item" wx:for="{{cart}}" wx:key="product_id">
+      <view class="item-info">
+        <text class="item-name">{{item.product_name}}</text>
+        <text class="item-temp">{{item.temperatureText}}</text>
+      </view>
+      <view class="item-actions">
+        <view class="qty-btn" bindtap="decreaseQty" data-index="{{index}}">-</view>
+        <text class="qty-num">{{item.quantity}}</text>
+        <view class="qty-btn" bindtap="increaseQty" data-index="{{index}}">+</view>
+      </view>
+      <text class="item-price">￥{{item.price * item.quantity / 100}}</text>
+      <text class="item-delete" bindtap="removeItem" data-index="{{index}}">×</text>
+    </view>
+  </view>
+
+  <view wx:else class="empty-box">
+    <text>购物车为空</text>
+  </view>
+
+  <!-- 支付方式 -->
+  <view class="payment-section" wx:if="{{cart.length > 0}}">
+    <text class="section-title">支付方式</text>
+    <view class="payment-options">
+      <view class="payment-item {{paymentType === 'cash' ? 'active' : ''}}" bindtap="selectPayment" data-type="cash">
+        <text>微信支付</text>
+      </view>
+      <view class="payment-item {{paymentType === 'points' ? 'active' : ''}}" bindtap="selectPayment" data-type="points">
+        <text>积分支付</text>
+      </view>
+      <view class="payment-item {{paymentType === 'balance' ? 'active' : ''}}" bindtap="selectPayment" data-type="balance">
+        <text>余额支付</text>
+        <text class="balance-info">(美式:{{balance.americano}} 任意:{{balance.any}})</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="checkout-bar" wx:if="{{cart.length > 0}}">
+    <view class="total-info">
+      <text class="total-label">合计</text>
+      <text class="total-price">￥{{cart.reduce((sum, item) => sum + item.price * item.quantity, 0) / 100}}</text>
+    </view>
+    <button class="checkout-btn" bindtap="checkout" loading="{{loading}}">结算</button>
+  </view>
+</view>

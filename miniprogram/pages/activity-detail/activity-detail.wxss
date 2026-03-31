@@ -271,6 +271,14 @@ page {
   border-radius: 32rpx;
 }
 
+.participant-item.checked-in {
+  background: #1A1A1A;
+}
+
+.participant-item.checked-in .participant-name {
+  color: #FFFFFF;
+}
+
 .participant-avatar {
   width: 48rpx;
   height: 48rpx;
@@ -282,18 +290,6 @@ page {
   font-size: 26rpx;
   color: #1A1A1A;
   font-weight: 500;
-}
-
-.status-dot {
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 50%;
-  background: #E0E0E0;
-  margin-left: 8rpx;
-}
-
-.status-dot.checked-in {
-  background: #1A1A1A;
 }
 
 .view-all-btn {

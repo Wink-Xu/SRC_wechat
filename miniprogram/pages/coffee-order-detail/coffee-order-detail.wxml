@@ -1,0 +1,63 @@
+<!--pages/coffee-order-detail/coffee-order-detail.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:elif="{{order}}">
+    <!-- 订单状态 -->
+    <view class="status-card">
+      <text class="status-text">
+        {{order.status === 'pending' ? '待支付' : order.status === 'paid' ? '已支付' : order.status === 'completed' ? '已完成' : '已取消'}}
+      </text>
+    </view>
+
+    <!-- 门店信息 -->
+    <view class="store-card">
+      <text class="card-title">门店信息</text>
+      <text class="store-name">{{order.store_name}}</text>
+      <text class="store-address">{{order.store_address}}</text>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="products-card">
+      <text class="card-title">商品明细</text>
+      <view class="product-item" wx:for="{{order.items}}" wx:key="product_id">
+        <view class="product-info">
+          <text class="product-name">{{item.product_name}}</text>
+          <text class="product-temp">{{item.temperature === 'cold' ? '冷' : '热'}}</text>
+        </view>
+        <view class="product-right">
+          <text class="product-qty">x{{item.quantity}}</text>
+          <text class="product-price">￥{{item.price / 100}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单信息 -->
+    <view class="info-card">
+      <text class="card-title">订单信息</text>
+      <view class="info-row">
+        <text class="info-label">订单编号</text>
+        <text class="info-value">{{order.order_no}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">下单时间</text>
+        <text class="info-value">{{order.formattedTime}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">支付方式</text>
+        <text class="info-value">{{order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : '余额支付'}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">商品总额</text>
+        <text class="info-value price">￥{{order.total_amount / 100}}</text>
+      </view>
+    </view>
+
+    <!-- 取消订单按钮 -->
+    <view class="action-section" wx:if="{{order.status === 'pending'}}">
+      <button class="cancel-btn" bindtap="cancelOrder">取消订单</button>
+    </view>
+  </block>
+</view>

@@ -54,6 +54,14 @@
         <view class="menu-grid-icon iconfont icon-rank"></view>
         <text class="menu-grid-title">排行榜</text>
       </view>
+      <view class="menu-grid-item" bindtap="goToCoffeeBalance" wx:if="{{isLoggedIn}}">
+        <view class="menu-grid-icon iconfont icon-product"></view>
+        <text class="menu-grid-title">咖啡余额</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders" wx:if="{{isLoggedIn}}">
+        <view class="menu-grid-icon iconfont icon-order"></view>
+        <text class="menu-grid-title">咖啡订单</text>
+      </view>
     </view>
   </view>
 
@@ -90,6 +98,14 @@
         <view class="menu-grid-icon iconfont icon-order"></view>
         <text class="menu-grid-title">订单管理</text>
       </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee/admin-coffee">
+        <view class="menu-grid-icon iconfont icon-product"></view>
+        <text class="menu-grid-title">咖啡商品</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee-orders/admin-coffee-orders">
+        <view class="menu-grid-icon iconfont icon-order"></view>
+        <text class="menu-grid-title">咖啡订单</text>
+      </view>
     </view>
   </view>
 
@@ -115,8 +131,8 @@
 <!-- 头像裁剪组件 -->
 <cover-adjuster
   id="avatarAdjuster"
-  outputWidth="{{300}}"
-  outputHeight="{{300}}"
+  outputWidth="{{800}}"
+  outputHeight="{{800}}"
   bind:confirm="onAvatarConfirm"
   bind:cancel="onAvatarCancel"
 />

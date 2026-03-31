@@ -1,0 +1,79 @@
+/* pages/admin-coffee/admin-coffee.wxss */
+page {
+  background: #F8F8F8;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 20rpx;
+}
+
+.add-btn {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 8rpx;
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.product-item {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+}
+
+.product-category {
+  font-size: 24rpx;
+  color: #999999;
+  margin-right: 16rpx;
+}
+
+.product-price {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 4rpx;
+}
+
+.status-tag.active {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-tag.inactive {
+  background: #F5F5F5;
+  color: #999999;
+}
+
+.loading-box, .empty-box {
+  text-align: center;
+  padding: 60rpx;
+  color: #999999;
+}

@@ -1,0 +1,41 @@
+<!--pages/admin-coffee-orders/admin-coffee-orders.wxml-->
+<view class="container">
+  <!-- 筛选 -->
+  <view class="filter-tabs">
+    <view class="filter-tab {{statusFilter === 'all' ? 'active' : ''}}" bindtap="onFilterChange" data-status="all">全部</view>
+    <view class="filter-tab {{statusFilter === 'paid' ? 'active' : ''}}" bindtap="onFilterChange" data-status="paid">已支付</view>
+    <view class="filter-tab {{statusFilter === 'completed' ? 'active' : ''}}" bindtap="onFilterChange" data-status="completed">已完成</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{orders.length === 0}}" class="empty-box">
+    <text>暂无订单</text>
+  </view>
+
+  <view wx:else class="order-list">
+    <view class="order-item" wx:for="{{orders}}" wx:key="_id">
+      <view class="order-header">
+        <text class="order-no">{{item.order_no}}</text>
+        <text class="order-status">{{item.status === 'pending' ? '待支付' : item.status === 'paid' ? '已支付' : item.status === 'completed' ? '已完成' : '已取消'}}</text>
+      </view>
+      <view class="order-info">
+        <text class="user-name">{{item.user_nickname}}</text>
+        <text class="order-time">{{item.formattedTime}}</text>
+      </view>
+      <view class="order-products">
+        <text wx:for="{{item.items}}" wx:for-item="product" wx:key="product_id">
+          {{product.product_name}} x{{product.quantity}}
+        </text>
+      </view>
+      <view class="order-footer">
+        <text class="order-total">￥{{item.total_amount / 100}}</text>
+        <view class="order-actions" wx:if="{{item.status === 'paid'}}">
+          <button class="complete-btn" data-id="{{item._id}}" data-status="completed" bindtap="updateStatus">完成</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

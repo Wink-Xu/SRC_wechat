@@ -1,0 +1,73 @@
+<!--pages/admin-coffee-edit/admin-coffee-edit.wxml-->
+<view class="container">
+  <view class="form-section">
+    <view class="form-item">
+      <text class="form-label">商品名称</text>
+      <input class="form-input" placeholder="请输入商品名称" value="{{formData.name}}" data-field="name" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">分类</text>
+      <picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange">
+        <view class="form-picker">
+          {{categories[0].name}}
+          <text wx:for="{{categories}}" wx:key="key" wx:if="{{item.key === formData.category}}">{{item.name}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">价格（元）</text>
+      <input class="form-input" type="digit" placeholder="请输入价格" value="{{formData.price}}" data-field="price" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">积分价格（可选）</text>
+      <input class="form-input" type="number" placeholder="不填则不支持积分支付" value="{{formData.points_price}}" data-field="points_price" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">温度选项</text>
+      <picker mode="selector" range="{{temperatureOptions}}" range-key="name" bindchange="onTemperatureChange">
+        <view class="form-picker">
+          <text wx:for="{{temperatureOptions}}" wx:key="key" wx:if="{{item.key === formData.temperature}}">{{item.name}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品描述</text>
+      <textarea class="form-textarea" placeholder="请输入商品描述（可选）" value="{{formData.description}}" data-field="description" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">排序权重</text>
+      <input class="form-input" type="number" placeholder="数字越小越靠前" value="{{formData.sort_order}}" data-field="sort_order" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item switch-item">
+      <text class="form-label">是否上架</text>
+      <switch checked="{{formData.is_available}}" data-field="is_available" bindchange="onSwitchChange" />
+    </view>
+
+    <view class="form-item switch-item">
+      <text class="form-label">是否为充值套餐</text>
+      <switch checked="{{formData.is_recharge}}" data-field="is_recharge" bindchange="onSwitchChange" />
+    </view>
+
+    <block wx:if="{{formData.is_recharge}}">
+      <view class="form-item">
+        <text class="form-label">套餐类型</text>
+        <picker mode="selector" range="{{['美式套餐', '任意套餐']}}" bindchange="onInputChange">
+          <view class="form-picker">{{formData.recharge_type === 'americano' ? '美式套餐' : '任意套餐'}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">包含杯数</text>
+        <input class="form-input" type="number" placeholder="请输入杯数" value="{{formData.recharge_count}}" data-field="recharge_count" bindinput="onInputChange" />
+      </view>
+    </block>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit">保存</button>
+</view>

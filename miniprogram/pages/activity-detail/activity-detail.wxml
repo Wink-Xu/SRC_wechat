@@ -88,10 +88,9 @@
           </view>
         </view>
         <view class="participants-list" wx:if="{{participants.length > 0}}">
-          <view class="participant-item" wx:for="{{participants}}" wx:for-limit="6" wx:key="_id">
+          <view class="participant-item {{item.check_in_status === 'checked_in' ? 'checked-in' : ''}}" wx:for="{{participants}}" wx:for-limit="6" wx:key="_id">
             <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" bindtap="previewParticipantAvatar" data-index="{{index}}"></image>
             <text class="participant-name">{{item.nickname}}</text>
-            <text class="status-dot {{item.status === 'checked_in' ? 'checked-in' : ''}}" wx:if="{{item.status}}"></text>
           </view>
         </view>
         <view class="no-participants" wx:else>

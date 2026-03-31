@@ -1,0 +1,90 @@
+/* pages/coffee-orders/coffee-orders.wxss */
+page {
+  background: #F8F8F8;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 20rpx;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.order-item {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.order-no {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.order-status {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.status-pending {
+  color: #CC7722;
+}
+
+.status-paid {
+  color: #2E7D32;
+}
+
+.status-completed {
+  color: #1A1A1A;
+}
+
+.status-cancelled {
+  color: #999999;
+}
+
+.order-items {
+  font-size: 28rpx;
+  color: #1A1A1A;
+  line-height: 1.8;
+}
+
+.order-items text {
+  display: block;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #F5F5F5;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.order-total {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.loading-box, .empty-box, .loading-more, .no-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #999999;
+}

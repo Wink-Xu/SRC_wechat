@@ -1,0 +1,146 @@
+/* pages/coffee-order-detail/coffee-order-detail.wxss */
+page {
+  background: #F8F8F8;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 状态卡片 */
+.status-card {
+  background: #1A1A1A;
+  border-radius: 12rpx;
+  padding: 40rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+/* 卡片通用样式 */
+.store-card, .products-card, .info-card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 20rpx;
+}
+
+/* 门店信息 */
+.store-name {
+  display: block;
+  font-size: 30rpx;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+}
+
+.store-address {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+/* 商品列表 */
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #1A1A1A;
+}
+
+.product-temp {
+  font-size: 24rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+
+.product-right {
+  display: flex;
+  align-items: center;
+}
+
+.product-qty {
+  font-size: 26rpx;
+  color: #999999;
+  margin-right: 16rpx;
+}
+
+.product-price {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #1A1A1A;
+}
+
+/* 订单信息 */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #1A1A1A;
+}
+
+.info-value.price {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* 取消按钮 */
+.action-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background: #FFFFFF;
+}
+
+.cancel-btn {
+  background: #F5F5F5;
+  color: #666666;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  padding: 24rpx 0;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 100rpx;
+  color: #999999;
+}

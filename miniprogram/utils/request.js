@@ -126,6 +126,24 @@ const debugApi = {
   checkActivities: (data) => callFunction('debug', 'checkActivities', data, { showLoad: false, showErrorMsg: false })
 };
 
+// 咖啡相关接口
+const coffeeApi = {
+  getProducts: (data) => callFunction('coffee', 'getProducts', data, { showLoad: false }),
+  getProductDetail: (data) => callFunction('coffee', 'getProductDetail', data),
+  getBalance: (data) => callFunction('coffee', 'getBalance', data, { showLoad: false }),
+  createOrder: (data) => callFunction('coffee', 'createOrder', data),
+  payOrderByPoints: (data) => callFunction('coffee', 'payOrderByPoints', data),
+  payOrderByCash: (data) => callFunction('coffee', 'payOrderByCash', data),
+  payOrderByBalance: (data) => callFunction('coffee', 'payOrderByBalance', data),
+  getOrders: (data) => callFunction('coffee', 'getOrders', data, { showLoad: false }),
+  getOrderDetail: (data) => callFunction('coffee', 'getOrderDetail', data),
+  cancelOrder: (data) => callFunction('coffee', 'cancelOrder', data),
+  adminGetProducts: (data) => callFunction('coffee', 'adminGetProducts', data, { showLoad: false }),
+  adminManageProduct: (data) => callFunction('coffee', 'adminManageProduct', data),
+  adminGetOrders: (data) => callFunction('coffee', 'adminGetOrders', data, { showLoad: false }),
+  adminUpdateOrderStatus: (data) => callFunction('coffee', 'adminUpdateOrderStatus', data)
+};
+
 module.exports = {
   callFunction,
   userApi,
@@ -133,5 +151,6 @@ module.exports = {
   pointsApi,
   shopApi,
   adminApi,
-  debugApi
+  debugApi,
+  coffeeApi
 };

@@ -12,6 +12,10 @@
     "pages/product-detail/product-detail",
     "pages/orders/orders",
     "pages/order-detail/order-detail",
+    "pages/coffee/coffee",
+    "pages/coffee-cart/coffee-cart",
+    "pages/coffee-orders/coffee-orders",
+    "pages/coffee-order-detail/coffee-order-detail",
     "pages/profile/profile",
     "pages/apply-membership/apply-membership",
     "pages/address-edit/address-edit",
@@ -19,7 +23,10 @@
     "pages/admin-members/admin-members",
     "pages/admin-activities/admin-activities",
     "pages/admin-products/admin-products",
-    "pages/admin-orders/admin-orders"
+    "pages/admin-orders/admin-orders",
+    "pages/admin-coffee/admin-coffee",
+    "pages/admin-coffee-edit/admin-coffee-edit",
+    "pages/admin-coffee-orders/admin-coffee-orders"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -40,6 +47,10 @@
       {
         "pagePath": "pages/shop/shop",
         "text": "周边"
+      },
+      {
+        "pagePath": "pages/coffee/coffee",
+        "text": "咖啡"
       },
       {
         "pagePath": "pages/profile/profile",

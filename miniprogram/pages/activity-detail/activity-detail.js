@@ -196,7 +196,7 @@ Page({
     } else if (activity.registration_fee_type === 'cash' && activity.registration_fee > 0) {
       const confirm = await showConfirm(
         '确认报名',
-        `此活动需要支付 ¥${activity.registration_fee}，确认报名吗？`
+        `此活动需要支付 ¥${activity.registration_fee_yuan}，确认报名吗？`
       );
       if (!confirm) return;
       // TODO: 微信支付流程

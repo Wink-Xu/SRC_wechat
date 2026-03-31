@@ -1,0 +1,74 @@
+<!--pages/coffee/coffee.wxml-->
+<view class="container">
+  <!-- 门店信息 -->
+  <view class="store-info">
+    <text class="store-name">{{storeName}}</text>
+    <text class="store-address">{{storeAddress}}</text>
+  </view>
+
+  <!-- 分类 Tab -->
+  <scroll-view class="category-tabs" scroll-x>
+    <view
+      class="tab-item {{currentCategory === item.key ? 'active' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="key"
+      bindtap="switchCategory"
+      data-category="{{item.key}}"
+    >
+      {{item.name}}
+    </view>
+  </scroll-view>
+
+  <!-- 商品列表 -->
+  <view class="product-list">
+    <view wx:if="{{loading}}" class="loading-box">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{products.length === 0}}" class="empty-box">
+      <text>暂无商品</text>
+    </view>
+
+    <view class="product-item" wx:for="{{products}}" wx:key="_id">
+      <view class="product-info">
+        <text class="product-name">{{item.name}}</text>
+        <text class="product-temp" wx:if="{{item.temperature === 'both'}}">(冷/热)</text>
+        <text class="product-temp" wx:elif="{{item.temperature === 'cold_only'}}">(冷)</text>
+        <text class="product-temp" wx:elif="{{item.temperature === 'hot_only'}}">(热)</text>
+      </view>
+      <view class="product-right">
+        <text class="product-price">￥{{item.price / 100}}</text>
+        <view class="add-btn" bindtap="onAddToCart" data-product="{{item}}">
+          <text>+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部购物车栏 -->
+  <view class="cart-bar">
+    <view class="cart-left" bindtap="goToCart">
+      <view class="cart-icon-wrapper">
+        <text class="cart-icon">🛒</text>
+        <view class="cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <view class="cart-total">
+        <text class="total-label">合计</text>
+        <text class="total-price">￥{{cartTotal / 100}}</text>
+      </view>
+    </view>
+    <view class="cart-btn" bindtap="goToCart">去结算</view>
+  </view>
+
+  <!-- 温度选择弹窗 -->
+  <view class="temp-modal" wx:if="{{showTempModal}}">
+    <view class="modal-mask" bindtap="closeTempModal"></view>
+    <view class="modal-content">
+      <text class="modal-title">选择温度</text>
+      <view class="temp-btns">
+        <view class="temp-btn" bindtap="selectTemp" data-temp="cold">冷</view>
+        <view class="temp-btn" bindtap="selectTemp" data-temp="hot">热</view>
+      </view>
+    </view>
+  </view>
+</view>
