@@ -1,5 +1,18 @@
 <!--pages/coffee-orders/coffee-orders.wxml-->
 <view class="container">
+  <!-- 咖啡余额卡片 -->
+  <view class="balance-card">
+    <view class="balance-item">
+      <text class="balance-label">美式余额</text>
+      <text class="balance-value">{{balance.americano}}杯</text>
+    </view>
+    <view class="balance-divider"></view>
+    <view class="balance-item">
+      <text class="balance-label">任意余额</text>
+      <text class="balance-value">{{balance.any}}杯</text>
+    </view>
+  </view>
+
   <view wx:if="{{loading && orders.length === 0}}" class="loading-box">
     <text>加载中...</text>
   </view>

@@ -1,5 +1,5 @@
 // pages/profile/profile.js
-const { userApi, pointsApi, activityApi, adminApi, coffeeApi } = require('../../utils/request');
+const { userApi, pointsApi, activityApi, adminApi } = require('../../utils/request');
 const { formatPhone, showSuccess, showConfirm, showInfo } = require('../../utils/util');
 const app = getApp();
 
@@ -14,8 +14,7 @@ Page({
     openid: '',         // 临时显示 openid
     points: 0,
     activityCount: 0,
-    pendingMembersCount: 0,  // 待审核成员数量
-    coffeeBalance: { americano: 0, any: 0 }  // 咖啡余额
+    pendingMembersCount: 0  // 待审核成员数量
   },
 
   onLoad: function () {
@@ -220,31 +219,6 @@ Page({
     wx.navigateTo({
       url: '/pages/orders/orders'
     });
-  },
-
-  // 跳转到咖啡余额页面
-  goToCoffeeBalance: async function () {
-    if (!this.data.isLoggedIn) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
-
-    try {
-      const result = await coffeeApi.getBalance({});
-      wx.showModal({
-        title: '咖啡余额',
-        content: `美式余额: ${result.americano} 杯\n任意余额: ${result.any} 杯`,
-        showCancel: false
-      });
-    } catch (error) {
-      wx.showToast({
-        title: '获取余额失败',
-        icon: 'none'
-      });
-    }
   },
 
   // 跳转到页面（需要登录）

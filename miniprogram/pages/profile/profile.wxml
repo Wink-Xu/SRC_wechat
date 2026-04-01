@@ -42,10 +42,6 @@
   <!-- 功能菜单 - 3 列网格 -->
   <view class="menu-card">
     <view class="menu-grid">
-      <view class="menu-grid-item" bindtap="goToMyActivities" wx:if="{{isLoggedIn && isMember}}">
-        <view class="menu-grid-icon iconfont icon-time"></view>
-        <text class="menu-grid-title">我的活动</text>
-      </view>
       <view class="menu-grid-item" bindtap="goToOrders">
         <view class="menu-grid-icon iconfont icon-order"></view>
         <text class="menu-grid-title">我的订单</text>
@@ -53,10 +49,6 @@
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank" wx:if="{{isLoggedIn}}">
         <view class="menu-grid-icon iconfont icon-rank"></view>
         <text class="menu-grid-title">排行榜</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToCoffeeBalance" wx:if="{{isLoggedIn}}">
-        <view class="menu-grid-icon iconfont icon-product"></view>
-        <text class="menu-grid-title">咖啡余额</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders" wx:if="{{isLoggedIn}}">
         <view class="menu-grid-icon iconfont icon-order"></view>
@@ -96,11 +88,11 @@
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-orders/admin-orders">
         <view class="menu-grid-icon iconfont icon-order"></view>
-        <text class="menu-grid-title">订单管理</text>
+        <text class="menu-grid-title">周边订单</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee/admin-coffee">
         <view class="menu-grid-icon iconfont icon-product"></view>
-        <text class="menu-grid-title">咖啡商品</text>
+        <text class="menu-grid-title">咖啡管理</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee-orders/admin-coffee-orders">
         <view class="menu-grid-icon iconfont icon-order"></view>

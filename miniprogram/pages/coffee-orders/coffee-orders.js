@@ -4,6 +4,7 @@ const { coffeeApi } = require('../../utils/request');
 Page({
   data: {
     orders: [],
+    balance: { americano: 0, any: 0 },
     loading: true,
     loadingMore: false,
     hasMore: true,
@@ -11,11 +12,28 @@ Page({
   },
 
   onLoad: function () {
+    this.loadBalance();
     this.loadOrders();
+  },
+
+  onShow: function () {
+    // 每次显示页面时刷新余额
+    this.loadBalance();
+  },
+
+  // 加载咖啡余额
+  loadBalance: async function () {
+    try {
+      const result = await coffeeApi.getBalance({});
+      this.setData({ balance: result });
+    } catch (error) {
+      console.error('加载余额失败', error);
+    }
   },
 
   onPullDownRefresh: function () {
     this.setData({ page: 1, hasMore: true, orders: [] });
+    this.loadBalance();
     this.loadOrders().then(() => {
       wx.stopPullDownRefresh();
     });
