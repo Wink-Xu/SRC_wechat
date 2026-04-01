@@ -20,6 +20,7 @@ Page({
     cartTotal: 0,
     showTempModal: false,
     selectedProduct: null,
+    selectedTemp: 'cold',
     loading: true
   },
 
@@ -37,8 +38,40 @@ Page({
   loadProducts: async function () {
     try {
       const result = await coffeeApi.getProducts({ category: this.data.currentCategory });
+      const products = result.list || [];
+
+      // 处理商品图片
+      const cloudImageIds = products
+        .filter(p => p.image && p.image.startsWith('cloud://'))
+        .map(p => p.image);
+
+      let tempUrlMap = {};
+      if (cloudImageIds.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({
+            fileList: cloudImageIds
+          });
+          tempUrlResult.fileList.forEach(file => {
+            if (file.status === 0 && file.tempFileURL) {
+              tempUrlMap[file.fileID] = file.tempFileURL;
+            }
+          });
+        } catch (err) {
+          console.error('获取图片临时链接失败', err);
+        }
+      }
+
+      const processedProducts = products.map(p => {
+        if (p.image && p.image.startsWith('cloud://') && tempUrlMap[p.image]) {
+          return { ...p, display_image: tempUrlMap[p.image] };
+        } else if (p.image) {
+          return { ...p, display_image: p.image };
+        }
+        return p;
+      });
+
       this.setData({
-        products: result.list || [],
+        products: processedProducts,
         loading: false
       });
     } catch (error) {
@@ -73,22 +106,33 @@ Page({
     this.setData({ cartCount: count, cartTotal: total });
   },
 
-  // 点击加号
+  // 点击选规格
   onAddToCart: function (e) {
     const product = e.currentTarget.dataset.product;
 
     if (product.temperature === 'both') {
-      this.setData({ showTempModal: true, selectedProduct: product });
-    } else {
-      const temp = product.temperature === 'cold_only' ? 'cold' : 'hot';
-      this.addToCart(product, temp);
+      // 需要选择温度
+      this.setData({
+        showTempModal: true,
+        selectedProduct: product,
+        selectedTemp: 'cold'
+      });
+    } else if (product.temperature === 'cold_only') {
+      this.addToCart(product, 'cold');
+    } else if (product.temperature === 'hot_only') {
+      this.addToCart(product, 'hot');
     }
   },
 
   // 选择温度
   selectTemp: function (e) {
     const temp = e.currentTarget.dataset.temp;
-    this.addToCart(this.data.selectedProduct, temp);
+    this.setData({ selectedTemp: temp });
+  },
+
+  // 确认加入购物车
+  confirmAdd: function () {
+    this.addToCart(this.data.selectedProduct, this.data.selectedTemp);
     this.setData({ showTempModal: false, selectedProduct: null });
   },
 
@@ -131,10 +175,5 @@ Page({
       return;
     }
     wx.navigateTo({ url: '/pages/coffee-cart/coffee-cart' });
-  },
-
-  // 去咖啡订单
-  goToOrders: function () {
-    wx.navigateTo({ url: '/pages/coffee-orders/coffee-orders' });
   }
 });
