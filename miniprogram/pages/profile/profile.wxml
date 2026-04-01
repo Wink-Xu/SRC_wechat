@@ -84,7 +84,7 @@
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-products/admin-products">
         <view class="menu-grid-icon iconfont icon-product"></view>
-        <text class="menu-grid-title">商品管理</text>
+        <text class="menu-grid-title">周边管理</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-orders/admin-orders">
         <view class="menu-grid-icon iconfont icon-order"></view>
