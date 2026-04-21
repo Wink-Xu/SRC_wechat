@@ -25,8 +25,8 @@
     <view class="order-item" wx:for="{{orders}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
       <view class="order-header">
         <text class="order-no">{{item.order_no}}</text>
-        <text class="order-status {{item.status === 'pending' ? 'status-pending' : item.status === 'paid' ? 'status-paid' : item.status === 'completed' ? 'status-completed' : 'status-cancelled'}}">
-          {{item.status === 'pending' ? '待支付' : item.status === 'paid' ? '已支付' : item.status === 'completed' ? '已完成' : '已取消'}}
+        <text class="order-status {{item.status === 'pending' ? 'status-pending' : item.status === 'paid' || item.status === 'processing' ? 'status-paid' : item.status === 'completed' ? 'status-completed' : 'status-cancelled'}}">
+          {{item.status === 'pending' ? '待支付' : item.status === 'paid' ? '已支付' : item.status === 'processing' ? '制作中' : item.status === 'completed' ? '已完成' : '已取消'}}
         </text>
       </view>
       <view class="order-items">

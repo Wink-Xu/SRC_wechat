@@ -869,7 +869,7 @@ async function handleExportOrders(data, openid) {
         items: order.items.map(item => `${item.product_name} x${item.quantity}`).join('; '),
         totalAmount: `￥${(order.total_amount / 100).toFixed(2)}`,
         paymentType: order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : order.payment_type === 'balance' ? '余额支付' : '未支付',
-        orderStatus: order.status === 'pending' ? '待处理' : order.status === 'processing' ? '制作中' : order.status === 'completed' ? '已完成' : '已取消',
+        orderStatus: order.status === 'pending' ? '待处理' : order.status === 'paid' ? '已支付' : order.status === 'processing' ? '制作中' : order.status === 'completed' ? '已完成' : '已取消',
         pointsUsed: order.points_used || 0,
         americanoBalanceUsed: order.balance_used?.americano || 0,
         anyBalanceUsed: order.balance_used?.any || 0

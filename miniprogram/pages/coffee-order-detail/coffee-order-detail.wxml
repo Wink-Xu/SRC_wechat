@@ -7,10 +7,11 @@
   <block wx:elif="{{order}}">
     <!-- 订单状态头部 -->
     <view class="status-card">
-      <view class="status-icon">{{order.status === 'completed' ? '✓' : order.status === 'cancelled' ? '×' : '○'}}</view>
+      <view class="status-icon">{{order.status === 'completed' ? '✓' : order.status === 'cancelled' ? '×' : order.status === 'paid' || order.status === 'processing' ? '○' : '○'}}</view>
       <text class="status-text">{{order.statusText}}</text>
       <text class="status-desc" wx:if="{{order.status === 'completed'}}">订单已完成，感谢惠顾</text>
       <text class="status-desc" wx:if="{{order.status === 'processing'}}">后厨正在制作中</text>
+      <text class="status-desc" wx:if="{{order.status === 'paid'}}">商家已接单，正在准备</text>
       <text class="status-desc" wx:if="{{order.status === 'pending'}}">等待商家接单</text>
     </view>
 
