@@ -30,6 +30,8 @@ page {
   width: 32rpx;
   height: 32rpx;
   margin-right: 12rpx;
+  font-size: 32rpx;
+  line-height: 1;
 }
 
 .search-input {
@@ -52,6 +54,8 @@ page {
 .filter-icon {
   width: 28rpx;
   height: 28rpx;
+  font-size: 28rpx;
+  line-height: 1;
 }
 
 /* 状态筛选 Tab */
@@ -142,9 +146,10 @@ page {
 }
 
 .arrow-icon {
-  width: 28rpx;
-  height: 28rpx;
+  font-size: 48rpx;
+  color: #999999;
   opacity: 0.5;
+  line-height: 1;
 }
 
 /* 状态标签 */
@@ -289,13 +294,15 @@ page {
   text-align: center;
   padding: 120rpx 32rpx;
   color: #999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .empty-icon {
-  width: 200rpx;
-  height: 200rpx;
+  font-size: 100rpx;
   margin-bottom: 24rpx;
-  opacity: 0.5;
+  line-height: 1;
 }
 
 .empty-text {

@@ -3,12 +3,12 @@
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-wrapper">
-      <image class="search-icon" src="/images/search.png"></image>
+      <view class="search-icon">🔍</view>
       <input class="search-input" placeholder="搜索订单号或用户昵称" value="{{searchKeyword}}" bindinput="onSearchInput" confirm-type="search" bindconfirm="onSearch"/>
     </view>
     <view class="filter-btn" bindtap="showFilter">
       <text>筛选</text>
-      <image class="filter-icon" src="/images/filter.png"></image>
+      <view class="filter-icon">⚡</view>
     </view>
   </view>
 
@@ -45,7 +45,7 @@
   </view>
 
   <view wx:elif="{{orders.length === 0}}" class="empty-box">
-    <image class="empty-icon" src="/images/empty.png"></image>
+    <text class="empty-icon">📦</text>
     <text class="empty-text">暂无订单</text>
   </view>
 
@@ -58,7 +58,7 @@
             {{item.statusText}}
           </view>
         </view>
-        <image class="arrow-icon" src="/images/arrow.png"></image>
+        <text class="arrow-icon">›</text>
       </view>
 
       <view class="order-body" bindtap="goToDetail" data-id="{{item._id}}">
