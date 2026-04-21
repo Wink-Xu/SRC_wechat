@@ -1,28 +1,27 @@
 <!--pages/coffee/coffee.wxml-->
 <view class="container {{cartCount > 0 ? 'has-cart' : ''}}">
   <!-- 门店信息 -->
-  <view class="store-info">
-    <view class="store-header">
-      <text class="store-name">{{storeName}}</text>
-      <text class="store-address">{{storeAddress}}</text>
-    </view>
+  <view class="store-info" bindtap="openMap">
+    <text class="store-name">{{storeName}}</text>
+    <text class="store-address">{{storeAddress}}<text class="map-icon">📍</text></text>
   </view>
 
   <!-- 分类 Tab -->
-  <scroll-view class="category-tabs" scroll-x enhanced show-scrollbar="{{false}}">
+  <view class="category-tabs">
     <view
       class="tab-item {{currentCategory === item.key ? 'active' : ''}}"
       wx:for="{{categories}}"
       wx:key="key"
-      bindtap="switchCategory"
+      bindtap="scrollToCategory"
       data-category="{{item.key}}"
+      id="tab-{{item.key}}"
     >
       {{item.name}}
     </view>
-  </scroll-view>
+  </view>
 
-  <!-- 商品列表 -->
-  <scroll-view class="product-list" scroll-y enhanced show-scrollbar="{{false}}">
+  <!-- 商品列表 - 只支持上下滚动 -->
+  <scroll-view class="product-list" scroll-y enhanced show-scrollbar="{{false}}" scroll-into-view="{{scrollToView}}" scroll-with-animation="true" bindscroll="onProductListScroll">
     <view wx:if="{{loading}}" class="loading-box">
       <text>加载中...</text>
     </view>
@@ -31,20 +30,33 @@
       <text>暂无商品</text>
     </view>
 
-    <view class="product-grid" wx:else>
-      <view class="product-item" wx:for="{{products}}" wx:key="_id">
-        <image class="product-image" src="{{item.display_image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
-        <view class="product-content">
-          <text class="product-name">{{item.name}}</text>
-          <view class="product-temp-row">
-            <text class="product-temp" wx:if="{{item.temperature === 'both'}}">冷/热</text>
-            <text class="product-temp" wx:elif="{{item.temperature === 'cold_only'}}">仅冷</text>
-            <text class="product-temp" wx:elif="{{item.temperature === 'hot_only'}}">仅热</text>
-          </view>
-          <view class="product-footer">
-            <text class="product-price">￥{{item.price / 100}}</text>
-            <view class="select-btn" bindtap="onAddToCart" data-product="{{item}}">
-              <text>选规格</text>
+    <view class="product-list-wrapper" wx:else>
+      <!-- 按分类分组显示 -->
+      <view wx:for="{{groupedProducts}}" wx:key="key" data-category="{{item.key}}">
+        <view class="category-header" id="category-{{item.key}}">
+          <text class="category-title">{{item.name}}</text>
+          <text class="category-count">{{item.products.length}}款</text>
+        </view>
+        <view class="products-in-category">
+          <view class="product-item" wx:for="{{item.products}}" wx:key="_id" wx:for-item="product" bindtap="goToDetail" data-id="{{product._id}}">
+            <image class="product-image" src="{{product.display_image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
+            <view class="product-content">
+              <text class="product-sub-name">{{product.sub_name}}</text>
+              <text class="product-name">{{product.name}}</text>
+              <text class="product-price">￥{{product.price / 100}}</text>
+            </view>
+            <!-- 根据购物车数量显示不同 UI -->
+            <view wx:if="{{product.cartQuantity > 0}}" class="quantity-controller" catchtap="stopPropagation">
+              <view class="add-btn" bindtap="decreaseCartQuantity" data-product="{{product}}">
+                <text class="add-btn-text">−</text>
+              </view>
+              <text class="quantity-num">{{product.cartQuantity}}</text>
+              <view class="add-btn" bindtap="increaseCartQuantity" data-product="{{product}}">
+                <text class="add-btn-text">+</text>
+              </view>
+            </view>
+            <view wx:else class="add-btn" catchtap="onAddToCart" data-product="{{product}}">
+              <text class="add-btn-text">+</text>
             </view>
           </view>
         </view>
@@ -53,40 +65,52 @@
   </scroll-view>
 
   <!-- 底部购物车栏 -->
-  <view class="cart-bar" wx:if="{{cartCount > 0}}">
-    <view class="cart-left" bindtap="goToCart">
+  <view class="cart-bar" wx:if="{{cartCount > 0}}" bindtap="goToCart">
+    <view class="cart-left">
       <view class="cart-icon-wrapper">
-        <view class="cart-icon-box">
-          <text class="cart-icon-text">🛒</text>
-        </view>
-        <view class="cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+        <text class="cart-icon">🛒</text>
+        <view class="cart-badge">{{cartCount}}</view>
       </view>
-      <view class="cart-total">
-        <text class="total-price">￥{{cartTotal / 100}}</text>
-      </view>
+      <text class="cart-total-price">￥{{cartTotal / 100}}</text>
     </view>
-    <view class="cart-btn" bindtap="goToCart">去结算</view>
+    <view class="cart-checkout-btn">选好了</view>
   </view>
 
-  <!-- 温度选择弹窗 -->
-  <view class="temp-modal" wx:if="{{showTempModal}}">
+  <!-- 选择规格弹窗 -->
+  <view class="spec-modal" wx:if="{{showTempModal}}">
     <view class="modal-mask" bindtap="closeTempModal"></view>
-    <view class="modal-content">
-      <view class="modal-header">
-        <text class="modal-title">{{selectedProduct.name}}</text>
-        <text class="modal-price">￥{{selectedProduct.price / 100}}</text>
+    <view class="modal-sheet">
+      <!-- 商品信息：左图右文 -->
+      <view class="spec-product-info">
+        <image class="spec-product-image" src="{{selectedProduct.display_image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
+        <view class="spec-product-text">
+          <text class="spec-product-name">{{selectedProduct.name}}</text>
+          <text class="spec-product-sub">{{selectedProduct.sub_name || ''}}</text>
+          <text class="spec-product-desc" wx:if="{{selectedProduct.description}}">{{selectedProduct.description}}</text>
+        </view>
+        <view class="spec-close" bindtap="closeTempModal">×</view>
       </view>
-      <view class="modal-section">
-        <text class="section-label">温度</text>
-        <view class="temp-btns">
-          <view class="temp-btn {{selectedTemp === 'cold' ? 'active' : ''}}" bindtap="selectTemp" data-temp="cold">冷</view>
-          <view class="temp-btn {{selectedTemp === 'hot' ? 'active' : ''}}" bindtap="selectTemp" data-temp="hot" wx:if="{{selectedProduct.temperature === 'both' || selectedProduct.temperature === 'hot_only'}}">热</view>
+
+      <!-- 数量选择 -->
+      <view class="spec-section">
+        <view class="spec-section-header">
+          <text class="spec-section-title">数量</text>
+        </view>
+        <view class="spec-quantity">
+          <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
+          <text class="quantity-num">{{quantity}}</text>
+          <view class="quantity-btn" bindtap="increaseQuantity">+</view>
         </view>
       </view>
-      <view class="modal-actions">
-        <view class="cancel-btn" bindtap="closeTempModal">取消</view>
-        <view class="confirm-btn" bindtap="confirmAdd">加入购物车</view>
+
+      <!-- 备注输入 -->
+      <view class="spec-section">
+        <text class="spec-section-title">备注（可选）</text>
+        <textarea class="spec-remark" placeholder="例如：少糖、去冰、加浓等" maxlength="100" value="{{remark}}" bindinput="onRemarkInput"></textarea>
       </view>
+
+      <!-- 加入购物车按钮 -->
+      <view class="spec-add-btn" bindtap="confirmAdd">添加至购物车</view>
     </view>
   </view>
 </view>

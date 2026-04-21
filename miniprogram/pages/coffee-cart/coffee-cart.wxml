@@ -3,17 +3,20 @@
   <!-- 购物车列表 -->
   <view class="cart-list" wx:if="{{cart.length > 0}}">
     <view class="cart-item" wx:for="{{cart}}" wx:key="product_id">
+      <image class="item-image" src="{{item.image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
       <view class="item-info">
         <text class="item-name">{{item.product_name}}</text>
-        <text class="item-temp">{{item.temperatureText}}</text>
+        <view class="item-meta">
+          <text class="item-temp-tag">{{item.temperatureText}}</text>
+          <text class="item-qty">×{{item.quantity}}</text>
+        </view>
+        <text class="item-price">￥{{item.price * item.quantity / 100}}</text>
       </view>
       <view class="item-actions">
         <view class="qty-btn" bindtap="decreaseQty" data-index="{{index}}">-</view>
         <text class="qty-num">{{item.quantity}}</text>
         <view class="qty-btn" bindtap="increaseQty" data-index="{{index}}">+</view>
       </view>
-      <text class="item-price">￥{{item.price * item.quantity / 100}}</text>
-      <text class="item-delete" bindtap="removeItem" data-index="{{index}}">×</text>
     </view>
   </view>
 
@@ -44,6 +47,6 @@
       <text class="total-label">合计</text>
       <text class="total-price">￥{{cartTotal / 100}}</text>
     </view>
-    <button class="checkout-btn" bindtap="checkout" loading="{{loading}}">结算</button>
+    <button class="checkout-btn" bindtap="checkout" loading="{{loading}}">去支付</button>
   </view>
 </view>

@@ -1,0 +1,261 @@
+/* pages/coffee-detail/coffee-detail.wxss */
+page {
+  background: #F5F5F5;
+  min-height: 100vh;
+}
+
+.container {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* 顶部大图 */
+.product-hero-image {
+  width: 100%;
+  height: 70vh;
+  background: #FFFFFF;
+  position: relative;
+}
+
+/* 返回按钮 */
+.back-btn {
+  position: fixed;
+  top: 60rpx;
+  right: 32rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.back-icon {
+  color: #333333;
+  font-size: 32rpx;
+}
+
+/* 底部商品信息卡片 */
+.product-card {
+  background: #FFFFFF;
+  padding: 32rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  margin-top: -60rpx;
+  position: relative;
+  z-index: 10;
+  border-radius: 32rpx 32rpx 0 0;
+}
+
+.product-header {
+  margin-bottom: 16rpx;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.product-sub {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+}
+
+.product-desc {
+  margin-top: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.product-desc text {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.price-and-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32rpx;
+}
+
+.product-price {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.select-spec-btn {
+  background: #333333;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 500;
+  padding: 16rpx 32rpx;
+  border-radius: 8rpx;
+}
+
+/* 选规格弹窗 */
+.spec-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-sheet {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 24rpx 24rpx 0 0;
+  width: 100%;
+  padding: 48rpx 32rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+/* 商品信息：左图右文 */
+.spec-product-info {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 40rpx;
+  padding-right: 60rpx;
+}
+
+.spec-product-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: #F8F8F8;
+}
+
+.spec-product-text {
+  flex: 1;
+  padding-left: 24rpx;
+}
+
+.spec-product-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.spec-product-sub {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.spec-product-desc {
+  font-size: 24rpx;
+  color: #999999;
+  display: block;
+  line-height: 1.5;
+}
+
+.spec-close {
+  position: absolute;
+  top: 40rpx;
+  right: 32rpx;
+  font-size: 32rpx;
+  color: #666666;
+  padding: 8rpx;
+}
+
+/* 规格选择区块 */
+.spec-section {
+  margin-bottom: 32rpx;
+}
+
+.spec-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.spec-section-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+/* 数量选择 */
+.spec-quantity {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.quantity-btn {
+  width: 48rpx;
+  height: 48rpx;
+  background: #F5F5F5;
+  border-radius: 4rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #333333;
+}
+
+.quantity-btn.disabled {
+  color: #CCCCCC;
+}
+
+.quantity-num {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  margin: 0 32rpx;
+  min-width: 40rpx;
+  text-align: center;
+}
+
+/* 备注输入框 */
+.spec-remark {
+  width: 100%;
+  min-height: 160rpx;
+  background: #F5F5F5;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  color: #333333;
+  margin-top: 16rpx;
+}
+
+/* 加入购物车按钮 */
+.spec-add-btn {
+  background: #333333;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 500;
+  text-align: center;
+  padding: 32rpx 0;
+  border-radius: 12rpx;
+  margin-top: 48rpx;
+}

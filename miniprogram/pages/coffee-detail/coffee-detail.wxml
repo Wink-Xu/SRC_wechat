@@ -1,0 +1,70 @@
+<!--pages/coffee-detail/coffee-detail.wxml-->
+<view class="container">
+  <!-- 顶部大图 -->
+  <image class="product-hero-image" src="{{product.display_image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
+
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack">
+    <text class="back-icon">×</text>
+  </view>
+
+  <!-- 底部商品信息卡片 -->
+  <view class="product-card">
+    <!-- 商品信息 -->
+    <view class="product-header">
+      <view class="product-info">
+        <text class="product-name">{{product.name}}</text>
+        <text class="product-sub">{{product.sub_name || ''}}</text>
+      </view>
+    </view>
+
+    <!-- 商品描述 -->
+    <view class="product-desc" wx:if="{{product.description}}">
+      <text>{{product.description}}</text>
+    </view>
+
+    <!-- 价格和选规格按钮 -->
+    <view class="price-and-btn">
+      <text class="product-price">￥{{product.price / 100}}</text>
+      <view class="select-spec-btn" bindtap="openSpecModal">选规格 ></view>
+    </view>
+  </view>
+
+  <!-- 选规格弹窗 -->
+  <view class="spec-modal" wx:if="{{showSpecModal}}">
+    <view class="modal-mask" bindtap="closeSpecModal"></view>
+    <view class="modal-sheet">
+      <!-- 商品信息：左图右文 -->
+      <view class="spec-product-info">
+        <image class="spec-product-image" src="{{product.display_image || '/images/coffee-default.png'}}" mode="aspectFill"></image>
+        <view class="spec-product-text">
+          <text class="spec-product-name">{{product.name}}</text>
+          <text class="spec-product-sub">{{product.sub_name || ''}}</text>
+          <text class="spec-product-desc" wx:if="{{product.description}}">{{product.description}}</text>
+        </view>
+        <view class="spec-close" bindtap="closeSpecModal">×</view>
+      </view>
+
+      <!-- 数量选择 -->
+      <view class="spec-section">
+        <view class="spec-section-header">
+          <text class="spec-section-title">数量</text>
+        </view>
+        <view class="spec-quantity">
+          <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">-</view>
+          <text class="quantity-num">{{quantity}}</text>
+          <view class="quantity-btn" bindtap="increaseQuantity">+</view>
+        </view>
+      </view>
+
+      <!-- 备注输入 -->
+      <view class="spec-section">
+        <text class="spec-section-title">备注（可选）</text>
+        <textarea class="spec-remark" placeholder="例如：少糖、去冰、加浓等" maxlength="100" value="{{remark}}" bindinput="onRemarkInput"></textarea>
+      </view>
+
+      <!-- 加入购物车按钮 -->
+      <view class="spec-add-btn" bindtap="confirmAdd">添加至购物车</view>
+    </view>
+  </view>
+</view>

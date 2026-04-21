@@ -44,15 +44,15 @@
     <view class="menu-grid">
       <view class="menu-grid-item" bindtap="goToOrders">
         <view class="menu-grid-icon iconfont icon-order"></view>
-        <text class="menu-grid-title">我的订单</text>
+        <text class="menu-grid-title">周边订单</text>
       </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank" wx:if="{{isLoggedIn}}">
-        <view class="menu-grid-icon iconfont icon-rank"></view>
-        <text class="menu-grid-title">排行榜</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders" wx:if="{{isLoggedIn}}">
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders">
         <view class="menu-grid-icon iconfont icon-order"></view>
         <text class="menu-grid-title">咖啡订单</text>
+      </view>
+      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank">
+        <view class="menu-grid-icon iconfont icon-rank"></view>
+        <text class="menu-grid-title">排行榜</text>
       </view>
     </view>
   </view>

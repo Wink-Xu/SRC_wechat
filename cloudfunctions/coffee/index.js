@@ -33,6 +33,8 @@ exports.main = async (event, context) => {
       return handleGetOrderDetail(data, openid);
     case 'cancelOrder':
       return handleCancelOrder(data, openid);
+    case 'initCollections':
+      return handleInitCollections(data, openid);
     case 'adminGetProducts':
       return handleAdminGetProducts(data, openid);
     case 'adminManageProduct':
@@ -53,6 +55,8 @@ async function handleGetProducts(data, openid) {
   const { category } = data;
 
   try {
+    console.log('handleGetProducts called with category:', category);
+
     let query = db.collection('coffee_products').where({ is_available: true });
 
     if (category) {
@@ -61,13 +65,15 @@ async function handleGetProducts(data, openid) {
 
     const result = await query.orderBy('sort_order', 'asc').get();
 
+    console.log('Found products:', result.data.length, result.data);
+
     return {
       code: 0,
       data: { list: result.data }
     };
   } catch (error) {
     console.error('获取咖啡商品失败', error);
-    return { code: -1, message: '获取失败' };
+    return { code: -1, message: '获取失败: ' + error.message };
   }
 }
 
@@ -549,6 +555,50 @@ async function handleCancelOrder(data, openid) {
   }
 }
 
+// ========== 数据库初始化 ==========
+
+// 初始化数据库集合
+async function handleInitCollections(data, openid) {
+  try {
+    // 检查管理员权限
+    const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+    const user = userResult.data[0];
+    if (user.role !== 'admin' && user.role !== 'leader') {
+      return { code: -1, message: '无权限' };
+    }
+
+    const collections = ['coffee_products', 'coffee_orders', 'coffee_balances'];
+    const results = [];
+
+    for (const collectionName of collections) {
+      try {
+        // 尝试创建集合
+        await db.createCollection(collectionName);
+        results.push({ name: collectionName, status: 'created' });
+      } catch (err) {
+        // 如果集合已存在，会报错，但不影响
+        if (err.errCode === -502005) {
+          results.push({ name: collectionName, status: 'exists' });
+        } else {
+          results.push({ name: collectionName, status: 'error', message: err.message });
+        }
+      }
+    }
+
+    return {
+      code: 0,
+      message: '数据库集合初始化完成',
+      data: { results }
+    };
+  } catch (error) {
+    console.error('初始化数据库集合失败', error);
+    return { code: -1, message: '初始化失败: ' + error.message };
+  }
+}
+
 // ========== 管理后台 ==========
 
 // 管理员获取所有商品
@@ -558,6 +608,9 @@ async function handleAdminGetProducts(data, openid) {
   try {
     // 检查管理员权限
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     if (user.role !== 'admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
@@ -579,21 +632,28 @@ async function handleAdminGetProducts(data, openid) {
     };
   } catch (error) {
     console.error('管理员获取商品失败', error);
-    return { code: -1, message: '获取失败' };
+    return { code: -1, message: '获取失败: ' + (error.message || '请检查coffee_products集合是否存在') };
   }
 }
 
 // 管理员新增/编辑商品
 async function handleAdminManageProduct(data, openid) {
-  const { id, action: productAction, ...productData } = data;
+  const { id, productAction, ...productData } = data;
+
+  console.log('handleAdminManageProduct called:', { productAction, id, productData });
 
   try {
     // 检查管理员权限
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     if (user.role !== 'admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
+
+    console.log('productAction value:', productAction);
 
     if (productAction === 'create') {
       // 新增商品
@@ -601,6 +661,7 @@ async function handleAdminManageProduct(data, openid) {
         ...productData,
         created_at: db.serverDate()
       };
+      console.log('Creating product:', newProduct);
       const result = await db.collection('coffee_products').add({ data: newProduct });
       return { code: 0, data: { id: result._id }, message: '创建成功' };
     } else if (productAction === 'update') {
@@ -622,10 +683,10 @@ async function handleAdminManageProduct(data, openid) {
       return { code: 0, message: currentStatus ? '已下架' : '已上架' };
     }
 
-    return { code: -1, message: '未知操作' };
+    return { code: -1, message: '未知操作: ' + productAction };
   } catch (error) {
     console.error('管理商品失败', error);
-    return { code: -1, message: '操作失败' };
+    return { code: -1, message: '操作失败: ' + error.message };
   }
 }
 
