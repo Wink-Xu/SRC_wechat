@@ -862,17 +862,17 @@ async function handleExportOrders(data, openid) {
     const exportData = result.data.map(order => {
       const user = usersMap[order.user_id];
       return {
-        订单号：order.order_no,
-        用户昵称：user?.nickname || '未知用户',
-        用户 OpenID: user?.openid || '',
-        下单时间：formatDate(order.created_at),
-        商品明细：order.items.map(item => `${item.product_name} x${item.quantity}`).join('; '),
-        总金额：`￥${(order.total_amount / 100).toFixed(2)}`,
-        支付方式：order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : order.payment_type === 'balance' ? '余额支付' : '未支付',
-        订单状态：order.status === 'pending' ? '待处理' : order.status === 'processing' ? '制作中' : order.status === 'completed' ? '已完成' : '已取消',
-        积分使用：order.points_used || 0,
-        美式余额使用：order.balance_used?.americano || 0,
-        任意余额使用：order.balance_used?.any || 0
+        orderNo: order.order_no,
+        userNickname: user?.nickname || '未知用户',
+        userOpenid: user?.openid || '',
+        orderTime: formatDate(order.created_at),
+        items: order.items.map(item => `${item.product_name} x${item.quantity}`).join('; '),
+        totalAmount: `￥${(order.total_amount / 100).toFixed(2)}`,
+        paymentType: order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : order.payment_type === 'balance' ? '余额支付' : '未支付',
+        orderStatus: order.status === 'pending' ? '待处理' : order.status === 'processing' ? '制作中' : order.status === 'completed' ? '已完成' : '已取消',
+        pointsUsed: order.points_used || 0,
+        americanoBalanceUsed: order.balance_used?.americano || 0,
+        anyBalanceUsed: order.balance_used?.any || 0
       };
     });
 
