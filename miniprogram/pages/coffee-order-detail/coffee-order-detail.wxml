@@ -5,59 +5,146 @@
   </view>
 
   <block wx:elif="{{order}}">
-    <!-- 订单状态 -->
+    <!-- 订单状态头部 -->
     <view class="status-card">
-      <text class="status-text">
-        {{order.status === 'pending' ? '待支付' : order.status === 'paid' ? '已支付' : order.status === 'completed' ? '已完成' : '已取消'}}
-      </text>
+      <view class="status-icon">{{order.status === 'completed' ? '✓' : order.status === 'cancelled' ? '×' : '○'}}</view>
+      <text class="status-text">{{order.statusText}}</text>
+      <text class="status-desc" wx:if="{{order.status === 'completed'}}">订单已完成，感谢惠顾</text>
+      <text class="status-desc" wx:if="{{order.status === 'processing'}}">后厨正在制作中</text>
+      <text class="status-desc" wx:if="{{order.status === 'pending'}}">等待商家接单</text>
     </view>
 
-    <!-- 门店信息 -->
-    <view class="store-card">
-      <text class="card-title">门店信息</text>
-      <text class="store-name">{{order.store_name}}</text>
-      <text class="store-address">{{order.store_address}}</text>
-    </view>
-
-    <!-- 商品列表 -->
+    <!-- 商品信息 -->
     <view class="products-card">
-      <text class="card-title">商品明细</text>
-      <view class="product-item" wx:for="{{order.items}}" wx:key="product_id">
-        <view class="product-info">
-          <text class="product-name">{{item.product_name}}</text>
-          <text class="product-temp">{{item.temperature === 'cold' ? '冷' : '热'}}</text>
+      <view class="card-header">
+        <text class="card-title">商品明细</text>
+      </view>
+      <view class="product-list">
+        <view class="product-item" wx:for="{{order.items}}" wx:key="product_id">
+          <view class="product-left">
+            <text class="product-name">{{item.product_name}}</text>
+            <text class="product-temp" wx:if="{{item.temperature}}">{{item.temperature === 'cold' ? '冷' : '热'}}</text>
+          </view>
+          <view class="product-right">
+            <text class="product-qty">x{{item.quantity}}</text>
+            <text class="product-price">￥{{item.price / 100}}</text>
+          </view>
         </view>
-        <view class="product-right">
-          <text class="product-qty">x{{item.quantity}}</text>
-          <text class="product-price">￥{{item.price / 100}}</text>
-        </view>
+      </view>
+      <view class="total-row">
+        <text class="total-label">订单总额</text>
+        <text class="total-price">￥{{order.total_amount / 100}}</text>
       </view>
     </view>
 
     <!-- 订单信息 -->
     <view class="info-card">
-      <text class="card-title">订单信息</text>
-      <view class="info-row">
-        <text class="info-label">订单编号</text>
-        <text class="info-value">{{order.order_no}}</text>
+      <view class="card-header">
+        <text class="card-title">订单信息</text>
       </view>
-      <view class="info-row">
-        <text class="info-label">下单时间</text>
-        <text class="info-value">{{order.formattedTime}}</text>
-      </view>
-      <view class="info-row">
-        <text class="info-label">支付方式</text>
-        <text class="info-value">{{order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : '余额支付'}}</text>
-      </view>
-      <view class="info-row">
-        <text class="info-label">商品总额</text>
-        <text class="info-value price">￥{{order.total_amount / 100}}</text>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">订单编号</text>
+          <view class="info-value-row">
+            <text class="info-value">{{order.order_no}}</text>
+            <text class="copy-btn" bindtap="copyOrderNo">复制</text>
+          </view>
+        </view>
+        <view class="info-item">
+          <text class="info-label">下单时间</text>
+          <text class="info-value">{{order.formattedTime}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">支付方式</text>
+          <text class="info-value">{{getPaymentText(order.payment_type)}}</text>
+        </view>
+        <view class="info-item" wx:if="{{order.points_used}}">
+          <text class="info-label">使用积分</text>
+          <text class="info-value">{{order.points_used}}</text>
+        </view>
+        <view class="info-item" wx:if="{{order.balance_used}}">
+          <text class="info-label">余额支付</text>
+          <text class="info-value">美式{{order.balance_used.americano}}杯 任意{{order.balance_used.any}}杯</text>
+        </view>
       </view>
     </view>
 
-    <!-- 取消订单按钮 -->
-    <view class="action-section" wx:if="{{order.status === 'pending'}}">
-      <button class="cancel-btn" bindtap="cancelOrder">取消订单</button>
+    <!-- 用户信息（管理员可见） -->
+    <view class="info-card" wx:if="{{isAdmin && order.user_nickname}}">
+      <view class="card-header">
+        <text class="card-title">用户信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">用户昵称</text>
+          <text class="info-value">{{order.user_nickname}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">用户 OpenID</text>
+          <text class="info-value openid">{{order.user_openid}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 门店信息 -->
+    <view class="info-card">
+      <view class="card-header">
+        <text class="card-title">门店信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">门店名称</text>
+          <text class="info-value">{{order.store_name}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">门店地址</text>
+          <text class="info-value">{{order.store_address}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间线（管理员可见） -->
+    <view class="timeline-card" wx:if="{{isAdmin}}">
+      <view class="card-header">
+        <text class="card-title">订单时间线</text>
+      </view>
+      <view class="timeline">
+        <view class="timeline-item">
+          <view class="timeline-dot"></view>
+          <view class="timeline-content">
+            <text class="timeline-text">订单创建</text>
+            <text class="timeline-time">{{order.formattedTime}}</text>
+          </view>
+        </view>
+        <view class="timeline-item" wx:if="{{order.paid_at}}">
+          <view class="timeline-dot active"></view>
+          <view class="timeline-content">
+            <text class="timeline-text">支付完成</text>
+            <text class="timeline-time">{{order.formattedPaidTime}}</text>
+          </view>
+        </view>
+        <view class="timeline-item" wx:if="{{order.completed_at}}">
+          <view class="timeline-dot active"></view>
+          <view class="timeline-content">
+            <text class="timeline-text">订单完成</text>
+            <text class="timeline-time">{{order.formattedCompletedTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 管理员操作按钮 -->
+    <view class="admin-actions" wx:if="{{isAdmin}}">
+      <view class="action-row">
+        <button class="action-btn pending-btn" wx:if="{{order.status === 'pending'}}" bindtap="updateOrderStatus" data-status="processing">开始制作</button>
+        <button class="action-btn processing-btn" wx:if="{{order.status === 'processing'}}" bindtap="updateOrderStatus" data-status="completed">完成订单</button>
+        <button class="action-btn cancel-btn" wx:if="{{order.status === 'pending' || order.status === 'processing'}}" bindtap="updateOrderStatus" data-status="cancelled">取消订单</button>
+      </view>
+    </view>
+
+    <!-- 用户取消按钮 -->
+    <view class="user-action" wx:if="{{!isAdmin && order.status === 'pending'}}">
+      <button class="cancel-order-btn" bindtap="cancelOrder">取消订单</button>
     </view>
   </block>
 </view>

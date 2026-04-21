@@ -4,10 +4,19 @@ const { coffeeApi } = require('../../utils/request');
 Page({
   data: {
     order: null,
-    loading: true
+    loading: true,
+    isAdmin: false,
+    statusOptions: [
+      { value: 'pending', text: '待处理' },
+      { value: 'processing', text: '制作中' },
+      { value: 'completed', text: '已完成' },
+      { value: 'cancelled', text: '已取消' }
+    ]
   },
 
   onLoad: function (options) {
+    // 判断是否从管理后台进入
+    this.setData({ isAdmin: options.from === 'admin' });
     if (options.id) {
       this.loadOrder(options.id);
     }
@@ -16,14 +25,56 @@ Page({
   loadOrder: async function (id) {
     try {
       const result = await coffeeApi.getOrderDetail({ id });
-      this.setData({
-        order: result.order,
-        loading: false
-      });
+      const order = result.order;
+      // 添加状态文本
+      order.statusText = this.getStatusText(order.status);
+      this.setData({ order, loading: false });
     } catch (error) {
       console.error('加载订单失败', error);
       this.setData({ loading: false });
     }
+  },
+
+  getStatusText: function (status) {
+    const map = {
+      'pending': '待处理',
+      'processing': '制作中',
+      'completed': '已完成',
+      'cancelled': '已取消'
+    };
+    return map[status] || status;
+  },
+
+  // 更新订单状态（管理员）
+  updateOrderStatus: async function (e) {
+    const { status } = e.currentTarget.dataset;
+    const statusText = this.getStatusText(status);
+
+    wx.showModal({
+      title: '确认操作',
+      content: `确定要将订单状态改为"${statusText}"吗？`,
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await coffeeApi.adminUpdateOrderStatus({ orderId: this.data.order._id, status });
+            wx.showToast({ title: '更新成功', icon: 'success' });
+            this.loadOrder(this.data.order._id);
+          } catch (error) {
+            wx.showToast({ title: error.message || '操作失败', icon: 'none' });
+          }
+        }
+      }
+    });
+  },
+
+  // 复制订单号
+  copyOrderNo: function () {
+    wx.setClipboardData({
+      data: this.data.order.order_no,
+      success: () => {
+        wx.showToast({ title: '已复制', icon: 'success' });
+      }
+    });
   },
 
   cancelOrder: async function () {

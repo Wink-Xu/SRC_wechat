@@ -142,6 +142,7 @@ const coffeeApi = {
   adminManageProduct: (data) => callFunction('coffee', 'adminManageProduct', data),
   adminGetOrders: (data) => callFunction('coffee', 'adminGetOrders', data, { showLoad: false }),
   adminUpdateOrderStatus: (data) => callFunction('coffee', 'adminUpdateOrderStatus', data),
+  exportOrders: (data) => callFunction('coffee', 'exportOrders', data),
   initCollections: (data) => callFunction('coffee', 'initCollections', data, { showErrorMsg: false })
 };
 

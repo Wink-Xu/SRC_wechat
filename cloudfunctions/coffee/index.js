@@ -43,6 +43,8 @@ exports.main = async (event, context) => {
       return handleAdminGetOrders(data, openid);
     case 'adminUpdateOrderStatus':
       return handleAdminUpdateOrderStatus(data, openid);
+    case 'exportOrders':
+      return handleExportOrders(data, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
@@ -692,7 +694,7 @@ async function handleAdminManageProduct(data, openid) {
 
 // 管理员获取所有订单
 async function handleAdminGetOrders(data, openid) {
-  const { page = 1, limit = 20, status } = data;
+  const { page = 1, limit = 20, status, keyword, startDate, endDate } = data;
 
   try {
     // 检查管理员权限
@@ -702,11 +704,31 @@ async function handleAdminGetOrders(data, openid) {
       return { code: -1, message: '无权限' };
     }
 
+    // 构建查询条件
     let query = db.collection('coffee_orders');
+    const conditions = {};
 
+    // 状态筛选
     if (status && status !== 'all') {
-      query = query.where({ status });
+      conditions.status = status;
     }
+
+    // 日期范围筛选
+    if (startDate || endDate) {
+      conditions.created_at = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.created_at['$gte'] = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.created_at['$lte'] = end;
+      }
+    }
+
+    query = query.where(conditions);
 
     const countResult = await query.count();
     const total = countResult.total;
@@ -728,15 +750,31 @@ async function handleAdminGetOrders(data, openid) {
       usersMap[u._id] = u;
     });
 
-    const list = listResult.data.map(order => ({
-      ...order,
-      formattedTime: formatDate(order.created_at),
-      user_nickname: usersMap[order.user_id]?.nickname || '未知用户'
-    }));
+    // 格式化订单列表
+    const list = listResult.data.map(order => {
+      const user = usersMap[order.user_id];
+      return {
+        ...order,
+        formattedTime: formatDate(order.created_at),
+        user_nickname: user?.nickname || '未知用户',
+        user_openid: user?.openid || '',
+        itemsText: order.items.map(item => `${item.product_name} x${item.quantity}`).join('、')
+      };
+    });
+
+    // 关键词搜索（订单号或用户昵称）
+    let filteredList = list;
+    if (keyword) {
+      filteredList = list.filter(order => {
+        return order.order_no.includes(keyword) ||
+               order.user_nickname.includes(keyword) ||
+               order.user_openid.includes(keyword);
+      });
+    }
 
     return {
       code: 0,
-      data: { list, total, page, limit }
+      data: { list: filteredList, total: filteredList.length, page, limit }
     };
   } catch (error) {
     console.error('管理员获取订单失败', error);
@@ -769,6 +807,103 @@ async function handleAdminUpdateOrderStatus(data, openid) {
   } catch (error) {
     console.error('更新订单状态失败', error);
     return { code: -1, message: '更新失败' };
+  }
+}
+
+// 导出订单数据
+async function handleExportOrders(data, openid) {
+  const { status, startDate, endDate } = data;
+
+  try {
+    // 检查管理员权限
+    const userResult = await db.collection('users').where({ openid }).get();
+    const user = userResult.data[0];
+    if (user.role !== 'admin' && user.role !== 'leader') {
+      return { code: -1, message: '无权限' };
+    }
+
+    // 构建查询条件
+    let query = db.collection('coffee_orders');
+    const conditions = {};
+
+    if (status && status !== 'all') {
+      conditions.status = status;
+    }
+
+    if (startDate || endDate) {
+      conditions.created_at = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        conditions.created_at['$gte'] = start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        conditions.created_at['$lte'] = end;
+      }
+    }
+
+    query = query.where(conditions);
+
+    const result = await query.orderBy('created_at', 'desc').get();
+
+    // 获取用户信息
+    const userIds = [...new Set(result.data.map(o => o.user_id))];
+    const usersResult = await db.collection('users').where({
+      _id: _.in(userIds)
+    }).get();
+    const usersMap = {};
+    usersResult.data.forEach(u => {
+      usersMap[u._id] = u;
+    });
+
+    // 格式化导出数据
+    const exportData = result.data.map(order => {
+      const user = usersMap[order.user_id];
+      return {
+        订单号：order.order_no,
+        用户昵称：user?.nickname || '未知用户',
+        用户 OpenID: user?.openid || '',
+        下单时间：formatDate(order.created_at),
+        商品明细：order.items.map(item => `${item.product_name} x${item.quantity}`).join('; '),
+        总金额：`￥${(order.total_amount / 100).toFixed(2)}`,
+        支付方式：order.payment_type === 'cash' ? '微信支付' : order.payment_type === 'points' ? '积分支付' : order.payment_type === 'balance' ? '余额支付' : '未支付',
+        订单状态：order.status === 'pending' ? '待处理' : order.status === 'processing' ? '制作中' : order.status === 'completed' ? '已完成' : '已取消',
+        积分使用：order.points_used || 0,
+        美式余额使用：order.balance_used?.americano || 0,
+        任意余额使用：order.balance_used?.any || 0
+      };
+    });
+
+    // 生成 CSV 格式（小程序端可以转换为 Excel）
+    const headers = Object.keys(exportData[0] || {});
+    const csvContent = [
+      headers.join(','),
+      ...exportData.map(row =>
+        headers.map(header => {
+          const value = String(row[header] || '');
+          // 处理包含逗号或换行的字段
+          if (value.includes(',') || value.includes('\n')) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    return {
+      code: 0,
+      data: {
+        orders: exportData,
+        csvContent,
+        count: exportData.length
+      },
+      message: `导出成功，共 ${exportData.length} 条订单`
+    };
+  } catch (error) {
+    console.error('导出订单失败', error);
+    return { code: -1, message: '导出失败：' + error.message };
   }
 }
 
