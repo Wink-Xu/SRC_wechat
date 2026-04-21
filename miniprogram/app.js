@@ -74,7 +74,8 @@ App({
       this.globalData.userInfo = userInfo;
       this.globalData.isLoggedIn = true;
       this.globalData.isMember = userInfo.status === 'approved';
-      this.globalData.isAdmin = userInfo.role === 'admin' || userInfo.role === 'leader';
+      // 支持所有管理员类型
+      this.globalData.isAdmin = userInfo.role === 'activity_admin' || userInfo.role === 'coffee_admin' || userInfo.role === 'leader';
       this.globalData.isLeader = userInfo.role === 'leader';
     }
   },
@@ -85,7 +86,8 @@ App({
     this.globalData.isLoggedIn = !!userInfo;
     // 只有 status === 'approved' 才是团员
     this.globalData.isMember = userInfo && userInfo.status === 'approved';
-    this.globalData.isAdmin = userInfo && (userInfo.role === 'admin' || userInfo.role === 'leader');
+    // 支持所有管理员类型
+    this.globalData.isAdmin = userInfo && (userInfo.role === 'activity_admin' || userInfo.role === 'coffee_admin' || userInfo.role === 'leader');
     this.globalData.isLeader = userInfo && userInfo.role === 'leader';
     // status === 'guest' 是游客
     this.globalData.isGuest = userInfo && userInfo.status === 'guest';

@@ -20,6 +20,12 @@
   letter-spacing: 0.5rpx;
 }
 
+.header-role {
+  font-size: 28rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+
 /* 数据统计 */
 .stats-grid {
   display: grid;

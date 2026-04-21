@@ -34,7 +34,8 @@
           <view class="member-header">
             <text class="member-name">{{item.nickname}}</text>
             <text class="role-tag" wx:if="{{item.role === 'leader'}}">团长</text>
-            <text class="role-tag admin" wx:elif="{{item.role === 'admin'}}">管理员</text>
+            <text class="role-tag admin" wx:elif="{{item.role === 'activity_admin'}}">活动管理员</text>
+            <text class="role-tag admin" wx:elif="{{item.role === 'coffee_admin'}}">咖啡管理员</text>
           </view>
           <text class="member-phone">{{item.formattedPhone}}</text>
           <text class="member-time">申请时间: {{item.formattedTime}}</text>
@@ -53,9 +54,9 @@
           class="btn btn-secondary btn-small"
           data-id="{{item._id}}"
           data-role="{{item.role}}"
-          bindtap="handleSetAdmin"
+          bindtap="handleSetRole"
         >
-          {{item.role === 'admin' ? '取消管理员' : '设为管理员'}}
+          设置角色
         </button>
         <button
           class="btn btn-danger btn-small"

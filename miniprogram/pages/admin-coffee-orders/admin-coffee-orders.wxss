@@ -61,10 +61,10 @@ page {
 /* 状态筛选 Tab */
 .status-tabs {
   display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
   background: #FFFFFF;
   padding: 16rpx 20rpx;
-  gap: 16rpx;
-  margin-top: 1rpx;
 }
 
 .tab-item {
@@ -73,8 +73,7 @@ page {
   color: #666666;
   background: #F5F5F5;
   border-radius: 20rpx;
-  white-space: nowrap;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .tab-item.active {

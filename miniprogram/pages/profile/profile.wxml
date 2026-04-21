@@ -12,7 +12,8 @@
         <text class="openid-text" wx:if="{{openid}}">OpenID: {{openid}}</text>
         <view class="role-tags" wx:if="{{isLoggedIn}}">
           <text class="role-tag" wx:if="{{isLeader}}">团长</text>
-          <text class="role-tag" wx:elif="{{isAdmin}}">管理员</text>
+          <text class="role-tag" wx:elif="{{userInfo.role === 'activity_admin'}}">活动管理员</text>
+          <text class="role-tag" wx:elif="{{userInfo.role === 'coffee_admin'}}">咖啡管理员</text>
           <text class="role-tag member" wx:elif="{{userInfo.status === 'approved'}}">团员</text>
           <text class="role-tag pending" wx:elif="{{userInfo.status === 'pending'}}">待审批</text>
           <text class="role-tag guest" wx:else>游客</text>
@@ -47,7 +48,7 @@
         <text class="menu-grid-title">周边订单</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders">
-        <view class="menu-grid-icon iconfont icon-order"></view>
+        <image class="menu-grid-icon" src="/images/icon-test.png"></image>
         <text class="menu-grid-title">咖啡订单</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank">
@@ -73,31 +74,40 @@
   <view class="admin-section" wx:if="{{isAdmin || isLeader}}">
     <view class="section-title">管理功能</view>
     <view class="menu-grid">
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-members/admin-members">
+      <!-- 仅团长可见成员管理 -->
+      <view class="menu-grid-item" wx:if="{{isLeader}}" bindtap="goToPage" data-path="/pages/admin-members/admin-members">
         <view class="menu-grid-icon iconfont icon-user"></view>
         <text class="menu-grid-title">成员管理</text>
         <view class="red-dot" wx:if="{{pendingMembersCount > 0}}"></view>
       </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-activities/admin-activities">
-        <view class="menu-grid-icon iconfont icon-activity"></view>
-        <text class="menu-grid-title">活动管理</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-products/admin-products">
-        <view class="menu-grid-icon iconfont icon-product"></view>
-        <text class="menu-grid-title">周边管理</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-orders/admin-orders">
-        <view class="menu-grid-icon iconfont icon-order"></view>
-        <text class="menu-grid-title">周边订单</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee/admin-coffee">
-        <view class="menu-grid-icon iconfont icon-product"></view>
-        <text class="menu-grid-title">咖啡管理</text>
-      </view>
-      <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee-orders/admin-coffee-orders">
-        <view class="menu-grid-icon iconfont icon-order"></view>
-        <text class="menu-grid-title">咖啡订单</text>
-      </view>
+
+      <!-- 活动管理员和团长可见 -->
+      <block wx:if="{{isLeader || isActivityAdmin}}">
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-activities/admin-activities">
+          <view class="menu-grid-icon iconfont icon-activity"></view>
+          <text class="menu-grid-title">活动管理</text>
+        </view>
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-products/admin-products">
+          <view class="menu-grid-icon iconfont icon-product"></view>
+          <text class="menu-grid-title">周边管理</text>
+        </view>
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-orders/admin-orders">
+          <view class="menu-grid-icon iconfont icon-order"></view>
+          <text class="menu-grid-title">周边订单</text>
+        </view>
+      </block>
+
+      <!-- 咖啡管理员和团长可见 -->
+      <block wx:if="{{isLeader || isCoffeeAdmin}}">
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee/admin-coffee">
+          <image class="menu-grid-icon" src="/images/kafei-3.png"></image>
+          <text class="menu-grid-title">咖啡管理</text>
+        </view>
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee-orders/admin-coffee-orders">
+          <image class="menu-grid-icon" src="/images/icon-test.png"></image>
+          <text class="menu-grid-title">咖啡订单</text>
+        </view>
+      </block>
     </view>
   </view>
 

@@ -2,11 +2,13 @@
 
 // 用户角色
 const ROLES = {
-  GUEST: 'guest',     // 游客（已登录但未申请入团）
-  PENDING: 'pending', // 待审批
-  MEMBER: 'member',   // 团员
-  ADMIN: 'admin',     // 管理员
-  LEADER: 'leader'    // 团长
+  GUEST: 'guest',           // 游客（已登录但未申请入团）
+  PENDING: 'pending',       // 待审批
+  MEMBER: 'member',         // 团员
+  ADMIN: 'admin',           // 管理员（兼容旧版）
+  ACTIVITY_ADMIN: 'activity_admin',  // 活动管理员
+  COFFEE_ADMIN: 'coffee_admin',      // 咖啡管理员
+  LEADER: 'leader'          // 团长
 };
 
 // 用户状态

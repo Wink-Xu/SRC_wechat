@@ -172,24 +172,41 @@ Page({
     }
   },
 
-  // 设置管理员
-  handleSetAdmin: async function (e) {
+  // 设置角色（团长专用）
+  handleSetRole: async function (e) {
     if (!this.data.isLeader) return;
 
     const { id, role } = e.currentTarget.dataset;
-    const newRole = role === 'admin' ? 'member' : 'admin';
-    const actionText = newRole === 'admin' ? '设为管理员' : '取消管理员';
 
-    const confirm = await showConfirm(actionText, `确定要${actionText}吗？`);
-    if (!confirm) return;
+    // 创建角色选择菜单
+    const roles = [
+      { value: 'member', label: '团员' },
+      { value: 'activity_admin', label: '活动管理员' },
+      { value: 'coffee_admin', label: '咖啡管理员' }
+    ];
 
-    try {
-      await userApi.setRole({ userId: id, role: newRole });
-      showSuccess('操作成功');
-      this.refreshMembers();
-    } catch (error) {
-      console.error('设置失败', error);
-    }
+    const currentRoleIndex = roles.findIndex(r => r.value === role);
+    const items = roles.map(r => r.label);
+
+    wx.showActionSheet({
+      itemList: items,
+      success: async (res) => {
+        const selectedRole = roles[res.tapIndex].value;
+        const selectedLabel = roles[res.tapIndex].label;
+
+        const confirm = await showConfirm('设置角色', `确定要将该用户设置为"${selectedLabel}"吗？`);
+        if (!confirm) return;
+
+        try {
+          await userApi.setRole({ userId: id, role: selectedRole });
+          showSuccess('设置成功');
+          this.refreshMembers();
+        } catch (error) {
+          console.error('设置角色失败', error);
+          wx.showToast({ title: error.message || '设置失败', icon: 'none' });
+        }
+      }
+    });
   },
 
   // 踢出团队
@@ -212,7 +229,8 @@ Page({
   getRoleText: function (role) {
     const roleMap = {
       member: '团员',
-      admin: '管理员',
+      activity_admin: '活动管理员',
+      coffee_admin: '咖啡管理员',
       leader: '团长'
     };
     return roleMap[role] || role;

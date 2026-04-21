@@ -46,10 +46,7 @@
       <view class="info-list">
         <view class="info-item">
           <text class="info-label">订单编号</text>
-          <view class="info-value-row">
-            <text class="info-value">{{order.order_no}}</text>
-            <text class="copy-btn" bindtap="copyOrderNo">复制</text>
-          </view>
+          <text class="info-value">{{order.order_no}}</text>
         </view>
         <view class="info-item">
           <text class="info-label">下单时间</text>
@@ -87,19 +84,15 @@
       </view>
     </view>
 
-    <!-- 门店信息 -->
-    <view class="info-card">
+    <!-- 备注信息（管理员可见） -->
+    <view class="info-card" wx:if="{{isAdmin && order.remark}}">
       <view class="card-header">
-        <text class="card-title">门店信息</text>
+        <text class="card-title">备注信息</text>
       </view>
       <view class="info-list">
         <view class="info-item">
-          <text class="info-label">门店名称</text>
-          <text class="info-value">{{order.store_name}}</text>
-        </view>
-        <view class="info-item">
-          <text class="info-label">门店地址</text>
-          <text class="info-value">{{order.store_address}}</text>
+          <text class="info-label">用户备注</text>
+          <text class="info-value">{{order.remark}}</text>
         </view>
       </view>
     </view>

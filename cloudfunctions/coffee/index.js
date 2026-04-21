@@ -184,8 +184,10 @@ async function handleCreateOrder(data, openid) {
         temperature: item.temperature,
         price: item.price,
         quantity: item.quantity,
-        category: item.category || ''
+        category: item.category || '',
+        remark: item.remark || ''
       })),
+      remark: items[0]?.remark || '',  // 保存第一个订单项的备注
       total_amount: totalAmount,
       total_quantity: totalQuantity,
       payment_type: '',
@@ -497,22 +499,44 @@ async function handleGetOrders(data, openid) {
 
 // 获取订单详情
 async function handleGetOrderDetail(data, openid) {
-  const { id } = data;
+  const { id, from } = data;
 
   try {
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+    const user = userResult.data[0];
     const userId = userResult.data[0]._id;
+    const role = user.role;
+
+    // 检查是否是管理员（团长或咖啡管理员）
+    const isAdmin = role === 'coffee_admin' || role === 'leader';
 
     const orderResult = await db.collection('coffee_orders').doc(id).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
-    if (order.user_id !== userId) {
+    // 非管理员只能查看自己的订单
+    if (!isAdmin && order.user_id !== userId) {
       return { code: -1, message: '订单不存在' };
     }
 
     // 格式化时间
     order.formattedTime = formatDate(order.created_at);
     order.formattedPaidTime = order.paid_at ? formatDate(order.paid_at) : '';
+    order.formattedCompletedTime = order.completed_at ? formatDate(order.completed_at) : '';
+
+    // 获取用户信息（管理员需要）
+    if (isAdmin) {
+      const userInfo = await db.collection('users').doc(order.user_id).get();
+      if (userInfo.data) {
+        order.user_nickname = userInfo.data.nickname || '';
+        order.user_openid = userInfo.data.openid || '';
+      }
+    }
 
     return {
       code: 0,
@@ -562,13 +586,13 @@ async function handleCancelOrder(data, openid) {
 // 初始化数据库集合
 async function handleInitCollections(data, openid) {
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     if (userResult.data.length === 0) {
       return { code: -1, message: '用户不存在' };
     }
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 
@@ -608,13 +632,13 @@ async function handleAdminGetProducts(data, openid) {
   const { page = 1, limit = 20 } = data;
 
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     if (userResult.data.length === 0) {
       return { code: -1, message: '用户不存在' };
     }
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 
@@ -645,13 +669,13 @@ async function handleAdminManageProduct(data, openid) {
   console.log('handleAdminManageProduct called:', { productAction, id, productData });
 
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     if (userResult.data.length === 0) {
       return { code: -1, message: '用户不存在' };
     }
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 
@@ -697,10 +721,10 @@ async function handleAdminGetOrders(data, openid) {
   const { page = 1, limit = 20, status, keyword, startDate, endDate } = data;
 
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 
@@ -753,12 +777,19 @@ async function handleAdminGetOrders(data, openid) {
     // 格式化订单列表
     const list = listResult.data.map(order => {
       const user = usersMap[order.user_id];
+      // 合并订单项的备注
+      let itemsText = order.items.map(item => `${item.product_name} x${item.quantity}`).join('、');
+      const remarks = order.items.filter(item => item.remark).map(item => item.remark).filter(Boolean);
+      if (remarks.length > 0) {
+        itemsText += ' [备注：' + remarks.join('; ') + ']';
+      }
       return {
         ...order,
         formattedTime: formatDate(order.created_at),
         user_nickname: user?.nickname || '未知用户',
         user_openid: user?.openid || '',
-        itemsText: order.items.map(item => `${item.product_name} x${item.quantity}`).join('、')
+        itemsText: itemsText,
+        remark: order.remark || ''
       };
     });
 
@@ -787,10 +818,10 @@ async function handleAdminUpdateOrderStatus(data, openid) {
   const { orderId, status } = data;
 
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 
@@ -815,10 +846,10 @@ async function handleExportOrders(data, openid) {
   const { status, startDate, endDate } = data;
 
   try {
-    // 检查管理员权限
+    // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
     const user = userResult.data[0];
-    if (user.role !== 'admin' && user.role !== 'leader') {
+    if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
     }
 

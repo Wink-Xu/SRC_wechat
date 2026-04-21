@@ -285,6 +285,12 @@ async function handleSetRole(data, wxContext, openid) {
       return { code: -1, message: '只有团长可以设置管理员' };
     }
 
+    // 验证角色值
+    const validRoles = ['member', 'leader', 'activity_admin', 'coffee_admin'];
+    if (!validRoles.includes(role)) {
+      return { code: -1, message: '无效的角色' };
+    }
+
     // 更新用户角色
     await db.collection('users').doc(userId).update({
       data: {

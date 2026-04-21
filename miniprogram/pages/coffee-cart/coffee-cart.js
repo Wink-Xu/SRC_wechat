@@ -95,14 +95,15 @@ Page({
     this.setData({ loading: true });
 
     try {
-      // 创建订单
+      // 创建订单（包含备注信息）
       const orderItems = cart.map(item => ({
         product_id: item.product_id,
         product_name: item.product_name,
         temperature: item.temperature,
         price: item.price,
         quantity: item.quantity,
-        category: item.category
+        category: item.category,
+        remark: item.remark || ''
       }));
 
       const orderResult = await coffeeApi.createOrder({ items: orderItems });

@@ -46,24 +46,22 @@ page {
 
 /* 分类筛选 */
 .category-tabs {
-  white-space: nowrap;
-  background: #FFFFFF;
-  padding: 0 32rpx;
-  margin-bottom: 16rpx;
   display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  background: #FFFFFF;
+  padding: 16rpx 32rpx;
+  margin-bottom: 16rpx;
   align-items: center;
-  height: 88rpx;
 }
 
 .tab-item {
-  display: inline-block;
   padding: 16rpx 24rpx;
   font-size: 28rpx;
   color: #666666;
   background: transparent;
-  margin-right: 16rpx;
   border-radius: 8rpx;
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .tab-item.active {

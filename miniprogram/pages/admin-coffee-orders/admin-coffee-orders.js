@@ -152,14 +152,57 @@ Page({
       content: '确定要导出当前筛选条件下的订单数据吗？',
       success: async (res) => {
         if (res.confirm) {
+          wx.showLoading({ title: '生成文件中...' });
           try {
-            await coffeeApi.exportOrders({
+            const result = await coffeeApi.exportOrders({
               status: this.data.statusFilter,
               startDate: this.data.startDate,
               endDate: this.data.endDate
             });
-            wx.showToast({ title: '导出成功', icon: 'success' });
+
+            wx.hideLoading();
+
+            if (result.csvContent && result.count > 0) {
+              // 创建 CSV 文件
+              const fileName = `咖啡订单_${new Date().getTime()}.csv`;
+              const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+
+              // 写入文件
+              const fs = wx.getFileSystemManager();
+              fs.writeFile({
+                filePath: filePath,
+                data: result.csvContent,
+                encoding: 'utf-8-sig',
+                success: () => {
+                  // 让用户选择分享方式
+                  wx.shareFileMessage({
+                    filePath: filePath,
+                    fileName: fileName,
+                    success: () => {
+                      wx.showToast({ title: `已导出 ${result.count} 条订单`, icon: 'success' });
+                    },
+                    fail: () => {
+                      // 如果分享失败，用打开方式
+                      wx.openDocument({
+                        filePath: filePath,
+                        showMenu: true,
+                        success: () => {
+                          wx.showToast({ title: `已导出 ${result.count} 条订单`, icon: 'success' });
+                        }
+                      });
+                    }
+                  });
+                },
+                fail: (err) => {
+                  console.error('写入文件失败', err);
+                  wx.showToast({ title: '保存文件失败', icon: 'none' });
+                }
+              });
+            } else {
+              wx.showToast({ title: '没有可导出的订单', icon: 'none' });
+            }
           } catch (error) {
+            wx.hideLoading();
             wx.showToast({ title: error.message || '导出失败', icon: 'none' });
           }
         }

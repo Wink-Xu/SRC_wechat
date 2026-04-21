@@ -9,6 +9,8 @@ Page({
     isLoggedIn: false,
     isAdmin: false,
     isLeader: false,
+    isActivityAdmin: false,   // 活动管理员
+    isCoffeeAdmin: false,     // 咖啡管理员
     isMember: false,    // 是否是团员（已批准）
     isPending: false,   // 是否待审批
     openid: '',         // 临时显示 openid
@@ -53,11 +55,15 @@ Page({
       userInfo = { ...userInfo, displayAvatar: userInfo.avatar };
     }
 
+    const role = userInfo?.role || '';
+
     this.setData({
       isLoggedIn,
       userInfo,
       isAdmin: app.globalData.isAdmin,
       isLeader: app.globalData.isLeader,
+      isActivityAdmin: role === 'activity_admin' || role === 'leader',
+      isCoffeeAdmin: role === 'coffee_admin' || role === 'leader',
       isMember: app.globalData.isMember,
       isPending: userInfo && userInfo.status === 'pending',
       openid: userInfo?.openid || '' // 显示 openid
@@ -88,8 +94,8 @@ Page({
       }
     }
 
-    // 获取待审核成员数量（仅管理员/团长）
-    if (isLoggedIn && (app.globalData.isAdmin || app.globalData.isLeader)) {
+    // 获取待审核成员数量（仅活动管理员/团长）
+    if (isLoggedIn && (app.globalData.isLeader || app.globalData.userInfo?.role === 'activity_admin')) {
       try {
         const pendingResult = await adminApi.getPendingMembers({});
         this.setData({

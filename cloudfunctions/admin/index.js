@@ -40,13 +40,31 @@ async function handleGetStatistics(data, wxContext) {
   const openid = wxContext.OPENID;
 
   try {
-    // 检查权限
-    const adminResult = await db.collection('users').where({
-      openid,
-      role: _.in(['admin', 'leader'])
-    }).get();
+    // 检查用户角色
+    const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+    const user = userResult.data[0];
+    const role = user.role;
 
-    if (adminResult.data.length === 0) {
+    // 咖啡管理员只能看咖啡数据
+    if (role === 'coffee_admin') {
+      // 获取咖啡订单数量
+      const coffeeOrderCount = await db.collection('coffee_orders').count();
+      return {
+        code: 0,
+        data: {
+          memberCount: 0,
+          pendingCount: 0,
+          activityCount: 0,
+          orderCount: coffeeOrderCount.total
+        }
+      };
+    }
+
+    // 活动管理员和团长可以看全部数据
+    if (!['activity_admin', 'leader'].includes(role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -63,7 +81,7 @@ async function handleGetStatistics(data, wxContext) {
     // 获取活动数量
     const activityCount = await db.collection('activities').count();
 
-    // 获取订单数量
+    // 获取周边订单数量
     const orderCount = await db.collection('orders').count();
 
     return {
@@ -86,10 +104,10 @@ async function handleGetPendingMembers(data, wxContext) {
   const openid = wxContext.OPENID;
 
   try {
-    // 检查权限
+    // 检查权限（团长或活动管理员）
     const adminResult = await db.collection('users').where({
       openid,
-      role: _.in(['admin', 'leader'])
+      role: _.in(['activity_admin', 'leader'])
     }).get();
 
     if (adminResult.data.length === 0) {
@@ -121,10 +139,10 @@ async function handleManageProduct(event, wxContext) {
   const productData = event.data?.data || event.data;
 
   try {
-    // 检查权限
+    // 检查权限（团长或活动管理员）
     const adminResult = await db.collection('users').where({
       openid,
-      role: _.in(['admin', 'leader'])
+      role: _.in(['activity_admin', 'leader'])
     }).get();
 
     if (adminResult.data.length === 0) {
@@ -170,10 +188,10 @@ async function handleUpdateOrderStatus(data, wxContext) {
   const { orderId, status } = data;
 
   try {
-    // 检查权限
+    // 检查权限（团长或活动管理员）
     const adminResult = await db.collection('users').where({
       openid,
-      role: _.in(['admin', 'leader'])
+      role: _.in(['activity_admin', 'leader'])
     }).get();
 
     if (adminResult.data.length === 0) {
@@ -206,10 +224,10 @@ async function handleGetOrders(data, wxContext) {
   const { page = 1, limit = 10, status } = data;
 
   try {
-    // 检查权限
+    // 检查权限（团长或活动管理员）
     const adminResult = await db.collection('users').where({
       openid,
-      role: _.in(['admin', 'leader'])
+      role: _.in(['activity_admin', 'leader'])
     }).get();
 
     if (adminResult.data.length === 0) {

@@ -16,21 +16,23 @@ Page({
 
   onLoad: function (options) {
     // 判断是否从管理后台进入
-    this.setData({ isAdmin: options.from === 'admin' });
+    const isAdmin = options.from === 'admin';
+    this.setData({ isAdmin });
     if (options.id) {
-      this.loadOrder(options.id);
+      this.loadOrder(options.id, isAdmin);
     }
   },
 
-  loadOrder: async function (id) {
+  loadOrder: async function (id, isAdmin) {
     try {
-      const result = await coffeeApi.getOrderDetail({ id });
+      const result = await coffeeApi.getOrderDetail({ id, from: isAdmin ? 'admin' : '' });
       const order = result.order;
       // 添加状态文本
       order.statusText = this.getStatusText(order.status);
       this.setData({ order, loading: false });
     } catch (error) {
       console.error('加载订单失败', error);
+      wx.showToast({ title: error.message || '加载失败', icon: 'none' });
       this.setData({ loading: false });
     }
   },

@@ -76,7 +76,7 @@ async function handleCreate(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -112,7 +112,7 @@ async function handleUpdate(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -138,7 +138,7 @@ async function handleUpdatePhotos(data, wxContext, testOpenid) {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
     // 只有管理员或团长可以上传照片
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -187,7 +187,7 @@ async function handleUpdateCoverImage(data, wxContext, testOpenid) {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
     // 只有管理员或团长可以更新封面
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -216,7 +216,7 @@ async function handlePublish(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -241,7 +241,7 @@ async function handleCancel(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -266,7 +266,7 @@ async function handleDelete(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -622,7 +622,7 @@ async function handleCheckIn(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -672,7 +672,7 @@ async function handleGetCheckInQrCode(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -825,7 +825,7 @@ async function handleFinishActivityWithCheckIn(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -918,7 +918,7 @@ async function handleRestartActivity(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 
@@ -1006,7 +1006,7 @@ async function handleUploadPhotos(data, wxContext, testOpenid) {
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
 
-    if (!user || !['admin', 'leader'].includes(user.role)) {
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
     }
 

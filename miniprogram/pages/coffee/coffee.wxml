@@ -103,8 +103,8 @@
         </view>
       </view>
 
-      <!-- 备注输入 -->
-      <view class="spec-section">
+      <!-- 备注输入（仅非套餐商品显示） -->
+      <view class="spec-section" wx:if="{{!selectedProduct.is_recharge}}">
         <text class="spec-section-title">备注（可选）</text>
         <textarea class="spec-remark" placeholder="例如：少糖、去冰、加浓等" maxlength="100" value="{{remark}}" bindinput="onRemarkInput"></textarea>
       </view>

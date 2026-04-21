@@ -30,12 +30,33 @@ const isGuest = () => {
 };
 
 /**
- * 检查是否是管理员
+ * 检查是否是管理员（包含所有管理员类型）
  * @returns {boolean}
  */
 const isAdmin = () => {
   const app = getApp();
-  return app.globalData.isAdmin;
+  const role = app.globalData.userInfo?.role;
+  return role === 'activity_admin' || role === 'coffee_admin' || role === 'leader';
+};
+
+/**
+ * 检查是否是活动管理员
+ * @returns {boolean}
+ */
+const isActivityAdmin = () => {
+  const app = getApp();
+  const role = app.globalData.userInfo?.role;
+  return role === 'activity_admin' || role === 'leader';
+};
+
+/**
+ * 检查是否是咖啡管理员
+ * @returns {boolean}
+ */
+const isCoffeeAdmin = () => {
+  const app = getApp();
+  const role = app.globalData.userInfo?.role;
+  return role === 'coffee_admin' || role === 'leader';
 };
 
 /**
@@ -128,18 +149,41 @@ const requireMember = () => {
 /**
  * 要求管理员身份
  * 如果不是管理员则提示
+ * @param {string} type 管理员类型 'activity' | 'coffee' | 'any'，默认 'any'
  * @returns {boolean} 是否是管理员
  */
-const requireAdmin = () => {
+const requireAdmin = (type = 'any') => {
   if (!requireLogin()) return false;
 
-  if (!isAdmin()) {
-    wx.showToast({
-      title: '您没有权限执行此操作',
-      icon: 'none'
-    });
-    return false;
+  const role = getUserRole();
+
+  if (type === 'activity') {
+    if (!['activity_admin', 'leader'].includes(role)) {
+      wx.showToast({
+        title: '您没有权限执行此操作',
+        icon: 'none'
+      });
+      return false;
+    }
+  } else if (type === 'coffee') {
+    if (!['coffee_admin', 'leader'].includes(role)) {
+      wx.showToast({
+        title: '您没有权限执行此操作',
+        icon: 'none'
+      });
+      return false;
+    }
+  } else {
+    // 任意管理员类型
+    if (!['activity_admin', 'coffee_admin', 'leader'].includes(role)) {
+      wx.showToast({
+        title: '您没有权限执行此操作',
+        icon: 'none'
+      });
+      return false;
+    }
   }
+
   return true;
 };
 
@@ -166,6 +210,8 @@ module.exports = {
   isMember,
   isGuest,
   isAdmin,
+  isActivityAdmin,
+  isCoffeeAdmin,
   isLeader,
   getUserInfo,
   getUserRole,

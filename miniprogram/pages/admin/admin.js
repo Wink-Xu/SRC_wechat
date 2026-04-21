@@ -10,7 +10,8 @@ Page({
       activityCount: 0,
       orderCount: 0
     },
-    loading: true
+    loading: true,
+    userRole: ''
   },
 
   onLoad: function () {
@@ -18,11 +19,20 @@ Page({
       setTimeout(() => wx.switchTab({ url: '/pages/index/index' }), 1500);
       return;
     }
+    this.loadUserInfo();
     this.loadStatistics();
   },
 
   onShow: function () {
     this.loadStatistics();
+  },
+
+  // 加载用户信息
+  loadUserInfo: function () {
+    const user = wx.getStorageSync('userInfo');
+    if (user && user.role) {
+      this.setData({ userRole: user.role });
+    }
   },
 
   // 加载统计数据

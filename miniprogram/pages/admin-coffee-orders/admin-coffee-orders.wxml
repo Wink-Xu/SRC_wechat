@@ -13,13 +13,13 @@
   </view>
 
   <!-- 状态筛选 Tab -->
-  <scroll-view class="status-tabs" scroll-x enhanced show-scrollbar="false">
+  <view class="status-tabs">
     <view class="tab-item {{statusFilter === 'all' ? 'active' : ''}}" bindtap="onFilterChange" data-status="all">全部</view>
     <view class="tab-item {{statusFilter === 'pending' ? 'active' : ''}}" bindtap="onFilterChange" data-status="pending">待处理</view>
     <view class="tab-item {{statusFilter === 'processing' ? 'active' : ''}}" bindtap="onFilterChange" data-status="processing">制作中</view>
     <view class="tab-item {{statusFilter === 'completed' ? 'active' : ''}}" bindtap="onFilterChange" data-status="completed">已完成</view>
     <view class="tab-item {{statusFilter === 'cancelled' ? 'active' : ''}}" bindtap="onFilterChange" data-status="cancelled">已取消</view>
-  </scroll-view>
+  </view>
 
   <!-- 日期筛选 -->
   <view class="date-filter" wx:if="{{showDateFilter}}">
