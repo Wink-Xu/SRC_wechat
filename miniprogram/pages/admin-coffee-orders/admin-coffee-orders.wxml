@@ -92,7 +92,7 @@
       </view>
 
       <!-- 订单状态操作按钮 -->
-      <view class="order-operation" wx:if="{{item.status === 'pending'}}">
+      <view class="order-operation" wx:if="{{item.status === 'pending' || item.status === 'paid'}}">
         <button class="op-btn processing-btn" data-id="{{item._id}}" data-status="processing" bindtap="updateStatus">开始制作</button>
       </view>
       <view class="order-operation" wx:if="{{item.status === 'processing'}}">
