@@ -30,7 +30,7 @@ Page({
     this.setData({ hasSubscribed });
   },
 
-  // 请求订阅消息
+  // 请求订阅消息 - 第一步：获取模板 ID
   requestSubscribe: async function () {
     const that = this;
 
@@ -45,9 +45,9 @@ Page({
         }
       });
 
-      console.log('云函数返回:', result);
-
       wx.hideLoading();
+
+      console.log('云函数返回:', result);
 
       if (!result.result || result.result.code !== 0) {
         console.error('云函数调用失败:', result.result);
@@ -58,33 +58,37 @@ Page({
       const TEMPLATE_ID = result.result.data.templateId;
       console.log('获取到模板 ID:', TEMPLATE_ID);
 
-      wx.requestSubscribeMessage({
-        tmplIds: [TEMPLATE_ID],
-        success: function (res) {
-          console.log('订阅结果:', res);
-          if (res[TEMPLATE_ID] === 'accept') {
-            wx.setStorageSync('coffee_order_subscribed', true);
-            that.setData({ hasSubscribed: true });
-            wx.showToast({ title: '订阅成功', icon: 'success' });
-          } else if (res[TEMPLATE_ID] === 'reject') {
-            wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
-          }
-        },
-        fail: function (err) {
-          console.error('订阅失败', err);
-          // 检查是否是模板 ID 格式问题
-          if (err.errCode === 1003010 || (err.errMsg && err.errMsg.indexOf('invalid template id') !== -1)) {
-            wx.showToast({ title: '模板 ID 无效，请检查配置', icon: 'none' });
-          } else {
-            wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
-          }
-        }
-      });
+      // 第二步：立即调用订阅消息（在用户点击的同步上下文中）
+      that.subscribeMessage(TEMPLATE_ID);
+
     } catch (error) {
       wx.hideLoading();
       console.error('获取模板 ID 失败', error);
       wx.showToast({ title: error.message || '获取失败', icon: 'none' });
     }
+  },
+
+  // 调用订阅消息
+  subscribeMessage: function (templateId) {
+    const that = this;
+
+    wx.requestSubscribeMessage({
+      tmplIds: [templateId],
+      success: function (res) {
+        console.log('订阅结果:', res);
+        if (res[templateId] === 'accept') {
+          wx.setStorageSync('coffee_order_subscribed', true);
+          that.setData({ hasSubscribed: true });
+          wx.showToast({ title: '订阅成功', icon: 'success' });
+        } else if (res[templateId] === 'reject') {
+          wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
+        }
+      },
+      fail: function (err) {
+        console.error('订阅失败', err);
+        wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
+      }
+    });
   },
 
   // 格式化日期 YYYY-MM-DD
