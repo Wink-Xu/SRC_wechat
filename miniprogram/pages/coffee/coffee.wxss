@@ -20,6 +20,31 @@ page {
   flex-shrink: 0;
   border-bottom: 1rpx solid #F0F0F0;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.store-info-left {
+  flex: 1;
+}
+
+/* 营业状态标签 */
+.shop-status-tag {
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  flex-shrink: 0;
+}
+
+.shop-status-tag.open {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.shop-status-tag.closed {
+  background: #F5F5F5;
+  color: #999999;
 }
 
 .store-name {
@@ -257,8 +282,61 @@ page {
   margin-right: 24rpx;
 }
 
-.cart-icon {
-  font-size: 36rpx;
+/* 购物车图标 - 纯 CSS 绘制 */
+.cart-icon-svg {
+  width: 44rpx;
+  height: 44rpx;
+  position: relative;
+}
+
+.cart-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44rpx;
+  height: 4rpx;
+  background: #1A1A1A;
+  border-radius: 2rpx;
+}
+
+.cart-basket {
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  width: 36rpx;
+  height: 24rpx;
+  border: 4rpx solid #1A1A1A;
+  border-top: none;
+  border-radius: 0 0 4rpx 4rpx;
+  box-sizing: border-box;
+}
+
+.cart-handle {
+  position: absolute;
+  top: -6rpx;
+  right: 0;
+  width: 16rpx;
+  height: 10rpx;
+  border: 4rpx solid #1A1A1A;
+  border-bottom: none;
+  border-radius: 10rpx 10rpx 0 0;
+  box-sizing: border-box;
+}
+
+.cart-wheels {
+  position: absolute;
+  bottom: -4rpx;
+  left: 4rpx;
+  right: 4rpx;
+  display: flex;
+  justify-content: space-between;
+}
+
+.wheel {
+  width: 10rpx;
+  height: 10rpx;
+  background: #1A1A1A;
+  border-radius: 50%;
 }
 
 .cart-badge {

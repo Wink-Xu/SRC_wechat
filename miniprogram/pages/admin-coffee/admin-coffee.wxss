@@ -25,6 +25,71 @@ page {
   color: #1A1A1A;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  margin-right: 24rpx;
+}
+
+/* 营业状态开关 */
+.shop-status-switch {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 20rpx;
+  background: #F5F5F5;
+  border-radius: 24rpx;
+}
+
+.shop-status-switch.active {
+  background: #E8F5E9;
+}
+
+.switch-text {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.shop-status-switch.active .switch-text {
+  color: #2E7D32;
+  font-weight: 500;
+}
+
+.switch-btn {
+  width: 48rpx;
+  height: 28rpx;
+  border-radius: 14rpx;
+  position: relative;
+  background: #CCCCCC;
+}
+
+.switch-btn.on {
+  background: #2E7D32;
+}
+
+.switch-btn.on::after {
+  content: '';
+  position: absolute;
+  top: 2rpx;
+  right: 2rpx;
+  width: 24rpx;
+  height: 24rpx;
+  background: #FFFFFF;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch-btn.off::after {
+  content: '';
+  position: absolute;
+  top: 2rpx;
+  left: 2rpx;
+  width: 24rpx;
+  height: 24rpx;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
 .add-btn {
   background: #1A1A1A;
   color: #FFFFFF;

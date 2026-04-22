@@ -31,7 +31,7 @@
       <view class="payment-item {{paymentType === 'cash' ? 'active' : ''}}" bindtap="selectPayment" data-type="cash">
         <text>微信支付</text>
       </view>
-      <view class="payment-item {{paymentType === 'points' ? 'active' : ''}}" bindtap="selectPayment" data-type="points">
+      <view class="payment-item {{paymentType === 'points' ? 'active' : ''}}" bindtap="selectPayment" data-type="points" wx:if="{{canUsePoints && isLoggedIn}}">
         <text>积分支付</text>
       </view>
       <view class="payment-item {{paymentType === 'balance' ? 'active' : ''}}" bindtap="selectPayment" data-type="balance">

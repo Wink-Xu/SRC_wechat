@@ -32,7 +32,16 @@ Page({
       { key: 'both', name: '冷热可选' },
       { key: 'cold_only', name: '仅冷' },
       { key: 'hot_only', name: '仅热' }
-    ]
+    ],
+    rechargeTypes: [
+      { key: 'americano', name: '美式套餐' },
+      { key: 'latte', name: '拿铁套餐' },
+      { key: 'special', name: '特调套餐' },
+      { key: 'decaf', name: '无咖啡因套餐' },
+      { key: 'pour_over', name: '单品手冲套餐' },
+      { key: 'any', name: '任意套餐' }
+    ],
+    rechargeTypeIndex: 0
   },
 
   onLoad: function (options) {
@@ -40,6 +49,14 @@ Page({
       this.setData({ id: options.id, isEdit: true });
       this.loadProduct(options.id);
     }
+  },
+
+  // 更新套餐类型索引
+  updateRechargeTypeIndex: function (rechargeType) {
+    const index = this.data.rechargeTypes.findIndex(t => t.key === rechargeType);
+    this.setData({
+      rechargeTypeIndex: index >= 0 ? index : 0
+    });
   },
 
   loadProduct: async function (id) {
@@ -66,6 +83,8 @@ Page({
         }
       }
 
+      const rechargeTypeIndex = this.data.rechargeTypes.findIndex(t => t.key === (product.recharge_type || 'americano'));
+
       this.setData({
         formData: {
           name: product.name || '',
@@ -81,7 +100,8 @@ Page({
           recharge_type: product.recharge_type || 'americano',
           recharge_count: product.recharge_count || 10
         },
-        displayImage: displayImage
+        displayImage: displayImage,
+        rechargeTypeIndex: rechargeTypeIndex >= 0 ? rechargeTypeIndex : 0
       });
     } catch (error) {
       console.error('加载商品失败', error);
@@ -165,6 +185,13 @@ Page({
   onTemperatureChange: function (e) {
     this.setData({
       'formData.temperature': this.data.temperatureOptions[e.detail.value].key
+    });
+  },
+
+  onRechargeTypeChange: function (e) {
+    this.setData({
+      rechargeTypeIndex: e.detail.value,
+      'formData.recharge_type': this.data.rechargeTypes[e.detail.value].key
     });
   },
 

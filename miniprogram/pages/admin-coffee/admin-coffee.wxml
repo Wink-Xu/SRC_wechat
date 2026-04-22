@@ -3,6 +3,13 @@
   <!-- 顶部标题栏 -->
   <view class="header">
     <text class="header-title">咖啡管理</text>
+    <view class="header-right">
+      <!-- 营业状态开关 -->
+      <view class="shop-status-switch {{isShopOpen ? 'active' : ''}}" bindtap="toggleShopStatus">
+        <text class="switch-text">{{isShopOpen ? '营业中' : '已打烊'}}</text>
+        <view class="switch-btn {{isShopOpen ? 'on' : 'off'}}"></view>
+      </view>
+    </view>
     <view class="add-btn" bindtap="goToAdd">
       <text class="add-icon">+</text>
       <text class="add-text">添加商品</text>

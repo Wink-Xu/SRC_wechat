@@ -2,8 +2,13 @@
 <view class="container {{cartCount > 0 ? 'has-cart' : ''}}">
   <!-- 门店信息 -->
   <view class="store-info" bindtap="openMap">
-    <text class="store-name">{{storeName}}</text>
-    <text class="store-address">{{storeAddress}}<text class="map-icon">📍</text></text>
+    <view class="store-info-left">
+      <text class="store-name">{{storeName}}</text>
+      <text class="store-address">{{storeAddress}}<text class="map-icon">📍</text></text>
+    </view>
+    <view class="shop-status-tag {{isShopOpen ? 'open' : 'closed'}}">
+      {{isShopOpen ? '营业中' : '已打烊'}}
+    </view>
   </view>
 
   <!-- 分类 Tab -->
@@ -68,7 +73,16 @@
   <view class="cart-bar" wx:if="{{cartCount > 0}}" bindtap="goToCart">
     <view class="cart-left">
       <view class="cart-icon-wrapper">
-        <text class="cart-icon">🛒</text>
+        <view class="cart-icon-svg">
+          <view class="cart-body"></view>
+          <view class="cart-basket">
+            <view class="cart-handle"></view>
+            <view class="cart-wheels">
+              <view class="wheel"></view>
+              <view class="wheel"></view>
+            </view>
+          </view>
+        </view>
         <view class="cart-badge">{{cartCount}}</view>
       </view>
       <text class="cart-total-price">￥{{cartTotal / 100}}</text>

@@ -72,8 +72,8 @@
     <block wx:if="{{formData.is_recharge}}">
       <view class="form-item">
         <text class="form-label">套餐类型</text>
-        <picker mode="selector" range="{{['美式套餐', '任意套餐']}}" bindchange="onInputChange">
-          <view class="form-picker">{{formData.recharge_type === 'americano' ? '美式套餐' : '任意套餐'}}</view>
+        <picker mode="selector" range="{{rechargeTypes}}" range-key="name" value="{{rechargeTypeIndex}}" bindchange="onRechargeTypeChange">
+          <view class="form-picker">{{rechargeTypes[rechargeTypeIndex].name}}</view>
         </picker>
       </view>
       <view class="form-item">

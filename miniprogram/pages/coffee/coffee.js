@@ -25,19 +25,48 @@ Page({
     loading: true,
     scrollToView: '',
     scrollToTab: '',
-    currentCategory: 'americano'
+    currentCategory: 'americano',
+    isShopOpen: true,
+    shopStatusLoaded: false
   },
 
   onLoad: function () {
     this.loadAllProducts();
     this.loadCartFromStorage();
+    this.loadShopStatus();
   },
 
   onShow: function () {
     this.loadCartFromStorage();
     this.updateCartSummary();
+    this.loadShopStatus();
     // 重新加载商品数据，确保显示最新的商品信息
     this.loadAllProducts();
+  },
+
+  // 加载店铺营业状态
+  loadShopStatus: async function () {
+    const that = this;
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'coffee',
+        data: {
+          action: 'getShopStatus'
+        }
+      });
+
+      if (result.result && result.result.code === 0) {
+        that.setData({
+          isShopOpen: result.result.data.isOpen,
+          shopStatusLoaded: true
+        });
+      } else {
+        that.setData({ shopStatusLoaded: true });
+      }
+    } catch (error) {
+      console.error('加载店铺状态失败', error);
+      that.setData({ shopStatusLoaded: true });
+    }
   },
 
   onReady: function () {
@@ -310,6 +339,12 @@ Page({
   // 点击选规格
   onAddToCart: function (e) {
     const product = e.currentTarget.dataset.product;
+
+    // 检查店铺营业状态
+    if (!this.data.isShopOpen && this.data.shopStatusLoaded) {
+      wx.showToast({ title: '店铺已打烊，暂停点单', icon: 'none' });
+      return;
+    }
 
     // 打开选择规格弹窗
     this.setData({

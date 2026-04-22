@@ -239,13 +239,15 @@ page {
 /* 备注输入框 */
 .spec-remark {
   width: 100%;
-  min-height: 160rpx;
+  min-height: 120rpx;
   background: #F5F5F5;
   border-radius: 8rpx;
-  padding: 24rpx;
-  font-size: 28rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
   color: #333333;
-  margin-top: 16rpx;
+  margin-top: 12rpx;
+  line-height: 1.5;
+  box-sizing: border-box;
 }
 
 /* 加入购物车按钮 */

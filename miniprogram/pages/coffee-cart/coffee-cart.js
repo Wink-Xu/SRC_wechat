@@ -7,18 +7,37 @@ Page({
     cartTotal: 0,
     balance: { americano: 0, any: 0 },
     paymentType: 'cash',
-    loading: false
+    loading: false,
+    canUsePoints: true,  // 是否可以使用积分支付（所有商品都支持）
+    isLoggedIn: false    // 是否已登录
   },
 
   onLoad: function () {
+    this.checkLoginStatus();
     this.loadCart();
     this.loadBalance();
+  },
+
+  // 检查登录状态
+  checkLoginStatus: function () {
+    const userInfo = wx.getStorageSync('userInfo') || {};
+    const isOpenid = wx.getStorageSync('openid');
+    this.setData({
+      isLoggedIn: !!(userInfo.openid || isOpenid)
+    });
   },
 
   // 加载购物车
   loadCart: function () {
     const cart = wx.getStorageSync('coffee_cart') || [];
-    this.setData({ cart });
+
+    // 检查是否所有商品都支持积分支付
+    const allSupportPoints = cart.every(item => item.points_price && item.points_price > 0);
+
+    this.setData({
+      cart,
+      canUsePoints: allSupportPoints
+    });
     this.updateCartTotal();
   },
 

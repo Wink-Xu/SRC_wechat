@@ -14,15 +14,81 @@ Page({
       { key: 'decaf', name: '无咖啡因' },
       { key: 'pour_over', name: '单品手冲' },
       { key: 'recharge', name: '充值套餐' }
-    ]
+    ],
+    isShopOpen: false,
+    shopStatusLoading: false
   },
 
   onLoad: function () {
     this.loadProducts();
+    this.loadShopStatus();
   },
 
   onShow: function () {
     this.loadProducts();
+    this.loadShopStatus();
+  },
+
+  // 加载店铺营业状态
+  loadShopStatus: async function () {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'coffee',
+        data: {
+          action: 'getShopStatus'
+        }
+      });
+
+      if (result.result && result.result.code === 0) {
+        this.setData({ isShopOpen: result.result.data.isOpen });
+      }
+    } catch (error) {
+      console.error('加载店铺状态失败', error);
+    }
+  },
+
+  // 切换店铺营业状态
+  toggleShopStatus: function () {
+    const newStatus = !this.data.isShopOpen;
+    const actionText = newStatus ? '开始营业' : '停止营业';
+
+    wx.showModal({
+      title: '确认操作',
+      content: `确定要${actionText}吗？`,
+      success: async (res) => {
+        if (res.confirm) {
+          this.setShopStatus(newStatus);
+        }
+      }
+    });
+  },
+
+  // 设置店铺营业状态
+  setShopStatus: async function (isOpen) {
+    wx.showLoading({ title: '设置中...' });
+
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'coffee',
+        data: {
+          action: 'setShopStatus',
+          isOpen
+        }
+      });
+
+      wx.hideLoading();
+
+      if (result.result && result.result.code === 0) {
+        this.setData({ isShopOpen: isOpen });
+        wx.showToast({ title: result.result.message || '设置成功', icon: 'success' });
+      } else {
+        wx.showToast({ title: result.result?.message || '设置失败', icon: 'none' });
+      }
+    } catch (error) {
+      wx.hideLoading();
+      wx.showToast({ title: '设置失败', icon: 'none' });
+      console.error('设置店铺状态失败', error);
+    }
   },
 
   loadProducts: async function () {

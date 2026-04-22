@@ -45,6 +45,10 @@ exports.main = async (event, context) => {
       return handleAdminUpdateOrderStatus(data, openid);
     case 'exportOrders':
       return handleExportOrders(data, openid);
+    case 'getShopStatus':
+      return handleGetShopStatus(data, openid);
+    case 'setShopStatus':
+      return handleSetShopStatus(data, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
@@ -260,6 +264,13 @@ async function handlePayOrderByPoints(data, openid) {
       return { code: -1, message: '订单状态不正确' };
     }
 
+
+    // 验证所有商品都支持积分支付
+    for (const item of order.items) {
+      if (!item.points_price || item.points_price <= 0) {
+        return { code: -1, message: '部分商品不支持积分支付' };
+      }
+    }
     // 计算所需积分（1元=1积分，价格单位是分）
     const requiredPoints = order.total_amount / 100;
 
@@ -969,4 +980,88 @@ function formatDate(date) {
   const hour = String(d.getHours()).padStart(2, '0');
   const minute = String(d.getMinutes()).padStart(2, '0');
   return `${year}-${month}-${day} ${hour}:${minute}`;
+}
+
+// ========== 店铺营业状态相关 ==========
+
+// 获取店铺营业状态
+async function handleGetShopStatus(data, openid) {
+  try {
+    const statusResult = await db.collection('coffee_shop_status').limit(1).get();
+    const status = statusResult.data.length > 0 ? statusResult.data[0] : null;
+
+    return {
+      code: 0,
+      data: {
+        isOpen: status ? status.isOpen : false,
+        updatedTime: status ? status.updatedTime : null
+      }
+    };
+  } catch (error) {
+    console.error('获取店铺状态失败', error);
+    return { code: -1, message: '获取失败：' + error.message };
+  }
+}
+
+// 设置店铺营业状态（仅咖啡管理员和团长可操作）
+async function handleSetShopStatus(data, openid) {
+  const { isOpen } = data;
+
+  try {
+    // 验证用户权限
+    const userResult = await db.collection('users').where({ openid }).field({ role: true }).get();
+    const user = userResult.data[0];
+    const isAdmin = user && (user.role === 'coffee_admin' || user.role === 'leader');
+
+    if (!isAdmin) {
+      return { code: -1, message: '无权限操作' };
+    }
+
+    // 更新或创建状态记录
+    const existingStatus = await db.collection('coffee_shop_status').limit(1).get();
+
+    if (existingStatus.data.length > 0) {
+      await db.collection('coffee_shop_status').doc(existingStatus.data[0]._id).update({
+        data: {
+          isOpen,
+          updatedTime: new Date().getTime()
+        }
+      });
+    } else {
+      await db.collection('coffee_shop_status').add({
+        data: {
+          isOpen,
+          updatedTime: new Date().getTime()
+        }
+      });
+    }
+
+    // 如果开始营业，发送订阅消息给所有咖啡管理员
+    if (isOpen) {
+      try {
+        await cloud.callFunction({
+          name: 'notification',
+          data: {
+            action: 'sendOrderNotification',
+            orderId: 'status_change',
+            orderNo: '店铺开始营业',
+            items: [],
+            totalAmount: 0,
+            createTime: new Date().toLocaleString('zh-CN')
+          }
+        });
+      } catch (err) {
+        console.error('发送营业通知失败', err);
+      }
+    }
+
+    return {
+      code: 0,
+      data: { isOpen },
+      message: isOpen ? '已开始营业' : '已停止营业'
+    };
+  } catch (error) {
+    console.error('设置店铺状态失败', error);
+    return { code: -1, message: '设置失败：' + error.message };
+  }
 }
