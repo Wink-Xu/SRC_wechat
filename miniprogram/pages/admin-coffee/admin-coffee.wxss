@@ -73,19 +73,18 @@ page {
   content: '';
   position: absolute;
   top: 2rpx;
-  right: 2rpx;
+  left: 2rpx;
   width: 24rpx;
   height: 24rpx;
   background: #FFFFFF;
   border-radius: 50%;
-  transition: transform 0.3s;
 }
 
 .switch-btn.off::after {
   content: '';
   position: absolute;
   top: 2rpx;
-  left: 2rpx;
+  right: 2rpx;
   width: 24rpx;
   height: 24rpx;
   background: #FFFFFF;
