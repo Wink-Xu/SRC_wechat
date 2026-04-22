@@ -34,7 +34,7 @@
       </view>
       <view class="order-items">
         <text wx:for="{{item.items}}" wx:for-item="product" wx:key="product_id">
-          {{product.product_name}}({{product.temperature === 'cold' ? '冷' : '热'}}) x{{product.quantity}}
+          {{product.product_name}} x{{product.quantity}}
         </text>
       </view>
       <view class="order-footer">
