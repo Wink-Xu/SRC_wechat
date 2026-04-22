@@ -11,7 +11,7 @@ const _ = db.command;
 // 订阅消息模板 ID（需要在微信公众平台申请）
 // 申请路径：微信公众平台 -> 功能 -> 订阅通知 -> 添加模板
 // 推荐模板：订单支付通知 (模板 ID 需要根据实际申请填写)
-const TEMPLATE_ID = 'YOUR_TEMPLATE_ID_HERE'; // 替换为实际申请的模板 ID
+const TEMPLATE_ID = 'PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U';
 
 // 云函数入口函数
 exports.main = async (event, context) => {
