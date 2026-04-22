@@ -75,6 +75,10 @@
           <text class="info-label">商品：</text>
           <text class="info-value">{{item.itemsText}}</text>
         </view>
+        <view class="order-info-row remark-row" wx:if="{{item.remark}}">
+          <text class="info-label">备注：</text>
+          <text class="info-value remark-text">{{item.remark}}</text>
+        </view>
       </view>
 
       <view class="order-footer">

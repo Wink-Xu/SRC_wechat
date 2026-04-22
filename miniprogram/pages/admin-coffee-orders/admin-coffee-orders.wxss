@@ -222,6 +222,15 @@ page {
   flex: 1;
 }
 
+.remark-row .info-value {
+  color: #F57C00;
+  font-weight: 500;
+}
+
+.remark-text {
+  max-width: 80%;
+}
+
 .order-footer {
   display: flex;
   justify-content: space-between;
