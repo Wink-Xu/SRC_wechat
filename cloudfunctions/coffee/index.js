@@ -135,14 +135,12 @@ async function handleGetBalance(data, openid) {
 
 // ========== 订单相关 ==========
 
-// 生成订单号
-function generateOrderNo() {
+// 生成订单号（使用云函数时间戳保证唯一性）
+async function generateOrderNo() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const random = Math.random().toString(36).substr(2, 6).toUpperCase();
-  return `CF${year}${month}${day}${random}`;
+  const timestamp = now.getTime();
+  const random = Math.floor(Math.random() * 1000);
+  return `CF${timestamp}${random}`;
 }
 
 // 创建订单

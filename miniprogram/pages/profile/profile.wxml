@@ -48,7 +48,7 @@
         <text class="menu-grid-title">周边订单</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/coffee-orders/coffee-orders">
-        <image class="menu-grid-icon" src="/images/icon-test.png"></image>
+        <image class="menu-grid-icon" src="/images/dingdan-1.png"></image>
         <text class="menu-grid-title">咖啡订单</text>
       </view>
       <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/points-rank/points-rank">
@@ -104,7 +104,7 @@
           <text class="menu-grid-title">咖啡管理</text>
         </view>
         <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-coffee-orders/admin-coffee-orders">
-          <image class="menu-grid-icon" src="/images/icon-test.png"></image>
+          <image class="menu-grid-icon" src="/images/dingdan-1.png"></image>
           <text class="menu-grid-title">咖啡订单</text>
         </view>
       </block>
