@@ -34,6 +34,8 @@ Page({
   requestSubscribe: async function () {
     const that = this;
 
+    wx.showLoading({ title: '获取中...' });
+
     try {
       // 从云函数获取模板 ID
       const result = await wx.cloud.callFunction({
@@ -43,11 +45,23 @@ Page({
         }
       });
 
+      console.log('云函数返回:', result);
+
+      wx.hideLoading();
+
+      if (!result.result || result.result.code !== 0) {
+        console.error('云函数调用失败:', result.result);
+        wx.showToast({ title: result.result?.message || '获取失败', icon: 'none' });
+        return;
+      }
+
       const TEMPLATE_ID = result.result.data.templateId;
+      console.log('获取到模板 ID:', TEMPLATE_ID);
 
       wx.requestSubscribeMessage({
         tmplIds: [TEMPLATE_ID],
         success: function (res) {
+          console.log('订阅结果:', res);
           if (res[TEMPLATE_ID] === 'accept') {
             wx.setStorageSync('coffee_order_subscribed', true);
             that.setData({ hasSubscribed: true });
@@ -58,11 +72,18 @@ Page({
         },
         fail: function (err) {
           console.error('订阅失败', err);
+          // 检查是否是模板 ID 格式问题
+          if (err.errCode === 1003010 || (err.errMsg && err.errMsg.indexOf('invalid template id') !== -1)) {
+            wx.showToast({ title: '模板 ID 无效，请检查配置', icon: 'none' });
+          } else {
+            wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
+          }
         }
       });
     } catch (error) {
+      wx.hideLoading();
       console.error('获取模板 ID 失败', error);
-      wx.showToast({ title: '获取模板 ID 失败', icon: 'none' });
+      wx.showToast({ title: error.message || '获取失败', icon: 'none' });
     }
   },
 
