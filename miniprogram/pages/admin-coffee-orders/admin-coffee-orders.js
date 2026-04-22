@@ -83,7 +83,13 @@ Page({
       const orders = (result.list || []).map(order => ({
         ...order,
         statusText: this.getStatusText(order.status),
-        itemsText: order.items.map(item => `${item.product_name} x${item.quantity}`).join('、')
+        itemsText: order.items.map(item => {
+          let text = `${item.product_name} x${item.quantity}`;
+          if (item.remark) {
+            text += ` [${item.remark}]`;
+          }
+          return text;
+        }).join('、')
       }));
       this.setData({ orders, loading: false });
     } catch (error) {
