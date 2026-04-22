@@ -91,8 +91,15 @@ Page({
       }
 
       if (result.result && result.result.code === 0) {
-        this.setData({ isShopOpen: isOpen });
-        wx.showToast({ title: result.result.message || '设置成功', icon: 'success' });
+        // 立即更新状态，实现视觉上的即时反馈
+        this.setData({ isShopOpen: isOpen }, () => {
+          wx.showToast({ title: result.result.message || '设置成功', icon: 'success' });
+        });
+
+        // 延迟刷新一次状态，确保与服务器同步
+        setTimeout(() => {
+          this.loadShopStatus();
+        }, 500);
       } else {
         wx.showToast({ title: result.result?.message || '设置失败', icon: 'none' });
       }
