@@ -67,6 +67,8 @@ Page({
   setShopStatus: async function (isOpen) {
     wx.showLoading({ title: '设置中...' });
 
+    console.log('设置店铺状态:', isOpen);
+
     try {
       const result = await wx.cloud.callFunction({
         name: 'coffee',
@@ -76,7 +78,17 @@ Page({
         }
       });
 
+      console.log('云函数返回:', result);
+
       wx.hideLoading();
+
+      // 检查云函数是否返回错误
+      if (result.errMsg || (result.result && result.result.code === -1)) {
+        const errorMsg = result.result?.message || result.errMsg || '未知操作';
+        console.error('错误:', errorMsg);
+        wx.showToast({ title: errorMsg, icon: 'none' });
+        return;
+      }
 
       if (result.result && result.result.code === 0) {
         this.setData({ isShopOpen: isOpen });
@@ -86,8 +98,8 @@ Page({
       }
     } catch (error) {
       wx.hideLoading();
-      wx.showToast({ title: '设置失败', icon: 'none' });
       console.error('设置店铺状态失败', error);
+      wx.showToast({ title: error.message || '设置失败', icon: 'none' });
     }
   },
 
