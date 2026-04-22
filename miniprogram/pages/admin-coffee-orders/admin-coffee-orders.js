@@ -34,59 +34,30 @@ Page({
   requestSubscribe: function () {
     const that = this;
 
-    wx.showLoading({ title: '获取中...' });
+    // 直接使用模板 ID（绕过云函数）
+    const TEMPLATE_ID = 'PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U';
 
-    // 使用回调而不是 await，保持用户手势上下文
-    wx.cloud.callFunction({
-      name: 'notification',
-      data: {
-        action: 'requestSubscribe'
-      },
-      success: function (result) {
-        wx.hideLoading();
-        console.log('云函数返回:', result);
+    console.log('使用模板 ID:', TEMPLATE_ID);
 
-        if (!result.result || result.result.code !== 0) {
-          console.error('云函数调用失败:', result.result);
-          wx.showToast({ title: result.result?.message || '获取失败', icon: 'none' });
-          return;
+    // 直接调用订阅消息
+    wx.requestSubscribeMessage({
+      tmplIds: [TEMPLATE_ID],
+      success: function (res) {
+        console.log('订阅结果:', res);
+        if (res[TEMPLATE_ID] === 'accept') {
+          wx.setStorageSync('coffee_order_subscribed', true);
+          that.setData({ hasSubscribed: true });
+          wx.showToast({ title: '订阅成功', icon: 'success' });
+        } else if (res[TEMPLATE_ID] === 'reject') {
+          wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
+        } else {
+          console.log('订阅返回:', res);
+          wx.showToast({ title: '订阅结果：' + JSON.stringify(res), icon: 'none' });
         }
-
-        const TEMPLATE_ID = result.result.data.templateId;
-        console.log('获取到模板 ID:', TEMPLATE_ID);
-
-        // 在回调中立即调用订阅消息
-        wx.requestSubscribeMessage({
-          tmplIds: [TEMPLATE_ID],
-          success: function (res) {
-            console.log('订阅结果:', res);
-            if (res[TEMPLATE_ID] === 'accept') {
-              wx.setStorageSync('coffee_order_subscribed', true);
-              that.setData({ hasSubscribed: true });
-              wx.showToast({ title: '订阅成功', icon: 'success' });
-            } else if (res[TEMPLATE_ID] === 'reject') {
-              wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
-            }
-          },
-          fail: function (err) {
-            console.error('订阅失败', err);
-            // 模拟器限制：在真机上可以正常工作
-            if (err.errMsg && err.errMsg.indexOf('can only be invoked by user TAP gesture') !== -1) {
-              wx.showModal({
-                title: '模拟器限制',
-                content: '订阅消息功能在开发者工具模拟器中受限，请在真机上测试。模板 ID 已正确获取。',
-                showCancel: false
-              });
-            } else {
-              wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
-            }
-          }
-        });
       },
-      fail: function (error) {
-        wx.hideLoading();
-        console.error('获取模板 ID 失败', error);
-        wx.showToast({ title: error.message || '获取失败', icon: 'none' });
+      fail: function (err) {
+        console.error('订阅失败完整错误:', err);
+        wx.showToast({ title: '订阅失败：' + err.errMsg, icon: 'none', duration: 3000 });
       }
     });
   },
