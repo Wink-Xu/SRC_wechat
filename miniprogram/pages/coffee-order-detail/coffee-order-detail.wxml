@@ -7,6 +7,7 @@
   <block wx:elif="{{order}}">
     <!-- 订单状态头部 -->
     <view class="status-card">
+      <text class="pickup-no-display" wx:if="{{order.pickup_no}}">取餐号 {{order.pickup_no}}</text>
       <view class="status-icon">{{order.status === 'completed' ? '✓' : order.status === 'cancelled' ? '×' : order.status === 'paid' || order.status === 'processing' ? '○' : '○'}}</view>
       <text class="status-text">{{order.statusText}}</text>
       <text class="status-desc" wx:if="{{order.status === 'completed'}}">订单已完成，感谢惠顾</text>
@@ -47,10 +48,6 @@
         <view class="info-item">
           <text class="info-label">订单编号</text>
           <text class="info-value">{{order.order_no}}</text>
-        </view>
-        <view class="info-item" wx:if="{{order.pickup_no}}">
-          <text class="info-label">取餐号</text>
-          <text class="info-value pickup-no">{{order.pickup_no}}</text>
         </view>
         <view class="info-item">
           <text class="info-label">下单时间</text>
