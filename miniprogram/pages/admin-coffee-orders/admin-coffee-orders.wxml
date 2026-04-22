@@ -82,11 +82,8 @@
         <text class="order-total">￥{{item.total_amount / 100}}</text>
       </view>
 
-      <!-- 订单状态操作按钮 -->
-      <view class="order-operation" wx:if="{{item.status === 'pending' || item.status === 'paid'}}">
-        <button class="op-btn processing-btn" data-id="{{item._id}}" data-status="processing" bindtap="updateStatus">开始制作</button>
-      </view>
-      <view class="order-operation" wx:if="{{item.status === 'processing'}}">
+      <!-- 完成订单按钮 -->
+      <view class="order-operation" wx:if="{{item.status === 'pending' || item.status === 'paid' || item.status === 'processing'}}">
         <button class="op-btn complete-btn" data-id="{{item._id}}" data-status="completed" bindtap="updateStatus">完成订单</button>
       </view>
     </view>

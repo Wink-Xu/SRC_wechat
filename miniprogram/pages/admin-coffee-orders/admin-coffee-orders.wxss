@@ -257,11 +257,6 @@ page {
   border: none;
 }
 
-.processing-btn {
-  background: #1976D2;
-  color: #FFFFFF;
-}
-
 .complete-btn {
   background: #2E7D32;
   color: #FFFFFF;

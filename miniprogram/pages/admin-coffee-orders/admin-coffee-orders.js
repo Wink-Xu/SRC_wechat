@@ -204,18 +204,26 @@ Page({
             wx.hideLoading();
 
             if (result.csvContent && result.count > 0) {
+              // 添加 BOM 头防止 Excel 乱码
+              const BOM = '\uFEFF';
+              const csvData = BOM + result.csvContent;
+
               // 创建 CSV 文件
-              const fileName = `咖啡订单_${new Date().getTime()}.csv`;
+              const timestamp = new Date().getTime();
+              const fileName = `咖啡订单_${timestamp}.csv`;
               const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+
+              console.log('文件路径:', filePath);
 
               // 写入文件
               const fs = wx.getFileSystemManager();
               fs.writeFile({
                 filePath: filePath,
-                data: result.csvContent,
-                encoding: 'utf-8-sig',
-                success: () => {
-                  // 直接打开文档，用户可以选择用其他应用打开
+                data: csvData,
+                encoding: 'utf-8',
+                success: (res) => {
+                  console.log('写入成功:', res);
+                  // 直接打开文档
                   wx.openDocument({
                     filePath: filePath,
                     showMenu: true,
@@ -224,13 +232,13 @@ Page({
                     },
                     fail: (err) => {
                       console.error('打开文档失败', err);
-                      wx.showToast({ title: '打开失败，可在文件管理中查看', icon: 'none' });
+                      wx.showToast({ title: '文件已保存，可在文件管理查看', icon: 'none' });
                     }
                   });
                 },
                 fail: (err) => {
                   console.error('写入文件失败', err);
-                  wx.showToast({ title: '保存文件失败', icon: 'none' });
+                  wx.showToast({ title: '保存失败：' + err.errMsg, icon: 'none', duration: 3000 });
                 }
               });
             } else {
