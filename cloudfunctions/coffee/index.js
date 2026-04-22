@@ -987,8 +987,15 @@ function formatDate(date) {
 // 获取店铺营业状态
 async function handleGetShopStatus(data, openid) {
   try {
-    const statusResult = await db.collection('coffee_shop_status').limit(1).get();
-    const status = statusResult.data.length > 0 ? statusResult.data[0] : null;
+    // 尝试获取状态，如果集合不存在则返回默认值
+    let status = null;
+    try {
+      const statusResult = await db.collection('coffee_shop_status').limit(1).get();
+      status = statusResult.data.length > 0 ? statusResult.data[0] : null;
+    } catch (err) {
+      // 集合不存在，返回默认关闭状态
+      console.log('coffee_shop_status 集合不存在，使用默认状态');
+    }
 
     return {
       code: 0,
@@ -1017,10 +1024,17 @@ async function handleSetShopStatus(data, openid) {
       return { code: -1, message: '无权限操作' };
     }
 
-    // 更新或创建状态记录
-    const existingStatus = await db.collection('coffee_shop_status').limit(1).get();
+    // 更新或创建状态记录，如果集合不存在则先创建
+    let existingStatus = null;
+    try {
+      existingStatus = await db.collection('coffee_shop_status').limit(1).get();
+    } catch (err) {
+      // 集合不存在，先创建集合
+      console.log('coffee_shop_status 集合不存在，创建中...');
+      await db.createCollection('coffee_shop_status');
+    }
 
-    if (existingStatus.data.length > 0) {
+    if (existingStatus && existingStatus.data.length > 0) {
       await db.collection('coffee_shop_status').doc(existingStatus.data[0]._id).update({
         data: {
           isOpen,
