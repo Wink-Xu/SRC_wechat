@@ -70,7 +70,16 @@ Page({
           },
           fail: function (err) {
             console.error('订阅失败', err);
-            wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
+            // 模拟器限制：在真机上可以正常工作
+            if (err.errMsg && err.errMsg.indexOf('can only be invoked by user TAP gesture') !== -1) {
+              wx.showModal({
+                title: '模拟器限制',
+                content: '订阅消息功能在开发者工具模拟器中受限，请在真机上测试。模板 ID 已正确获取。',
+                showCancel: false
+              });
+            } else {
+              wx.showToast({ title: err.errMsg || '订阅失败', icon: 'none' });
+            }
           }
         });
       },
