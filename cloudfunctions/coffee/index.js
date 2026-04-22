@@ -840,12 +840,14 @@ async function handleAdminGetOrders(data, openid) {
     // 格式化订单列表
     const list = listResult.data.map(order => {
       const user = usersMap[order.user_id];
-      // 合并订单项的备注
-      let itemsText = order.items.map(item => `${item.product_name} x${item.quantity}`).join('、');
-      const remarks = order.items.filter(item => item.remark).map(item => item.remark).filter(Boolean);
-      if (remarks.length > 0) {
-        itemsText += ' [备注：' + remarks.join('; ') + ']';
-      }
+      // 格式化商品列表，每个商品带自己的备注
+      const itemsText = order.items.map(item => {
+        let text = `${item.product_name} x${item.quantity}`;
+        if (item.remark) {
+          text += ` [${item.remark}]`;
+        }
+        return text;
+      }).join('、');
       return {
         ...order,
         formattedTime: formatDate(order.created_at),
