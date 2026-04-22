@@ -56,8 +56,8 @@
       {
         "pagePath": "pages/coffee/coffee",
         "text": "咖啡",
-        "iconPath": "images/kafei-3.png",
-        "selectedIconPath": "images/coffee-active.png"
+        "iconPath": "images/kafei-2.png",
+        "selectedIconPath": "images/kafei-3.png"
       },
       {
         "pagePath": "pages/profile/profile",
