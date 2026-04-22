@@ -101,6 +101,15 @@
     </view>
   </view>
 
+  <!-- 订阅消息提示 -->
+  <view class="subscribe-section" wx:if="{{!hasSubscribed}}">
+    <view class="subscribe-tip">
+      <text class="tip-icon">🔔</text>
+      <text class="tip-text">开启新订单通知，第一时间收到提醒</text>
+    </view>
+    <button class="subscribe-btn" bindtap="requestSubscribe">开启通知</button>
+  </view>
+
   <!-- 导出按钮 -->
   <view class="export-section" wx:if="{{orders.length > 0}}">
     <button class="export-btn" bindtap="exportOrders">导出订单</button>

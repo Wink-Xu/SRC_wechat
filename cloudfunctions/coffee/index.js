@@ -207,6 +207,25 @@ async function handleCreateOrder(data, openid) {
       data: orderData
     });
 
+    // 发送订阅消息通知咖啡管理员
+    try {
+      const notification = await cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'sendOrderNotification',
+          orderId: orderResult._id,
+          orderNo: orderNo,
+          items: items,
+          totalAmount: totalAmount,
+          createTime: new Date().toLocaleString('zh-CN')
+        }
+      });
+      console.log('发送订单通知结果:', notification.result);
+    } catch (err) {
+      console.error('发送订单通知失败:', err);
+      // 通知失败不影响订单创建
+    }
+
     return {
       code: 0,
       data: { orderId: orderResult._id, orderNo },

@@ -312,3 +312,39 @@ page {
 .empty-text {
   font-size: 28rpx;
 }
+
+/* 订阅消息提示 */
+.subscribe-section {
+  background: #FFFFFF;
+  padding: 24rpx;
+  margin: 20rpx;
+  border-radius: 16rpx;
+}
+
+.subscribe-tip {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.tip-icon {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.tip-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.subscribe-btn {
+  width: 100%;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+  border-radius: 24rpx;
+  border: none;
+}

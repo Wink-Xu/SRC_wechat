@@ -1,5 +1,6 @@
 // pages/admin-coffee-orders/admin-coffee-orders.js
 const { coffeeApi } = require('../../utils/request');
+const { requireAdmin } = require('../../utils/auth');
 
 Page({
   data: {
@@ -10,7 +11,8 @@ Page({
     startDate: '',
     endDate: '',
     maxDate: '',
-    showDateFilter: false
+    showDateFilter: false,
+    hasSubscribed: false
   },
 
   onLoad: function () {
@@ -18,7 +20,50 @@ Page({
     const today = new Date();
     const maxDate = this.formatDate(today);
     this.setData({ maxDate });
+    this.checkSubscription();
     this.loadOrders();
+  },
+
+  // 检查是否已订阅
+  checkSubscription: function () {
+    const hasSubscribed = wx.getStorageSync('coffee_order_subscribed') || false;
+    this.setData({ hasSubscribed });
+  },
+
+  // 请求订阅消息
+  requestSubscribe: async function () {
+    const that = this;
+
+    try {
+      // 从云函数获取模板 ID
+      const result = await wx.cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'requestSubscribe'
+        }
+      });
+
+      const TEMPLATE_ID = result.result.data.templateId;
+
+      wx.requestSubscribeMessage({
+        tmplIds: [TEMPLATE_ID],
+        success: function (res) {
+          if (res[TEMPLATE_ID] === 'accept') {
+            wx.setStorageSync('coffee_order_subscribed', true);
+            that.setData({ hasSubscribed: true });
+            wx.showToast({ title: '订阅成功', icon: 'success' });
+          } else if (res[TEMPLATE_ID] === 'reject') {
+            wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
+          }
+        },
+        fail: function (err) {
+          console.error('订阅失败', err);
+        }
+      });
+    } catch (error) {
+      console.error('获取模板 ID 失败', error);
+      wx.showToast({ title: '获取模板 ID 失败', icon: 'none' });
+    }
   },
 
   // 格式化日期 YYYY-MM-DD
