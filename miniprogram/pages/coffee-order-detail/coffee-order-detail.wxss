@@ -171,6 +171,12 @@ page {
   word-break: break-all;
 }
 
+.info-value.pickup-no {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
 .copy-btn {
   font-size: 24rpx;
   color: #4A90E2;

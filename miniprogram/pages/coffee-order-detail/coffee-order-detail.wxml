@@ -48,6 +48,10 @@
           <text class="info-label">订单编号</text>
           <text class="info-value">{{order.order_no}}</text>
         </view>
+        <view class="info-item" wx:if="{{order.pickup_no}}">
+          <text class="info-label">取餐号</text>
+          <text class="info-value pickup-no">{{order.pickup_no}}</text>
+        </view>
         <view class="info-item">
           <text class="info-label">下单时间</text>
           <text class="info-value">{{order.formattedTime}}</text>

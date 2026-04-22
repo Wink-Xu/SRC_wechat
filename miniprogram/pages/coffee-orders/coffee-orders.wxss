@@ -61,9 +61,21 @@ page {
   margin-bottom: 16rpx;
 }
 
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
 .order-no {
   font-size: 24rpx;
   color: #999999;
+}
+
+.pickup-no {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .order-status {

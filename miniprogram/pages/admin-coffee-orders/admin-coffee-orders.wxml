@@ -53,7 +53,10 @@
     <view class="order-item" wx:for="{{orders}}" wx:key="_id">
       <view class="order-header" bindtap="goToDetail" data-id="{{item._id}}">
         <view class="header-left">
-          <text class="order-no">{{item.order_no}}</text>
+          <view class="order-no-group">
+            <text class="order-no">{{item.order_no}}</text>
+            <text class="pickup-no" wx:if="{{item.pickup_no}}">取餐号 {{item.pickup_no}}</text>
+          </view>
           <view class="status-tag status-{{item.status}}">
             {{item.statusText}}
           </view>

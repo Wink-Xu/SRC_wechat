@@ -143,6 +143,39 @@ async function generateOrderNo() {
   return `CF${timestamp}${random}`;
 }
 
+// 生成取餐号（每日从 001 开始）
+async function generatePickupNo() {
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  // 获取或创建今日的取餐号记录
+  let counterDoc = await db.collection('coffee_pickup_numbers').where({ date: today }).get();
+
+  if (counterDoc.data.length === 0) {
+    // 今日第一条，创建记录
+    const result = await db.collection('coffee_pickup_numbers').add({
+      data: {
+        date: today,
+        counter: 1,
+        createdAt: db.serverDate()
+      }
+    });
+    return '001';
+  } else {
+    // 已有记录，原子递增
+    const docId = counterDoc.data[0]._id;
+    const currentCounter = counterDoc.data[0].counter;
+    const newCounter = currentCounter + 1;
+
+    await db.collection('coffee_pickup_numbers').doc(docId).update({
+      data: { counter: newCounter }
+    });
+
+    // 返回三位数取餐号
+    return String(newCounter).padStart(3, '0');
+  }
+}
+
 // 创建订单
 async function handleCreateOrder(data, openid) {
   const { items } = data;
@@ -168,8 +201,9 @@ async function handleCreateOrder(data, openid) {
       totalQuantity += item.quantity;
     }
 
-    // 生成订单号
-    const orderNo = generateOrderNo();
+    // 生成订单号和取餐号
+    const orderNo = await generateOrderNo();
+    const pickupNo = await generatePickupNo();
 
     // 门店信息（固定）
     const storeName = 'And then';
@@ -178,6 +212,7 @@ async function handleCreateOrder(data, openid) {
     // 创建订单
     const orderData = {
       order_no: orderNo,
+      pickup_no: pickupNo,
       user_id: userId,
       user_openid: openid,
       items: items.map(item => ({
@@ -1048,9 +1083,27 @@ async function handleSetShopStatus(data, openid) {
       });
     }
 
-    // 如果开始营业，发送订阅消息给所有咖啡管理员
+    // 如果开始营业，重置取餐号计数器并发送订阅消息给所有咖啡管理员
     if (isOpen) {
       try {
+        // 重置今日的取餐号计数器
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // 先尝试删除今日记录（如果存在）
+        try {
+          const existingCounter = await db.collection('coffee_pickup_numbers').where({ date: today }).get();
+          if (existingCounter.data.length > 0) {
+            await db.collection('coffee_pickup_numbers').doc(existingCounter.data[0]._id).remove();
+          }
+        } catch (err) {
+          // 集合不存在，创建它
+          await db.createCollection('coffee_pickup_numbers');
+        }
+
+        console.log('取餐号计数器已重置，新的一天开始营业');
+
+        // 发送营业通知
         await cloud.callFunction({
           name: 'notification',
           data: {
@@ -1063,7 +1116,7 @@ async function handleSetShopStatus(data, openid) {
           }
         });
       } catch (err) {
-        console.error('发送营业通知失败', err);
+        console.error('重置取餐号或发送通知失败', err);
       }
     }
 

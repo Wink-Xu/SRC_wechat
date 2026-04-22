@@ -138,10 +138,22 @@ page {
   gap: 16rpx;
 }
 
+.order-no-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
 .order-no {
   font-size: 26rpx;
   color: #666666;
   font-weight: 500;
+}
+
+.pickup-no {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A1A;
 }
 
 .arrow-icon {
