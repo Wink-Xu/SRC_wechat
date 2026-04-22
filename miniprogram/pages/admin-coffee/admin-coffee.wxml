@@ -6,8 +6,8 @@
     <view class="header-right">
       <!-- 营业状态开关 -->
       <view class="shop-status-switch {{isShopOpen ? 'active' : ''}}" bindtap="toggleShopStatus">
-        <text class="switch-text">{{isShopOpen ? '营业中' : '已打烊'}}</text>
         <view class="switch-btn {{isShopOpen ? 'on' : 'off'}}"></view>
+        <text class="switch-text">{{isShopOpen ? '营业中' : '已打烊'}}</text>
       </view>
     </view>
     <view class="add-btn" bindtap="goToAdd">

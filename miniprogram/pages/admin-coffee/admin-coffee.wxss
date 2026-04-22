@@ -48,6 +48,7 @@ page {
 .switch-text {
   font-size: 26rpx;
   color: #666666;
+  order: 2;
 }
 
 .shop-status-switch.active .switch-text {
@@ -61,6 +62,7 @@ page {
   border-radius: 14rpx;
   position: relative;
   background: #CCCCCC;
+  order: 1;
 }
 
 .switch-btn.on {
