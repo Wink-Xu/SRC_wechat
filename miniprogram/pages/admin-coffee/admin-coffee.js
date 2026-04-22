@@ -84,8 +84,8 @@ Page({
       wx.hideLoading();
 
       // 检查云函数是否返回错误
-      if (result.errMsg || (result.result && result.result.code === -1)) {
-        const errorMsg = result.result?.message || result.errMsg || '未知操作';
+      if (result.result && result.result.code === -1) {
+        const errorMsg = result.result.message || '操作失败';
         console.error('错误:', errorMsg);
         wx.showToast({ title: errorMsg, icon: 'none' });
         return;
