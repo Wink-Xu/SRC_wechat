@@ -215,22 +215,16 @@ Page({
                 data: result.csvContent,
                 encoding: 'utf-8-sig',
                 success: () => {
-                  // 让用户选择分享方式
-                  wx.shareFileMessage({
+                  // 直接打开文档，用户可以选择用其他应用打开
+                  wx.openDocument({
                     filePath: filePath,
-                    fileName: fileName,
+                    showMenu: true,
                     success: () => {
                       wx.showToast({ title: `已导出 ${result.count} 条订单`, icon: 'success' });
                     },
-                    fail: () => {
-                      // 如果分享失败，用打开方式
-                      wx.openDocument({
-                        filePath: filePath,
-                        showMenu: true,
-                        success: () => {
-                          wx.showToast({ title: `已导出 ${result.count} 条订单`, icon: 'success' });
-                        }
-                      });
+                    fail: (err) => {
+                      console.error('打开文档失败', err);
+                      wx.showToast({ title: '打开失败，可在文件管理中查看', icon: 'none' });
                     }
                   });
                 },
@@ -244,7 +238,8 @@ Page({
             }
           } catch (error) {
             wx.hideLoading();
-            wx.showToast({ title: error.message || '导出失败', icon: 'none' });
+            console.error('导出订单失败', error);
+            wx.showToast({ title: error.message || '导出失败', icon: 'none', duration: 3000 });
           }
         }
       }

@@ -128,14 +128,19 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #F5F5F5;
+  padding-bottom: 16rpx;
 }
 
 .header-left {
   display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.header-right {
+  display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .order-no-group {
@@ -145,21 +150,19 @@ page {
 }
 
 .order-no {
-  font-size: 26rpx;
-  color: #666666;
-  font-weight: 500;
+  font-size: 24rpx;
+  color: #999999;
 }
 
 .pickup-no {
-  font-size: 30rpx;
-  font-weight: 600;
+  font-size: 32rpx;
+  font-weight: 700;
   color: #1A1A1A;
 }
 
 .arrow-icon {
   font-size: 48rpx;
   color: #999999;
-  opacity: 0.5;
   line-height: 1;
 }
 
@@ -197,13 +200,13 @@ page {
 }
 
 .order-body {
-  padding: 20rpx 0;
+  padding: 16rpx 0;
 }
 
 .order-info-row {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 12rpx;
+  margin-bottom: 10rpx;
   font-size: 26rpx;
   line-height: 1.5;
 }
@@ -211,7 +214,7 @@ page {
 .info-label {
   color: #999999;
   flex-shrink: 0;
-  width: 100rpx;
+  width: 90rpx;
 }
 
 .info-value {
@@ -223,35 +226,16 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #F5F5F5;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #F0F0F0;
 }
 
-.order-actions {
-  display: flex;
-  gap: 16rpx;
-}
-
-.action-btn {
-  padding: 10rpx 24rpx;
+.order-time {
   font-size: 24rpx;
-  border-radius: 16rpx;
-  background: #F5F5F5;
-  color: #666666;
+  color: #999999;
 }
 
 .order-total {
-  display: flex;
-  align-items: center;
-}
-
-.total-label {
-  font-size: 26rpx;
-  color: #999999;
-  margin-right: 8rpx;
-}
-
-.total-price {
   font-size: 32rpx;
   font-weight: 600;
   color: #1A1A1A;

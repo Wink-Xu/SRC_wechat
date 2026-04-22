@@ -57,11 +57,13 @@
             <text class="order-no">{{item.order_no}}</text>
             <text class="pickup-no" wx:if="{{item.pickup_no}}">取餐号 {{item.pickup_no}}</text>
           </view>
+        </view>
+        <view class="header-right">
           <view class="status-tag status-{{item.status}}">
             {{item.statusText}}
           </view>
+          <text class="arrow-icon">›</text>
         </view>
-        <text class="arrow-icon">›</text>
       </view>
 
       <view class="order-body" bindtap="goToDetail" data-id="{{item._id}}">
@@ -73,25 +75,11 @@
           <text class="info-label">商品：</text>
           <text class="info-value">{{item.itemsText}}</text>
         </view>
-        <view class="order-info-row">
-          <text class="info-label">时间：</text>
-          <text class="info-value">{{item.formattedTime}}</text>
-        </view>
       </view>
 
       <view class="order-footer">
-        <view class="order-actions">
-          <view class="action-btn copy-btn" bindtap="copyOrderNo" data-no="{{item.order_no}}">
-            <text>复制</text>
-          </view>
-          <view class="action-btn detail-btn" bindtap="goToDetail" data-id="{{item._id}}">
-            <text>详情</text>
-          </view>
-        </view>
-        <view class="order-total">
-          <text class="total-label">实付：</text>
-          <text class="total-price">￥{{item.total_amount / 100}}</text>
-        </view>
+        <text class="order-time">{{item.formattedTime}}</text>
+        <text class="order-total">￥{{item.total_amount / 100}}</text>
       </view>
 
       <!-- 订单状态操作按钮 -->
