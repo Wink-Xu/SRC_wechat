@@ -73,16 +73,7 @@
   <view class="cart-bar" wx:if="{{cartCount > 0}}" bindtap="goToCart">
     <view class="cart-left">
       <view class="cart-icon-wrapper">
-        <view class="cart-icon-svg">
-          <view class="cart-body"></view>
-          <view class="cart-basket">
-            <view class="cart-handle"></view>
-            <view class="cart-wheels">
-              <view class="wheel"></view>
-              <view class="wheel"></view>
-            </view>
-          </view>
-        </view>
+        <image class="cart-icon-img" src="/images/gouwuche.png" mode="aspectFit"></image>
         <view class="cart-badge">{{cartCount}}</view>
       </view>
       <text class="cart-total-price">￥{{cartTotal / 100}}</text>
