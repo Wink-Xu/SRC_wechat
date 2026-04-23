@@ -34,9 +34,9 @@
   <view wx:else class="order-list">
     <view class="order-item" wx:for="{{orders}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
       <view class="order-top">
-        <view class="pickup-badge" wx:if="{{item.pickup_no}}">
-          <text class="pickup-label">取餐号</text>
-          <text class="pickup-num">{{item.pickup_no}}</text>
+        <view class="order-no-group">
+          <text class="order-no-label">订单号</text>
+          <text class="order-no">{{item.order_no}}</text>
         </view>
         <view class="status-tag status-{{item.status}}">
           {{item.status === 'pending' ? '待支付' : item.status === 'paid' || item.status === 'processing' ? '已支付' : item.status === 'completed' ? '已完成' : '已取消'}}

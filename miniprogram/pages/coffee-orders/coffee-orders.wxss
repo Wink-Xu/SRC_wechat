@@ -99,22 +99,22 @@ page {
   margin-bottom: 20rpx;
 }
 
-.pickup-badge {
+.order-no-group {
   display: flex;
-  align-items: baseline;
-  gap: 10rpx;
+  flex-direction: column;
+  gap: 6rpx;
 }
 
-.pickup-label {
-  font-size: 22rpx;
+.order-no-label {
+  font-size: 20rpx;
   color: #999999;
 }
 
-.pickup-num {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #1A1A1A;
-  line-height: 1;
+.order-no {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  letter-spacing: 1rpx;
 }
 
 .status-tag {
