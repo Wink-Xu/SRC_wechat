@@ -8,17 +8,49 @@ Page({
     loading: true,
     loadingMore: false,
     hasMore: true,
-    page: 1
+    page: 1,
+    hasSubscribed: false
   },
 
   onLoad: function () {
+    this.checkSubscription();
     this.loadBalance();
     this.loadOrders();
   },
 
   onShow: function () {
-    // 每次显示页面时刷新余额
+    // 每次显示页面时刷新余额和订阅状态
+    this.checkSubscription();
     this.loadBalance();
+  },
+
+  // 检查是否已订阅
+  checkSubscription: function () {
+    const hasSubscribed = wx.getStorageSync('coffee_order_subscribed') || false;
+    this.setData({ hasSubscribed });
+  },
+
+  // 请求订阅消息
+  requestSubscribe: function () {
+    const that = this;
+    const TEMPLATE_ID = 'PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U';
+
+    wx.requestSubscribeMessage({
+      tmplIds: [TEMPLATE_ID],
+      success: function (res) {
+        console.log('订阅结果:', res);
+        if (res[TEMPLATE_ID] === 'accept') {
+          wx.setStorageSync('coffee_order_subscribed', true);
+          that.setData({ hasSubscribed: true });
+          wx.showToast({ title: '已开启通知', icon: 'success' });
+        } else if (res[TEMPLATE_ID] === 'reject') {
+          wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
+        }
+      },
+      fail: function (err) {
+        console.error('订阅失败:', err);
+      }
+    });
   },
 
   // 加载咖啡余额

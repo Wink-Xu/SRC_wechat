@@ -28,7 +28,37 @@ page {
 .header-right {
   display: flex;
   align-items: center;
+  gap: 16rpx;
   margin-right: 24rpx;
+}
+
+/* 通知按钮 */
+.notify-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  background: #F5F5F5;
+  border-radius: 24rpx;
+}
+
+.notify-btn.active {
+  background: #E3F2FD;
+}
+
+.notify-icon {
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.notify-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.notify-btn.active .notify-text {
+  color: #1976D2;
+  font-weight: 500;
 }
 
 /* 营业状态开关 */

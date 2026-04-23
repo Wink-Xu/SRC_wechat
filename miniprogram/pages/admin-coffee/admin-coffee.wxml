@@ -4,6 +4,11 @@
   <view class="header">
     <text class="header-title">咖啡管理</text>
     <view class="header-right">
+      <!-- 通知开关 -->
+      <view class="notify-btn {{hasSubscribed ? 'active' : ''}}" bindtap="requestSubscribe">
+        <text class="notify-icon">🔔</text>
+        <text class="notify-text">{{hasSubscribed ? '已开启' : '开启通知'}}</text>
+      </view>
       <!-- 营业状态开关 -->
       <view class="shop-status-switch {{isShopOpen ? 'active' : ''}}" bindtap="toggleShopStatus">
         <view class="switch-btn {{isShopOpen ? 'on' : 'off'}}"></view>
