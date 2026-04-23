@@ -21,6 +21,8 @@ exports.main = async (event, context) => {
   switch (action) {
     case 'sendOrderNotification':
       return handleSendOrderNotification(data, wxContext);
+    case 'sendShopOpenNotification':
+      return handleSendShopOpenNotification(data, wxContext);
     case 'requestSubscribe':
       return handleRequestSubscribe(data, wxContext);
     default:
@@ -56,23 +58,20 @@ async function handleSendOrderNotification(data, wxContext) {
     // 发送订阅消息给每个管理员
     const sendPromises = admins.map(async (admin) => {
       try {
-        // 注意：这里需要管理员之前订阅过消息
-        // 如果管理员没有订阅，发送会失败但不会影响其他管理员
         await cloud.openapi.subscribeMessage.send({
           touser: admin.openid,
           templateId: TEMPLATE_ID,
           page: '/pages/admin-coffee-orders/admin-coffee-orders',
           data: {
-            thing1: { value: itemName.length > 20 ? itemName.substring(0, 20) + '...' : itemName }, // 商品名称
-            thing2: { value: orderNo }, // 订单编号
-            amount3: { value: totalPrice }, // 订单金额
-            thing4: { value: '新订单待处理' }, // 订单状态
-            time5: { value: createTime || new Date().toLocaleString('zh-CN') } // 下单时间
+            thing1: { value: itemName.length > 20 ? itemName.substring(0, 20) + '...' : itemName },
+            thing2: { value: orderNo },
+            amount3: { value: totalPrice },
+            thing4: { value: '新订单待处理' },
+            time5: { value: createTime || new Date().toLocaleString('zh-CN') }
           }
         });
         console.log(`已发送通知给管理员：${admin.nickname || admin.openid}`);
       } catch (err) {
-        // 订阅消息发送失败通常是因为用户没有订阅，记录但不中断
         console.error(`发送通知给 ${admin.openid} 失败:`, err);
       }
     });
@@ -86,6 +85,58 @@ async function handleSendOrderNotification(data, wxContext) {
     };
   } catch (error) {
     console.error('发送订单通知失败', error);
+    return { code: -1, message: '发送通知失败：' + error.message };
+  }
+}
+
+// 发送店铺开张通知给咖啡管理员
+async function handleSendShopOpenNotification(data, wxContext) {
+  try {
+    // 获取所有咖啡管理员和团长的 openid
+    const adminResult = await db.collection('users').where({
+      role: _.in(['coffee_admin', 'leader'])
+    }).field({
+      openid: true,
+      nickname: true
+    }).get();
+
+    const admins = adminResult.data;
+    if (admins.length === 0) {
+      return { code: 0, message: '没有咖啡管理员，跳过通知' };
+    }
+
+    const openTime = new Date().toLocaleString('zh-CN');
+
+    // 发送订阅消息给每个管理员
+    const sendPromises = admins.map(async (admin) => {
+      try {
+        await cloud.openapi.subscribeMessage.send({
+          touser: admin.openid,
+          templateId: TEMPLATE_ID,
+          page: '/pages/admin-coffee-orders/admin-coffee-orders',
+          data: {
+            thing1: { value: '店铺已开始营业' },
+            thing2: { value: '营业通知' },
+            amount3: { value: '-' },
+            thing4: { value: '新的一天开始啦' },
+            time5: { value: openTime }
+          }
+        });
+        console.log(`已发送开张通知给管理员：${admin.nickname || admin.openid}`);
+      } catch (err) {
+        console.error(`发送开张通知给 ${admin.openid} 失败:`, err);
+      }
+    });
+
+    await Promise.all(sendPromises);
+
+    return {
+      code: 0,
+      message: `已发送开张通知给 ${admins.length} 位管理员`,
+      data: { adminCount: admins.length }
+    };
+  } catch (error) {
+    console.error('发送店铺开张通知失败', error);
     return { code: -1, message: '发送通知失败：' + error.message };
   }
 }

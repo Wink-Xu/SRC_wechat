@@ -1109,12 +1109,7 @@ async function handleSetShopStatus(data, openid) {
         await cloud.callFunction({
           name: 'notification',
           data: {
-            action: 'sendOrderNotification',
-            orderId: 'status_change',
-            orderNo: '店铺开始营业',
-            items: [],
-            totalAmount: 0,
-            createTime: new Date().toLocaleString('zh-CN')
+            action: 'sendShopOpenNotification'
           }
         });
       } catch (err) {
