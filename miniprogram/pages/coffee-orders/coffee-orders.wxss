@@ -11,9 +11,9 @@ page {
 /* 余额卡片 */
 .balance-card {
   background: #1A1A1A;
-  padding: 32rpx 40rpx;
-  margin: 24rpx 32rpx 20rpx;
-  border-radius: 20rpx;
+  padding: 24rpx 32rpx;
+  margin: 20rpx 24rpx 16rpx;
+  border-radius: 16rpx;
 }
 
 .balance-row {
@@ -26,20 +26,19 @@ page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
 .balance-value {
-  font-size: 48rpx;
+  font-size: 40rpx;
   font-weight: 600;
   color: #FFFFFF;
   line-height: 1;
 }
 
 .balance-label {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: rgba(255, 255, 255, 0.6);
-  margin-top: 8rpx;
 }
 
 .balance-divider {
@@ -54,41 +53,41 @@ page {
   align-items: center;
   gap: 12rpx;
   background: #FFFFFF;
-  margin: 0 32rpx 20rpx;
-  padding: 24rpx 28rpx;
-  border-radius: 16rpx;
+  margin: 0 24rpx 16rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
   box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .notify-icon {
-  font-size: 32rpx;
+  font-size: 28rpx;
   line-height: 1;
 }
 
 .notify-text {
   flex: 1;
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #333333;
 }
 
 .notify-arrow {
-  font-size: 36rpx;
+  font-size: 32rpx;
   color: #CCCCCC;
   line-height: 1;
 }
 
 /* 订单列表 */
 .order-list {
-  padding: 0 32rpx;
+  padding: 0 24rpx;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .order-item {
   background: #FFFFFF;
-  border-radius: 16rpx;
-  padding: 28rpx;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.03);
 }
 
@@ -96,7 +95,7 @@ page {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 12rpx;
 }
 
 .order-no-group {
@@ -150,31 +149,31 @@ page {
 }
 
 .order-items {
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .item-text {
   display: block;
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #333333;
-  line-height: 1.8;
+  line-height: 1.5;
 }
 
 .order-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16rpx;
+  padding-top: 12rpx;
   border-top: 1rpx solid #F0F0F0;
 }
 
 .order-time {
-  font-size: 22rpx;
+  font-size: 20rpx;
   color: #999999;
 }
 
 .order-price {
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #1A1A1A;
 }
