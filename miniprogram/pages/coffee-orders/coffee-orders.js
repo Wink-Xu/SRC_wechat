@@ -9,19 +9,31 @@ Page({
     loadingMore: false,
     hasMore: true,
     page: 1,
-    hasSubscribed: false
+    hasSubscribed: false,
+    hasLoaded: false
   },
 
   onLoad: function () {
     this.checkSubscription();
     this.loadBalance();
     this.loadOrders();
+    this.setData({ hasLoaded: true });
   },
 
   onShow: function () {
-    // 每次显示页面时刷新余额和订阅状态
+    // 每次显示页面时刷新订阅状态
     this.checkSubscription();
+    // 只在首次或缓存过期时刷新余额
+    if (this.data.hasLoaded) {
+      const lastBalanceLoadTime = wx.getStorageSync('coffee_balance_last_load_time') || 0;
+      if (Date.now() - lastBalanceLoadTime > 2 * 60 * 1000) {
+        this.loadBalance();
+      }
+      return;
+    }
     this.loadBalance();
+    this.loadOrders();
+    this.setData({ hasLoaded: true });
   },
 
   // 检查是否已订阅
@@ -58,6 +70,7 @@ Page({
     try {
       const result = await coffeeApi.getBalance({});
       this.setData({ balance: result });
+      wx.setStorageSync('coffee_balance_last_load_time', Date.now());
     } catch (error) {
       console.error('加载余额失败', error);
     }

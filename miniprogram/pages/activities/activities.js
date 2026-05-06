@@ -12,7 +12,8 @@ Page({
     loadingMore: false,
     hasMore: true,
     page: 1,
-    pageSize: 10
+    pageSize: 10,
+    hasLoaded: false
   },
 
   onLoad: function () {
@@ -20,7 +21,15 @@ Page({
   },
 
   onShow: function () {
-    this.refreshActivities();
+    // 如果已加载过，检查缓存时间，超过5分钟才刷新
+    if (this.data.hasLoaded) {
+      const lastLoadTime = wx.getStorageSync('activities_last_load_time') || 0;
+      if (Date.now() - lastLoadTime > 5 * 60 * 1000) {
+        this.refreshActivities();
+      }
+      return;
+    }
+    this.loadActivities();
   },
 
   onPullDownRefresh: function () {
@@ -154,13 +163,15 @@ Page({
     // 缓存第一页数据
     if (page === 1) {
       setCache('activities_list', { ongoingActivities, pastActivities }, 5 * 60 * 1000); // 5分钟缓存
+      wx.setStorageSync('activities_last_load_time', Date.now());
     }
 
     this.setData({
       ongoingActivities: page === 1 ? ongoingActivities : [...this.data.ongoingActivities, ...ongoingActivities],
       pastActivities: page === 1 ? pastActivities : [...this.data.pastActivities, ...pastActivities],
       hasMore: ongoingActivities.length >= pageSize || pastActivities.length >= pageSize,
-      loading: false
+      loading: false,
+      hasLoaded: true
     });
 
     // 预加载下一页

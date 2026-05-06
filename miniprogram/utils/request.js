@@ -11,7 +11,7 @@ const { showLoading, hideLoading, showError } = require('./util');
  * @returns {Promise<Object>} 返回结果
  */
 const callFunction = async (name, action, data = {}, options = {}) => {
-  const { showLoad = true, showErrorMsg = true } = options;
+  const { showLoad = false, showErrorMsg = true } = options;
 
   if (showLoad) {
     showLoading();
