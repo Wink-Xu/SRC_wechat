@@ -69,5 +69,15 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "cloud": true
+  "cloud": true,
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000,
+    "uploadFile": 10000
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于展示咖啡门店距离"
+    }
+  }
 }

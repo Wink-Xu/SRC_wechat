@@ -199,9 +199,12 @@ Page({
         `此活动需要支付 ¥${activity.registration_fee_yuan}，确认报名吗？`
       );
       if (!confirm) return;
-      // TODO: 微信支付流程
-      showInfo('微信支付功能开发中');
-      return;
+      // 现金支付活动，线下支付后确认
+      const confirm = await showConfirm(
+        '确认报名',
+        `此活动需要支付 ¥${activity.registration_fee_yuan}，支付后请点击确认报名`
+      );
+      if (!confirm) return;
     } else {
       const confirm = await showConfirm('确认报名', '确定要报名参加此活动吗？');
       if (!confirm) return;
