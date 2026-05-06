@@ -173,11 +173,17 @@ async function handlePayOrderByPoints(data, openid) {
   try {
     // 获取当前用户
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在，请先登录' };
+    }
     const userId = userResult.data[0]._id;
     const userPoints = userResult.data[0].points;
 
     // 获取订单
     const orderResult = await db.collection('orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -194,7 +200,7 @@ async function handlePayOrderByPoints(data, openid) {
 
     // 检查库存
     const productResult = await db.collection('products').doc(order.product_id).get();
-    if (productResult.data.stock < order.quantity) {
+    if (!productResult.data || productResult.data.stock < order.quantity) {
       return { code: -1, message: '库存不足' };
     }
 
@@ -249,6 +255,9 @@ async function handleGetOrders(data, openid) {
   try {
     // 获取当前用户
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在，请先登录' };
+    }
     const userId = userResult.data[0]._id;
 
     let query = db.collection('orders').where({ user_id: userId });
@@ -291,6 +300,9 @@ async function handleGetOrderDetail(data, openid) {
     const userId = userResult.data[0]._id;
 
     const orderResult = await db.collection('orders').doc(id).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -316,6 +328,9 @@ async function handleCancelOrder(data, openid) {
     const userId = userResult.data[0]._id;
 
     const orderResult = await db.collection('orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -349,6 +364,9 @@ async function handleConfirmReceipt(data, openid) {
     const userId = userResult.data[0]._id;
 
     const orderResult = await db.collection('orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {

@@ -247,7 +247,7 @@ async function handleApproveMember(data, wxContext, openid) {
     // 检查权限
     const adminResult = await db.collection('users').where({
       openid,
-      role: _.in(['admin', 'leader'])
+      role: _.in(['activity_admin', 'leader'])
     }).get();
 
     if (adminResult.data.length === 0) {

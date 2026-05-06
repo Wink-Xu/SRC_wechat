@@ -281,6 +281,9 @@ async function handlePayOrderByPoints(data, openid) {
   try {
     // 获取用户
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在，请先登录' };
+    }
     const user = userResult.data[0];
     const userId = user._id;
     const userPoints = user.points || 0;
@@ -354,9 +357,15 @@ async function handlePayOrderByCash(data, openid) {
 
   try {
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const userId = userResult.data[0]._id;
 
     const orderResult = await db.collection('coffee_orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -393,10 +402,16 @@ async function handlePayOrderByBalance(data, openid) {
 
   try {
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     const userId = user._id;
 
     const orderResult = await db.collection('coffee_orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -420,7 +435,6 @@ async function handlePayOrderByBalance(data, openid) {
     // 计算需要使用的余额
     let americanoUsed = 0;
     let anyUsed = 0;
-    let remainingQuantity = order.total_quantity;
 
     // 遍历订单项，按商品类型扣除对应余额
     for (const item of order.items) {
@@ -526,6 +540,9 @@ async function handleGetOrders(data, openid) {
 
   try {
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在，请先登录' };
+    }
     const userId = userResult.data[0]._id;
 
     let query = db.collection('coffee_orders').where({ user_id: userId });
@@ -617,9 +634,15 @@ async function handleCancelOrder(data, openid) {
 
   try {
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const userId = userResult.data[0]._id;
 
     const orderResult = await db.collection('coffee_orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
     const order = orderResult.data;
 
     if (order.user_id !== userId) {
@@ -786,6 +809,9 @@ async function handleAdminGetOrders(data, openid) {
   try {
     // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
@@ -885,6 +911,9 @@ async function handleAdminUpdateOrderStatus(data, openid) {
   try {
     // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
@@ -913,6 +942,9 @@ async function handleExportOrders(data, openid) {
   try {
     // 检查管理员权限（团长或咖啡管理员）
     const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     if (user.role !== 'coffee_admin' && user.role !== 'leader') {
       return { code: -1, message: '无权限' };
@@ -1052,6 +1084,9 @@ async function handleSetShopStatus(data, openid) {
   try {
     // 验证用户权限
     const userResult = await db.collection('users').where({ openid }).field({ role: true }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
     const user = userResult.data[0];
     const isAdmin = user && (user.role === 'coffee_admin' || user.role === 'leader');
 

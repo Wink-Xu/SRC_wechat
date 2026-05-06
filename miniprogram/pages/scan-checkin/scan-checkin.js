@@ -106,7 +106,8 @@ Page({
     }
 
     // 检查是否是团员
-    if (app.globalData.userInfo.status !== 'approved') {
+    const userInfo = app.globalData.userInfo;
+    if (!userInfo || userInfo.status !== 'approved') {
       wx.showToast({
         title: '仅限正式团员签到',
         icon: 'none'

@@ -59,7 +59,7 @@ Page({
       });
 
       wx.setNavigationBarTitle({
-        title: `报名名单 (${this.data.participants.length}人)`
+        title: `报名名单 (${processedParticipants.length}人)`
       });
     } catch (error) {
       console.error('加载报名名单失败', error);
