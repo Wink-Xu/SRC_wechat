@@ -16,7 +16,7 @@ Page({
 
   onLoad: function () {
     if (!requireMember()) {
-      setTimeout(() => wx.switchTab({ url: '/pages/index/index' }), 1500);
+      setTimeout(() => wx.switchTab({ url: '/pages/activities/activities' }), 1500);
       return;
     }
     this.loadData();
