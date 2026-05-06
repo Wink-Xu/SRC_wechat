@@ -7,6 +7,7 @@
 
 const CACHE_PREFIX = 'src_cache_';
 const CACHE_EXPIRE_TIME = 30 * 60 * 1000; // 30分钟过期
+const IMG_CACHE_KEY = CACHE_PREFIX + 'image_urls';
 
 /**
  * 设置缓存
@@ -73,28 +74,49 @@ const clearAllCache = () => {
 };
 
 /**
- * 图片URL缓存管理器
+ * 图片URL缓存管理器（优化：单次 localStorage 读写，避免多次 I/O）
  */
 const imageUrlCache = {
-  cache: {},
+  _map: null,
+  _loaded: false,
 
   /**
-   * 获取图片URL（优先从内存缓存，再到本地缓存）
+   * 加载缓存（懒加载，单次读取）
+   */
+  _load() {
+    if (!this._loaded) {
+      try {
+        const cached = wx.getStorageSync(IMG_CACHE_KEY);
+        this._map = (cached && cached.expire > Date.now()) ? cached.data : {};
+      } catch (e) {
+        this._map = {};
+      }
+      this._loaded = true;
+    }
+  },
+
+  /**
+   * 保存缓存（单次写入）
+   */
+  _save() {
+    try {
+      wx.setStorageSync(IMG_CACHE_KEY, {
+        data: this._map,
+        expire: Date.now() + 60 * 60 * 1000 // 1小时
+      });
+    } catch (e) {
+      console.error('图片缓存写入失败', e);
+    }
+  },
+
+  /**
+   * 获取图片URL
    * @param {string} fileID 云存储fileID
    * @returns {string|null} 缓存的URL
    */
   get(fileID) {
-    // 先查内存缓存
-    if (this.cache[fileID]) {
-      return this.cache[fileID];
-    }
-    // 再查本地缓存
-    const url = getCache('img_' + fileID);
-    if (url) {
-      this.cache[fileID] = url;
-      return url;
-    }
-    return null;
+    this._load();
+    return this._map[fileID] || null;
   },
 
   /**
@@ -103,8 +125,9 @@ const imageUrlCache = {
    * @param {string} url 临时URL
    */
   set(fileID, url) {
-    this.cache[fileID] = url;
-    setCache('img_' + fileID, url, 60 * 60 * 1000); // 图片URL缓存1小时
+    this._load();
+    this._map[fileID] = url;
+    this._save();
   },
 
   /**
@@ -112,11 +135,24 @@ const imageUrlCache = {
    * @param {Object} map fileID -> url 的映射
    */
   setBatch(map) {
+    this._load();
     Object.keys(map).forEach(fileID => {
       if (map[fileID]) {
-        this.set(fileID, map[fileID]);
+        this._map[fileID] = map[fileID];
       }
     });
+    this._save();
+  },
+
+  /**
+   * 清空图片缓存
+   */
+  clear() {
+    this._map = {};
+    this._loaded = true;
+    try {
+      wx.removeStorageSync(IMG_CACHE_KEY);
+    } catch (e) {}
   }
 };
 

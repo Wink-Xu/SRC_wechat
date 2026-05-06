@@ -77,6 +77,7 @@ const activityApi = {
   cancel: (data) => callFunction('activity', 'cancel', data),
   delete: (data) => callFunction('activity', 'delete', data),
   getList: (data) => callFunction('activity', 'getList', data, { showLoad: false }),
+  getListOptimized: (data) => callFunction('activity', 'getListOptimized', data, { showLoad: false }),
   getDetail: (data) => callFunction('activity', 'getDetail', data),
   register: (data) => callFunction('activity', 'register', data),
   cancelRegistration: (data) => callFunction('activity', 'cancelRegistration', data),

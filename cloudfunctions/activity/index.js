@@ -46,6 +46,8 @@ exports.main = async (event, context) => {
       return handleDelete(data, wxContext, testOpenid);
     case 'getList':
       return handleGetList(data, wxContext, testOpenid);
+    case 'getListOptimized':
+      return handleGetListOptimized(data, wxContext, testOpenid);
     case 'getDetail':
       return handleGetDetail(data, wxContext, testOpenid);
     case 'register':
@@ -360,6 +362,98 @@ async function handleGetList(data, wxContext, testOpenid) {
       code: 0,
       data: {
         list: activities,
+        total,
+        page,
+        limit
+      }
+    };
+  } catch (error) {
+    console.error('获取活动列表失败', error);
+    return { code: -1, message: '获取失败' };
+  }
+}
+
+// 获取活动列表（优化版：一次请求返回所有状态 + 批量查询报名数）
+async function handleGetListOptimized(data, wxContext, testOpenid) {
+  const { page = 1, limit = 20 } = data;
+
+  try {
+    const user = await getUser(wxContext.OPENID, testOpenid);
+    const userId = user ? user._id : null;
+
+    // 一次性获取所有活动（不分状态），按创建时间倒序
+    const query = db.collection('activities');
+    const countResult = await query.count();
+    const total = countResult.total;
+
+    const skip = (page - 1) * limit;
+    const listResult = await query
+      .orderBy('created_at', 'desc')
+      .skip(skip)
+      .limit(limit)
+      .get();
+
+    const activities = listResult.data;
+
+    if (activities.length === 0) {
+      return { code: 0, data: { list: [], total, page, limit } };
+    }
+
+    const activityIds = activities.map(a => a._id);
+
+    // 批量查询每个活动的报名数（一条 aggregation 搞定）
+    const regCountResult = await db.collection('registrations')
+      .where({
+        activity_id: _.in(activityIds),
+        status: _.in(['registered', 'checked_in'])
+      })
+      .get();
+
+    // 按 activity_id 分组统计
+    const countMap = {};
+    regCountResult.data.forEach(reg => {
+      const aid = reg.activity_id;
+      countMap[aid] = (countMap[aid] || 0) + 1;
+    });
+
+    // 批量查询用户在各活动的报名状态
+    let userRegMap = {};
+    if (userId) {
+      const userRegResult = await db.collection('registrations').where({
+        activity_id: _.in(activityIds),
+        user_id: userId
+      }).get();
+
+      userRegResult.data.forEach(reg => {
+        userRegMap[reg.activity_id] = {
+          status: reg.status,
+          checked_in: reg.status === 'checked_in'
+        };
+      });
+    }
+
+    // 组装数据
+    activities.forEach(activity => {
+      activity.registered_count = countMap[activity._id] || 0;
+
+      if (userId && userRegMap[activity._id]) {
+        activity.user_status = userRegMap[activity._id].status;
+        activity.user_checked_in = userRegMap[activity._id].checked_in;
+      } else {
+        activity.user_status = null;
+        activity.user_checked_in = false;
+      }
+    });
+
+    // 按状态分组
+    const ongoingList = activities.filter(a => a.status === 'ongoing');
+    const endedList = activities.filter(a => a.status === 'ended' || a.status === 'cancelled');
+
+    return {
+      code: 0,
+      data: {
+        ongoingList,
+        endedList,
         total,
         page,
         limit

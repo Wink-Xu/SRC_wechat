@@ -1,7 +1,6 @@
 // pages/activities/activities.js
 const { activityApi } = require('../../utils/request');
 const { formatDate } = require('../../utils/util');
-const { ACTIVITY_STATUS } = require('../../utils/constants');
 const { imageUrlCache, setCache, getCache } = require('../../utils/cache');
 
 Page({
@@ -49,7 +48,8 @@ Page({
     this.setData({
       page: 1,
       hasMore: true,
-      activities: []
+      ongoingActivities: [],
+      pastActivities: []
     });
     return this.loadActivities();
   },
@@ -83,44 +83,25 @@ Page({
     }
   },
 
-  // 刷新活动数据
+  // 刷新活动数据（优化：单次请求获取所有状态）
   refreshActivitiesData: async function (page, pageSize, isBackgroundRefresh) {
-    // 并行加载活动（优化：同时请求，不等待）
-    const [ongoingResult, pastResult] = await Promise.all([
-      activityApi.getList({
-        page,
-        limit: pageSize,
-        status: 'ongoing'
-      }, { showLoad: false }),
-      activityApi.getList({
-        page,
-        limit: pageSize,
-        status: 'ended'
-      }, { showLoad: false })
-    ]);
+    // 优化：单次请求替代原来的 2 次并行请求
+    const result = await activityApi.getListOptimized({
+      page,
+      limit: pageSize
+    });
 
-    // 跑步类型映射
-    const runTypeMap = {
-      road: '路跑',
-      trail: '越野跑',
-      hiking: '徒步',
-      brand: '品牌合作跑'
-    };
-
-    const self = this;
+    const allActivities = [...(result.ongoingList || []), ...(result.endedList || [])];
 
     // 收集所有需要转换的封面图 fileID
-    const allActivities = [...(ongoingResult.list || []), ...(pastResult.list || [])];
-
     const coverImageFileIDs = allActivities
       .filter(item => item.cover_image && item.cover_image.startsWith('cloud://'))
       .map(item => item.cover_image);
 
-    // 批量转换 fileID 为临时 URL（使用缓存）
+    // 批量转换 fileID 为临时 URL（优先从缓存获取）
     let tempUrlMap = {};
     const uncachedFileIDs = [];
 
-    // 先从缓存获取
     coverImageFileIDs.forEach(fileID => {
       const cachedUrl = imageUrlCache.get(fileID);
       if (cachedUrl) {
@@ -143,7 +124,6 @@ Page({
             newUrls[file.fileID] = file.tempFileURL;
           }
         });
-        // 批量缓存新的 URL
         imageUrlCache.setBatch(newUrls);
       } catch (err) {
         console.error('获取封面临时链接失败', err);
@@ -151,18 +131,14 @@ Page({
     }
 
     // 处理正在报名的活动
-    const ongoingActivities = (ongoingResult.list || []).map(function(item) {
-      return self.formatActivity(item, runTypeMap, tempUrlMap);
-    });
+    const ongoingActivities = (result.ongoingList || []).map(item => this.formatActivity(item, tempUrlMap));
 
     // 处理往期活动
-    const pastActivities = (pastResult.list || []).map(function(item) {
-      return self.formatActivity(item, runTypeMap, tempUrlMap);
-    });
+    const pastActivities = (result.endedList || []).map(item => this.formatActivity(item, tempUrlMap));
 
     // 缓存第一页数据
     if (page === 1) {
-      setCache('activities_list', { ongoingActivities, pastActivities }, 5 * 60 * 1000); // 5分钟缓存
+      setCache('activities_list', { ongoingActivities, pastActivities }, 5 * 60 * 1000);
       wx.setStorageSync('activities_last_load_time', Date.now());
     }
 
@@ -174,14 +150,22 @@ Page({
       hasLoaded: true
     });
 
-    // 预加载下一页
-    if (!isBackgroundRefresh) {
+    // 预加载下一页（非首次加载时才预加载，避免抢占首屏带宽）
+    if (!isBackgroundRefresh && !this._preloadOnFirstLoad) {
+      this._preloadOnFirstLoad = true;
       this.preloadNextPage();
     }
   },
 
   // 格式化活动数据
-  formatActivity: function(item, runTypeMap, tempUrlMap) {
+  formatActivity: function(item, tempUrlMap) {
+    const runTypeMap = {
+      road: '路跑',
+      trail: '越野跑',
+      hiking: '徒步',
+      brand: '品牌合作跑'
+    };
+
     const formatted = {
       ...item,
       formattedTime: formatDate(item.start_time, 'MM 月 DD 日 HH:mm'),
@@ -215,18 +199,43 @@ Page({
         page: this.data.page + 1
       });
 
-      const { ongoingResult, pastResult } = this._preloadedData;
+      const { result } = this._preloadedData;
       this._preloadedData = null;
 
-      const runTypeMap = {
-        road: '路跑',
-        trail: '越野跑',
-        hiking: '徒步',
-        brand: '品牌合作跑'
-      };
+      const allActivities = [...(result.ongoingList || []), ...(result.endedList || [])];
+      const coverImageFileIDs = allActivities
+        .filter(item => item.cover_image && item.cover_image.startsWith('cloud://'))
+        .map(item => item.cover_image);
 
-      const ongoingActivities = (ongoingResult.list || []).map(item => this.formatActivity(item, runTypeMap, {}));
-      const pastActivities = (pastResult.list || []).map(item => this.formatActivity(item, runTypeMap, {}));
+      let tempUrlMap = {};
+      const uncachedFileIDs = [];
+      coverImageFileIDs.forEach(fileID => {
+        const cachedUrl = imageUrlCache.get(fileID);
+        if (cachedUrl) {
+          tempUrlMap[fileID] = cachedUrl;
+        } else {
+          uncachedFileIDs.push(fileID);
+        }
+      });
+
+      if (uncachedFileIDs.length > 0) {
+        try {
+          const tempUrlResult = await wx.cloud.getTempFileURL({ fileList: uncachedFileIDs });
+          const newUrls = {};
+          tempUrlResult.fileList.forEach(file => {
+            if (file.status === 0 && file.tempFileURL) {
+              tempUrlMap[file.fileID] = file.tempFileURL;
+              newUrls[file.fileID] = file.tempFileURL;
+            }
+          });
+          imageUrlCache.setBatch(newUrls);
+        } catch (err) {
+          console.error('获取封面临时链接失败', err);
+        }
+      }
+
+      const ongoingActivities = (result.ongoingList || []).map(item => this.formatActivity(item, tempUrlMap));
+      const pastActivities = (result.endedList || []).map(item => this.formatActivity(item, tempUrlMap));
 
       this.setData({
         ongoingActivities: [...this.data.ongoingActivities, ...ongoingActivities],
@@ -259,19 +268,11 @@ Page({
       this._preloadedPage = this.data.page + 1;
 
       const self = this;
-      Promise.all([
-        activityApi.getList({
-          page: this._preloadedPage,
-          limit: this.data.pageSize,
-          status: 'ongoing'
-        }, { showLoad: false }),
-        activityApi.getList({
-          page: this._preloadedPage,
-          limit: this.data.pageSize,
-          status: 'ended'
-        }, { showLoad: false })
-      ]).then(function([ongoingResult, pastResult]) {
-        self._preloadedData = { ongoingResult, pastResult };
+      activityApi.getListOptimized({
+        page: this._preloadedPage,
+        limit: this.data.pageSize
+      }).then(function(result) {
+        self._preloadedData = { result };
         self._preloading = false;
       }).catch(function() {
         self._preloading = false;
