@@ -13,7 +13,6 @@ Page({
     isCoffeeAdmin: false,     // 咖啡管理员
     isMember: false,    // 是否是团员（已批准）
     isPending: false,   // 是否待审批
-    openid: '',         // 临时显示 openid
     points: 0,
     activityCount: 0,
     pendingMembersCount: 0  // 待审核成员数量
@@ -65,8 +64,7 @@ Page({
       isActivityAdmin: role === 'activity_admin' || role === 'leader',
       isCoffeeAdmin: role === 'coffee_admin' || role === 'leader',
       isMember: app.globalData.isMember,
-      isPending: userInfo && userInfo.status === 'pending',
-      openid: userInfo?.openid || '' // 显示 openid
+      isPending: userInfo && userInfo.status === 'pending'
     });
 
     // 获取积分和活动次数（仅团员）
@@ -185,7 +183,6 @@ Page({
 
   // 跳转到我的活动页面
   goToMyActivities: function () {
-    console.log('goToMyActivities 被调用，isLoggedIn:', this.data.isLoggedIn);
     if (!this.data.isLoggedIn) {
       wx.showToast({
         title: '请先登录',
@@ -193,7 +190,6 @@ Page({
       });
       return;
     }
-    console.log('准备跳转到 /pages/my-activities/my-activities');
     wx.navigateTo({
       url: '/pages/my-activities/my-activities'
     });

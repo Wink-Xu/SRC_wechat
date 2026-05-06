@@ -59,8 +59,6 @@ Page({
   loadActivities: async function () {
     const { page, pageSize } = this.data;
 
-    console.log('[AdminActivities] 开始加载活动，page:', page, 'pageSize:', pageSize);
-
     try {
       const result = await activityApi.getList({
         page,
@@ -68,9 +66,6 @@ Page({
         all: true // 获取所有状态的活动
       });
 
-      console.log('[AdminActivities] API 返回结果:', result);
-
-      // 收集需要转换的封面图 fileID
       const allActivities = result.list || [];
       const coverImageFileIDs = allActivities
         .filter(item => item.cover_image && item.cover_image.startsWith('cloud://'))
@@ -104,15 +99,11 @@ Page({
         };
       });
 
-      console.log('[AdminActivities] 格式化后的活动数量:', activities.length);
-
       this.setData({
         activities: page === 1 ? activities : [...this.data.activities, ...activities],
         hasMore: activities.length >= pageSize,
         loading: false
       });
-
-      console.log('[AdminActivities] setData 完成，当前活动数量:', this.data.activities.length);
     } catch (error) {
       console.error('加载活动列表失败', error);
       this.setData({ loading: false });
@@ -193,8 +184,6 @@ Page({
       const result = await activityApi.finishActivityWithCheckIn({ activityId: id });
 
       wx.hideLoading();
-
-      console.log('[结束活动] 返回结果:', result);
 
       // 成功
       if (result && result.success) {

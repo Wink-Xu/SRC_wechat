@@ -8,8 +8,6 @@
         <view class="nickname-row" bindtap="editNickname">
           <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
         </view>
-        <!-- 临时显示 openid -->
-        <text class="openid-text" wx:if="{{openid}}">OpenID: {{openid}}</text>
         <view class="role-tags" wx:if="{{isLoggedIn}}">
           <text class="role-tag" wx:if="{{isLeader}}">团长</text>
           <text class="role-tag" wx:elif="{{userInfo.role === 'activity_admin'}}">活动管理员</text>

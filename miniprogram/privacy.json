@@ -1,0 +1,22 @@
+{
+  "privacy": {
+    "permissions": [
+      {
+        "privacyKey": "wx.userProfile",
+        "privacyText": "用于完善用户个人资料，展示个人主页"
+      },
+      {
+        "privacyKey": "wx.contact",
+        "privacyText": "用于活动报名联系及快递配送"
+      },
+      {
+        "privacyKey": "wx.location",
+        "privacyText": "用于展示咖啡门店距离及地图导航"
+      },
+      {
+        "privacyKey": "wx.chooseAddress",
+        "privacyText": "用于商城订单快递配送地址"
+      }
+    ]
+  }
+}

@@ -163,7 +163,6 @@ Page({
   selectAddress: function () {
     wx.chooseAddress({
       success: (res) => {
-        console.log('[选择地址] 成功:', res);
         const address = {
           name: res.userName,
           phone: res.telNumber,

@@ -50,7 +50,6 @@ Page({
     wx.requestSubscribeMessage({
       tmplIds: [TEMPLATE_ID],
       success: function (res) {
-        console.log('订阅结果:', res);
         if (res[TEMPLATE_ID] === 'accept') {
           wx.setStorageSync('coffee_order_subscribed', true);
           that.setData({ hasSubscribed: true });

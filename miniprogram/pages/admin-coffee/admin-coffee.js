@@ -46,7 +46,6 @@ Page({
     wx.requestSubscribeMessage({
       tmplIds: [TEMPLATE_ID],
       success: function (res) {
-        console.log('订阅结果:', res);
         if (res[TEMPLATE_ID] === 'accept') {
           wx.setStorageSync('coffee_order_subscribed', true);
           that.setData({ hasSubscribed: true });
@@ -99,8 +98,6 @@ Page({
   setShopStatus: async function (isOpen) {
     wx.showLoading({ title: '设置中...' });
 
-    console.log('设置店铺状态:', isOpen);
-
     try {
       const result = await wx.cloud.callFunction({
         name: 'coffee',
@@ -109,8 +106,6 @@ Page({
           isOpen
         }
       });
-
-      console.log('云函数返回:', result);
 
       // 先隐藏 loading，再更新状态
       wx.hideLoading();

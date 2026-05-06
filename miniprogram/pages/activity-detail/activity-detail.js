@@ -549,7 +549,6 @@ Page({
     const self = this;
     wx.scanCode({
       success: function (res) {
-        console.log('扫码结果:', res);
 
         let activityId = null;
 

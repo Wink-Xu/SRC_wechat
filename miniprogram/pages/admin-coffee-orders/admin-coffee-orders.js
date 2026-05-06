@@ -37,13 +37,10 @@ Page({
     // 直接使用模板 ID（绕过云函数）
     const TEMPLATE_ID = 'PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U';
 
-    console.log('使用模板 ID:', TEMPLATE_ID);
-
     // 直接调用订阅消息
     wx.requestSubscribeMessage({
       tmplIds: [TEMPLATE_ID],
       success: function (res) {
-        console.log('订阅结果:', res);
         if (res[TEMPLATE_ID] === 'accept') {
           wx.setStorageSync('coffee_order_subscribed', true);
           that.setData({ hasSubscribed: true });
@@ -51,7 +48,6 @@ Page({
         } else if (res[TEMPLATE_ID] === 'reject') {
           wx.showToast({ title: '您已拒绝订阅', icon: 'none' });
         } else {
-          console.log('订阅返回:', res);
           wx.showToast({ title: '订阅结果：' + JSON.stringify(res), icon: 'none' });
         }
       },
@@ -219,8 +215,6 @@ Page({
               const fileName = `咖啡订单_${timestamp}.csv`;
               const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
 
-              console.log('文件路径:', filePath);
-
               // 写入文件
               const fs = wx.getFileSystemManager();
               fs.writeFile({
@@ -228,7 +222,6 @@ Page({
                 data: csvData,
                 encoding: 'utf-8',
                 success: (res) => {
-                  console.log('写入成功:', res);
                   // 直接打开文档
                   wx.openDocument({
                     filePath: filePath,

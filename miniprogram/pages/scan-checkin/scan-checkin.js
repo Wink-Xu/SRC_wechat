@@ -12,15 +12,12 @@ Page({
   },
 
   onLoad: function (options) {
-    console.log('扫码进入，options:', options);
-
     let activityId = null;
 
     // 小程序码扫码进入，scene 参数是活动 ID
     if (options.scene) {
       // decodeURIComponent 解码 scene
       const scene = decodeURIComponent(options.scene);
-      console.log('scene:', scene);
       activityId = scene;
     }
 

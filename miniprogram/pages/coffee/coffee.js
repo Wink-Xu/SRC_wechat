@@ -91,8 +91,6 @@ Page({
       const result = await coffeeApi.getProducts({});
       const products = result.list || [];
 
-      console.log('获取到商品列表:', products);
-
       // 处理商品图片
       const cloudImageIds = products
         .filter(p => p.image && p.image.startsWith('cloud://'))
@@ -125,8 +123,6 @@ Page({
         // 没有图片
         return p;
       });
-
-      console.log('处理后的商品列表:', processedProducts);
 
       this.setData({
         products: processedProducts,
@@ -175,7 +171,6 @@ Page({
 
     query.exec((res) => {
       if (!res || res.length !== this.data.groupedProducts.length) {
-        console.log('位置查询结果不完整', res);
         return;
       }
 
@@ -189,8 +184,6 @@ Page({
           this.categoryPositions[group.key] = rect.top - baseTop;
         }
       });
-
-      console.log('分类位置缓存完成（相对偏移量）:', this.categoryPositions);
     });
   },
 

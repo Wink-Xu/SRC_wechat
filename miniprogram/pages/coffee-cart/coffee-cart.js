@@ -21,9 +21,8 @@ Page({
   // 检查登录状态
   checkLoginStatus: function () {
     const userInfo = wx.getStorageSync('userInfo') || {};
-    const isOpenid = wx.getStorageSync('openid');
     this.setData({
-      isLoggedIn: !!(userInfo.openid || isOpenid)
+      isLoggedIn: !!userInfo._id
     });
   },
 

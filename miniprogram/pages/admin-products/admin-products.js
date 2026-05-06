@@ -169,9 +169,7 @@ Page({
   // 编辑商品
   editProduct: function (e) {
     const { id } = e.currentTarget.dataset;
-    console.log('[编辑商品] 商品 ID:', id);
     const product = this.data.products.find(p => p._id === id);
-    console.log('[编辑商品] 商品数据:', product);
 
     if (product) {
       // 过滤掉默认图片，只显示用户上传的图片
@@ -190,7 +188,6 @@ Page({
           stock: String(product.stock)
         }
       });
-      console.log('[编辑商品] 表单数据已设置，图片:', this.data.formData.images);
     }
   },
 
@@ -274,9 +271,6 @@ Page({
     const currentImages = this.data.formData.images;
     const remainingCount = 9 - currentImages.length; // 最多 9 张
 
-    console.log('[选择图片] 当前图片数量:', currentImages.length);
-    console.log('[选择图片] 当前图片:', currentImages);
-
     if (remainingCount <= 0) {
       showInfo('最多上传 9 张图片');
       return;
@@ -287,7 +281,6 @@ Page({
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        console.log('[选择图片] 选择的图片:', res.tempFilePaths);
         const tempFilePaths = res.tempFilePaths;
         // 上传到云存储
         wx.showLoading({ title: '上传中...' });
@@ -320,10 +313,8 @@ Page({
   // 删除图片
   deleteImage: function (e) {
     const { index } = e.currentTarget.dataset;
-    console.log('[删除图片] 删除索引:', index);
     const images = this.data.formData.images.slice(); // 创建副本
     images.splice(index, 1);
-    console.log('[删除图片] 删除后的图片:', images);
     this.setData({
       'formData.images': images
     });
@@ -333,7 +324,6 @@ Page({
   previewImage: function (e) {
     const { index } = e.currentTarget.dataset;
     const images = this.data.formData.images;
-    console.log('[预览图片] 预览索引:', index, '图片列表:', images);
     wx.previewImage({
       current: images[index],  // 使用图片 URL 而不是 index
       urls: images
