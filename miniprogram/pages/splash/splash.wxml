@@ -1,15 +1,11 @@
 <view class="splash">
-  <view class="splash-content">
-    <image class="splash-logo" src="/images/logo.png" mode="aspectFit"></image>
-    <view class="splash-title">SRC 跑步俱乐部</view>
-    <view class="splash-slogan">In the soil of SRC we grow into our better selves.</view>
+  <view class="splash-center">
+    <image class="splash-logo" src="/images/logo.jpg" mode="aspectFit"></image>
+    <view class="splash-line"></view>
     <view class="splash-loader">
       <view class="loader-dot dot1"></view>
       <view class="loader-dot dot2"></view>
       <view class="loader-dot dot3"></view>
     </view>
-  </view>
-  <view class="splash-footer">
-    <text>Powered by SRC</text>
   </view>
 </view>
