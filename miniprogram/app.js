@@ -121,45 +121,26 @@ App({
     return null;
   },
 
-  // 处理登录（在 profile 页面调用）
-  handleLogin: function () {
+  // 自动登录（无声，无需用户操作，获取 openid 并创建/更新用户记录）
+  autoLogin: function () {
     const that = this;
-    return new Promise((resolve, reject) => {
-      // 检查云开发是否已初始化
+    return new Promise((resolve) => {
       if (!wx.cloud) {
         console.error('云开发未初始化');
-        reject(new Error('云开发未初始化'));
+        resolve(null);
         return;
       }
 
-      // 真实模式：调用微信授权登录
-      wx.getUserProfile({
-        desc: '用于完善用户资料',
-        lang: 'zh_CN',
-        success: (res) => {
-          const userInfo = res.userInfo;
-
-          // 调用云函数登录
-          const { userApi } = require('./utils/request');
-          userApi.login({
-            nickName: userInfo.nickName,
-            avatarUrl: userInfo.avatarUrl,
-            gender: userInfo.gender
-          }).then((loginResult) => {
-            // 登录成功后更新全局用户状态
-            const cloudUser = loginResult.data || loginResult;
-            that.updateUserInfo(cloudUser);
-            resolve(cloudUser);
-          }).catch((err) => {
-            console.error('[登录] 云函数调用失败:', err);
-            reject(err);
-          });
-        },
-        fail: (err) => {
-          console.error('[登录] getUserProfile fail', err);
-          reject(err);
-        }
+      // 调用云函数登录，云函数通过 wxContext.OPENID 自动获取 openid
+      const { userApi } = require('./utils/request');
+      userApi.login({}).then((loginResult) => {
+        const cloudUser = loginResult.data || loginResult;
+        that.updateUserInfo(cloudUser);
+        resolve(cloudUser);
+      }).catch((err) => {
+        console.error('[自动登录] 失败:', err);
+        resolve(null);
       });
     });
-  }
+  },
 });

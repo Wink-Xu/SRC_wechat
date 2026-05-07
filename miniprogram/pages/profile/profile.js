@@ -105,11 +105,19 @@ Page({
     }
   },
 
-  // 微信授权登录
+  // 微信授权登录（静默自动登录）
   handleLogin: async function () {
     try {
       const app = getApp();
-      await app.handleLogin();
+      const result = await app.autoLogin();
+
+      if (!result) {
+        wx.showToast({
+          title: '登录失败，请重试',
+          icon: 'none'
+        });
+        return;
+      }
 
       // 登录成功，刷新页面
       this.refreshUserInfo();
@@ -120,18 +128,10 @@ Page({
       });
     } catch (error) {
       console.error('登录失败', error);
-      if (error.errMsg && error.errMsg.includes('auth deny')) {
-        // 用户拒绝授权
-        wx.showToast({
-          title: '你已拒绝授权',
-          icon: 'none'
-        });
-      } else {
-        wx.showToast({
-          title: '登录失败，请重试',
-          icon: 'none'
-        });
-      }
+      wx.showToast({
+        title: '登录失败，请重试',
+        icon: 'none'
+      });
     }
   },
 

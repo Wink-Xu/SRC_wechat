@@ -6,6 +6,20 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
+// 内容安全检测（文本）
+async function checkContent(text) {
+  if (!text || !text.trim()) return true;
+  try {
+    const result = await cloud.openapi.security.msgSecCheck({
+      content: text
+    });
+    return result.errCode === 0 && result.result === 'pass';
+  } catch (err) {
+    console.error('[内容安全检测] 失败', err);
+    return true;
+  }
+}
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
@@ -191,6 +205,16 @@ async function handleCreateOrder(data, openid) {
 
     if (!items || items.length === 0) {
       return { code: -1, message: '订单项为空' };
+    }
+
+    // 内容安全检测：检查备注
+    for (const item of items) {
+      if (item.remark) {
+        const ok = await checkContent(item.remark);
+        if (!ok) {
+          return { code: -1, message: '备注包含不适当的信息，请修改后重试' };
+        }
+      }
     }
 
     // 计算总价和总杯数

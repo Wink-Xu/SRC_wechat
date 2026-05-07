@@ -8,6 +8,20 @@ cloud.init({
 const db = cloud.database();
 const _ = db.command;
 
+// 内容安全检测（文本）
+async function checkContent(text) {
+  if (!text || !text.trim()) return true;
+  try {
+    const result = await cloud.openapi.security.msgSecCheck({
+      content: text
+    });
+    return result.errCode === 0 && result.result === 'pass';
+  } catch (err) {
+    console.error('[内容安全检测] 失败', err);
+    return true;
+  }
+}
+
 // ============================================
 // 团长配置 - 将以下 openid 替换为实际团长的微信 openid
 // ============================================
@@ -129,6 +143,10 @@ async function handleUpdateProfile(data, wxContext, openid) {
   const { nickname, avatar } = data;
 
   try {
+    // 内容安全检测
+    if (nickname && !await checkContent(nickname)) {
+      return { code: -1, message: '昵称包含不适当的信息，请修改后重试' };
+    }
     // 只更新传入的字段，避免覆盖其他字段
     const updateData = {
       updated_at: db.serverDate()
@@ -181,6 +199,10 @@ async function handleApplyMembership(data, wxContext, openid) {
   const { nickname, phone } = data;
 
   try {
+    // 内容安全检测
+    if (nickname && !await checkContent(nickname)) {
+      return { code: -1, message: '昵称包含不适当的信息，请修改后重试' };
+    }
     // 更新用户信息
     await db.collection('users').where({
       openid

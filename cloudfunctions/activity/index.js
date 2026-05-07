@@ -73,6 +73,21 @@ exports.main = async (event, context) => {
   }
 };
 
+// 内容安全检测（文本）
+async function checkContent(text) {
+  if (!text || !text.trim()) return true;
+  try {
+    const result = await cloud.openapi.security.msgSecCheck({
+      content: text
+    });
+    return result.errCode === 0 && result.result === 'pass';
+  } catch (err) {
+    console.error('[内容安全检测] 失败', err);
+    // 检测失败时放行，避免影响正常功能
+    return true;
+  }
+}
+
 // 创建活动
 async function handleCreate(data, wxContext, testOpenid) {
   try {
@@ -80,6 +95,13 @@ async function handleCreate(data, wxContext, testOpenid) {
 
     if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
+    }
+
+    // 内容安全检测
+    const titleOk = await checkContent(data.title);
+    const descOk = await checkContent(data.description || '');
+    if (!titleOk || !descOk) {
+      return { code: -1, message: '内容包含不适当的信息，请修改后重试' };
     }
 
     const activity = {
@@ -116,6 +138,13 @@ async function handleUpdate(data, wxContext, testOpenid) {
 
     if (!user || !['activity_admin', 'leader'].includes(user.role)) {
       return { code: -1, message: '没有权限' };
+    }
+
+    // 内容安全检测
+    const titleOk = await checkContent(updateData.title || '');
+    const descOk = await checkContent(updateData.description || '');
+    if (!titleOk || !descOk) {
+      return { code: -1, message: '内容包含不适当的信息，请修改后重试' };
     }
 
     await db.collection('activities').doc(id).update({
