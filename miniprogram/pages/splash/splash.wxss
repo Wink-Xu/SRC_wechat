@@ -1,0 +1,115 @@
+.splash {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #2d8a4e 0%, #1a5c32 50%, #0d3b1f 100%);
+  color: #ffffff;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  padding: 0 60rpx;
+}
+
+.splash-logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 32rpx;
+  margin-bottom: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.3);
+  animation: logoFade 0.6s ease-out;
+}
+
+@keyframes logoFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.splash-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  margin-bottom: 24rpx;
+  animation: textFade 0.6s ease-out 0.2s both;
+}
+
+@keyframes textFade {
+  0% {
+    opacity: 0;
+    transform: translateY(10rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-slogan {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 520rpx;
+  margin-bottom: 80rpx;
+  animation: textFade 0.6s ease-out 0.4s both;
+}
+
+.splash-loader {
+  display: flex;
+  gap: 16rpx;
+  animation: textFade 0.6s ease-out 0.6s both;
+}
+
+.loader-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.dot1 {
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.dot2 {
+  animation: bounce 1.2s ease-in-out 0.2s infinite;
+}
+
+.dot3 {
+  animation: bounce 1.2s ease-in-out 0.4s infinite;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.splash-footer {
+  padding-bottom: 80rpx;
+  animation: textFade 0.6s ease-out 0.6s both;
+}
+
+.splash-footer text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2rpx;
+}

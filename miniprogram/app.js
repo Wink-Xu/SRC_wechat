@@ -3,19 +3,19 @@ App({
   globalData: {
     userInfo: null,
     isLoggedIn: false,
-    isMember: false,      // 是否是团员（已批准）
-    isAdmin: false,       // 是否是管理员
-    isLeader: false,      // 是否是团长
-    isGuest: true         // 默认是游客（未登录）
+    isMember: false,       // 是否是团员（已批准）
+    isAdmin: false,        // 是否是管理员
+    isLeader: false,       // 是否是团长
+    isGuest: true          // 默认是游客（未登录）
   },
 
   onLaunch: function () {
-    // 初始化云开发
+    // 初始化云开发（splash 页可能已经初始化过，重复调用无影响）
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云开发');
     } else {
       wx.cloud.init({
-        env: 'cloud1-2gyhe7s5efa4155f', // 云开发环境 ID
+        env: 'cloud1-2gyhe7s5efa4155f',
         traceUser: true
       });
     }
@@ -26,8 +26,6 @@ App({
 
   // 当小程序从微信主界面扫码进入时处理
   onShow: function (options) {
-    console.log('onShow options:', options);
-
     // 处理微信扫码进入的场景
     if (options && options.scene) {
       this.handleScanCode(options.scene);
@@ -36,8 +34,6 @@ App({
 
   // 处理扫码进入
   handleScanCode: function (scene) {
-    console.log('处理扫码场景:', scene);
-
     let qrData;
     try {
       qrData = JSON.parse(decodeURIComponent(scene));
@@ -45,22 +41,17 @@ App({
       qrData = { type: 'checkin', activity_id: scene };
     }
 
-    console.log('解析二维码数据:', qrData);
-
     // 处理签到二维码
     if (qrData.type === 'checkin' && qrData.activity_id) {
       // 延迟跳转，确保 app 初始化完成
       setTimeout(() => {
         wx.navigateTo({
           url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(scene)}`,
-          fail: (err) => {
-            console.error('跳转失败', err);
+          fail: () => {
             // 如果已在 scan-checkin 页面，尝试重定向
-            if (err.errMsg.includes('already')) {
-              wx.redirectTo({
-                url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(scene)}`
-              });
-            }
+            wx.redirectTo({
+              url: `/pages/scan-checkin/scan-checkin?scene=${encodeURIComponent(scene)}`
+            });
           }
         });
       }, 300);
@@ -147,7 +138,6 @@ App({
         lang: 'zh_CN',
         success: (res) => {
           const userInfo = res.userInfo;
-          console.log('[登录] 获取到微信用户信息:', userInfo);
 
           // 调用云函数登录
           const { userApi } = require('./utils/request');
@@ -156,12 +146,8 @@ App({
             avatarUrl: userInfo.avatarUrl,
             gender: userInfo.gender
           }).then((loginResult) => {
-            console.log('[登录] 云函数返回:', loginResult);
-
             // 登录成功后更新全局用户状态
-            // 直接使用云函数返回的用户数据（保留数据库中的自定义头像昵称）
             const cloudUser = loginResult.data || loginResult;
-            console.log('[登录] 更新用户状态:', cloudUser);
             that.updateUserInfo(cloudUser);
             resolve(cloudUser);
           }).catch((err) => {
