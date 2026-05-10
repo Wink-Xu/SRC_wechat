@@ -442,7 +442,13 @@ Page({
       }, 1500);
     } catch (error) {
       console.error('提交失败', error);
-      showInfo('提交失败，请重试');
+      // 显示详细错误信息
+      const errorMsg = error && error.message ? error.message : '提交失败，请重试';
+      wx.showModal({
+        title: '创建失败',
+        content: errorMsg,
+        showCancel: false
+      });
     }
   }
 });

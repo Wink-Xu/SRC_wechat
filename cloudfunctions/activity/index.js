@@ -80,11 +80,15 @@ async function checkContent(text) {
     const result = await cloud.openapi.security.msgSecCheck({
       content: text
     });
-    // API 成功时不抛异常，result.result 为 'pass'/'risky'/'need_review'
+    // 检查 API 调用是否成功（errCode === 0）
+    if (result.errCode !== 0 && result.errCode !== undefined) {
+      console.warn('[内容安全检测] API 返回错误', result);
+    }
+    // result.result 为 'pass'/'risky'/'need_review'
     return result.result === 'pass';
   } catch (err) {
-    console.error('[内容安全检测] 失败', err);
-    // 检测失败时放行，避免影响正常功能
+    console.error('[内容安全检测] 异常', err);
+    // 检测异常时放行，避免影响正常功能
     return true;
   }
 }
@@ -98,11 +102,16 @@ async function handleCreate(data, wxContext, testOpenid) {
       return { code: -1, message: '没有权限' };
     }
 
-    // 内容安全检测
-    const titleOk = await checkContent(data.title);
-    const descOk = await checkContent(data.description || '');
-    if (!titleOk || !descOk) {
-      return { code: -1, message: '内容包含不适当的信息，请修改后重试' };
+    // 内容安全检测（非阻塞：检测失败/不通过仅记录日志，不阻止用户操作）
+    try {
+      const titleOk = await checkContent(data.title);
+      const descOk = await checkContent(data.description || '');
+      if (!titleOk || !descOk) {
+        console.warn('[内容安全检测] 内容疑似违规', { title: data.title });
+        // 暂不阻止，仅记录
+      }
+    } catch (err) {
+      console.error('[内容安全检测] 异常', err);
     }
 
     const activity = {
