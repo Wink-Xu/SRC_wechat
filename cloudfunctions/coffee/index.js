@@ -209,14 +209,18 @@ async function handleCreateOrder(data, openid) {
       return { code: -1, message: '订单项为空' };
     }
 
-    // 内容安全检测：检查备注
-    for (const item of items) {
-      if (item.remark) {
-        const ok = await checkContent(item.remark);
-        if (!ok) {
-          return { code: -1, message: '备注包含不适当的信息，请修改后重试' };
+    // 内容安全检测：检查备注（非阻塞）
+    try {
+      for (const item of items) {
+        if (item.remark) {
+          const ok = await checkContent(item.remark);
+          if (!ok) {
+            console.warn('[内容安全检测] 备注内容疑似违规');
+          }
         }
       }
+    } catch (err) {
+      console.error('[内容安全检测] 异常', err);
     }
 
     // 计算总价和总杯数

@@ -150,11 +150,15 @@ async function handleUpdate(data, wxContext, testOpenid) {
       return { code: -1, message: '没有权限' };
     }
 
-    // 内容安全检测
-    const titleOk = await checkContent(updateData.title || '');
-    const descOk = await checkContent(updateData.description || '');
-    if (!titleOk || !descOk) {
-      return { code: -1, message: '内容包含不适当的信息，请修改后重试' };
+    // 内容安全检测（非阻塞）
+    try {
+      const titleOk = await checkContent(updateData.title || '');
+      const descOk = await checkContent(updateData.description || '');
+      if (!titleOk || !descOk) {
+        console.warn('[内容安全检测] 内容疑似违规', { title: updateData.title });
+      }
+    } catch (err) {
+      console.error('[内容安全检测] 异常', err);
     }
 
     await db.collection('activities').doc(id).update({

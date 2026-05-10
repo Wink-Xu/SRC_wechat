@@ -145,9 +145,16 @@ async function handleUpdateProfile(data, wxContext, openid) {
   const { nickname, avatar } = data;
 
   try {
-    // 内容安全检测
-    if (nickname && !await checkContent(nickname)) {
-      return { code: -1, message: '昵称包含不适当的信息，请修改后重试' };
+    // 内容安全检测（非阻塞）
+    if (nickname) {
+      try {
+        const nickOk = await checkContent(nickname);
+        if (!nickOk) {
+          console.warn('[内容安全检测] 昵称疑似违规');
+        }
+      } catch (err) {
+        console.error('[内容安全检测] 异常', err);
+      }
     }
     // 只更新传入的字段，避免覆盖其他字段
     const updateData = {
@@ -201,9 +208,16 @@ async function handleApplyMembership(data, wxContext, openid) {
   const { nickname, phone } = data;
 
   try {
-    // 内容安全检测
-    if (nickname && !await checkContent(nickname)) {
-      return { code: -1, message: '昵称包含不适当的信息，请修改后重试' };
+    // 内容安全检测（非阻塞）
+    if (nickname) {
+      try {
+        const nickOk = await checkContent(nickname);
+        if (!nickOk) {
+          console.warn('[内容安全检测] 昵称疑似违规');
+        }
+      } catch (err) {
+        console.error('[内容安全检测] 异常', err);
+      }
     }
     // 更新用户信息
     await db.collection('users').where({
