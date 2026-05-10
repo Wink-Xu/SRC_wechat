@@ -80,7 +80,8 @@ async function checkContent(text) {
     const result = await cloud.openapi.security.msgSecCheck({
       content: text
     });
-    return result.errCode === 0 && result.result === 'pass';
+    // API 成功时不抛异常，result.result 为 'pass'/'risky'/'need_review'
+    return result.result === 'pass';
   } catch (err) {
     console.error('[内容安全检测] 失败', err);
     // 检测失败时放行，避免影响正常功能
