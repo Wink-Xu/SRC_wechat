@@ -6,10 +6,6 @@ Page({
     showContact: false
   },
 
-  onLoad: function () {
-    // 从云函数获取公告内容（可选）
-  },
-
   onToggleAnnouncements: function () {
     this.setData({ showAnnouncements: !this.data.showAnnouncements });
   },

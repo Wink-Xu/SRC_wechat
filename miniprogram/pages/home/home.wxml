@@ -1,49 +1,61 @@
 <view class="container">
   <!-- Banner -->
   <view class="banner">
-    <image class="logo" src="/images/logo.jpg" mode="aspectFill"></image>
-    <text class="club-name">Sunday Running Club</text>
-    <text class="club-slogan">一起奔跑，一起成长</text>
+    <image class="banner-img" src="/images/logo.jpg" mode="aspectFill"></image>
+    <view class="banner-overlay">
+      <text class="club-name">Sunday Running Club</text>
+      <text class="club-slogan">一起奔跑，一起成长</text>
+    </view>
   </view>
 
   <!-- 公告 -->
-  <view class="section">
-    <view class="section-header" bindtap="onToggleAnnouncements">
-      <text class="section-title">📢 公告</text>
+  <view class="section {{showAnnouncements ? 'expanded' : ''}}" bindtap="onToggleAnnouncements">
+    <view class="section-header">
+      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="section-title">公告</text>
       <text class="section-arrow {{showAnnouncements ? 'up' : ''}}">›</text>
     </view>
-    <view class="section-content" wx:if="{{showAnnouncements}}">
-      <text class="announce-content">欢迎加入 Sunday Running Club！本活动群定期举办跑步活动。</text>
+    <view class="section-body" wx:if="{{showAnnouncements}}">
+      <image class="section-cover" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="section-text">欢迎加入 Sunday Running Club！本活动群定期举办跑步活动，关注公众号获取最新消息。</text>
     </view>
   </view>
 
   <!-- 关于我们 -->
-  <view class="section">
-    <view class="section-header" bindtap="onToggleAbout">
-      <text class="section-title">🏃 关于我们</text>
+  <view class="section {{showAbout ? 'expanded' : ''}}" bindtap="onToggleAbout">
+    <view class="section-header">
+      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="section-title">关于我们</text>
       <text class="section-arrow {{showAbout ? 'up' : ''}}">›</text>
     </view>
-    <view class="section-content" wx:if="{{showAbout}}">
-      <text class="about-content">Sunday Running Club 是一个以跑步为主题的社群，我们定期组织各类跑步活动，包括路跑、越野跑、徒步等。无论你是跑步新手还是资深跑者，都欢迎加入我们！</text>
+    <view class="section-body" wx:if="{{showAbout}}">
+      <image class="section-cover" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="section-text">Sunday Running Club 是一个以跑步为主题的社群，定期组织路跑、越野跑、徒步等各类活动。无论你是新手还是老手，都欢迎加入！</text>
     </view>
   </view>
 
   <!-- 联系我们 -->
-  <view class="section">
-    <view class="section-header" bindtap="onToggleContact">
-      <text class="section-title">📞 联系我们</text>
+  <view class="section {{showContact ? 'expanded' : ''}}" bindtap="onToggleContact">
+    <view class="section-header">
+      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="section-title">联系我们</text>
       <text class="section-arrow {{showContact ? 'up' : ''}}">›</text>
     </view>
-    <view class="section-content" wx:if="{{showContact}}">
-      <view class="contact-item">
+    <view class="section-body" wx:if="{{showContact}}">
+      <view class="contact-row">
         <text class="contact-label">微信公众号</text>
         <text class="contact-value">SundayRunningClub</text>
       </view>
-      <view class="contact-item">
+      <view class="contact-row">
         <text class="contact-label">联系邮箱</text>
         <text class="contact-value">sundayrunning@example.com</text>
       </view>
       <button class="contact-btn" open-type="contact">在线客服</button>
     </view>
+  </view>
+
+  <!-- 底部 -->
+  <view class="footer">
+    <text class="footer-text">In the soil of SRC we grow into our better selves.</text>
   </view>
 </view>

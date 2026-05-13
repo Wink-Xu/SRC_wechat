@@ -479,6 +479,27 @@ page {
   border: none;
 }
 
+.btn-contact {
+  position: absolute;
+  top: 50%;
+  right: 24rpx;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 0 28rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  background: #F5F5F5;
+  color: #666666;
+  font-size: 24rpx;
+  border-radius: 28rpx;
+  border: none;
+  z-index: 10;
+}
+
+.btn-contact::after {
+  border: none;
+}
+
 .registration-closed {
   display: flex;
   align-items: center;

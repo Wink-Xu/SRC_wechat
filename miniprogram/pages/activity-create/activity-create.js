@@ -36,9 +36,17 @@ Page({
       registration_fee_yuan: '',  // 现金显示用（元）
       refund_policy: 'anytime',   // 退款政策: anytime | half
       // 重复设置
-      is_recurring: false,
-      repeat_days: []           // 1=周一, 2=周二, ... 7=周日
+      is_recurring: false
     },
+    // 星期选择（独立字段，避免嵌套数组渲染问题）
+    isRecurring: false,
+    repeatMon: false,
+    repeatTue: false,
+    repeatWed: false,
+    repeatThu: false,
+    repeatFri: false,
+    repeatSat: false,
+    repeatSun: false,
     runTypes: [
       { value: 'road', label: '路跑' },
       { value: 'trail', label: '越野跑' },
@@ -76,6 +84,12 @@ Page({
         success (res) {
           if (res.confirm) {
             that.setData({ formData: draft });
+            if (draft.repeat_days && draft.repeat_days.length > 0) {
+              that.setRepeatDays(draft.repeat_days);
+            }
+            if (draft.is_recurring) {
+              that.setData({ isRecurring: true });
+            }
           } else {
             that.clearDraft();
           }
@@ -174,10 +188,15 @@ Page({
             : '',
           refund_policy: activity.refund_policy || 'anytime',
           // 重复设置
-          is_recurring: activity.is_recurring || false,
-          repeat_days: activity.repeat_days || []
+          is_recurring: activity.is_recurring || false
         }
       });
+
+      // 恢复星期勾选
+      this.setData({ isRecurring: activity.is_recurring || false });
+      if (activity.repeat_days && activity.repeat_days.length > 0) {
+        this.setRepeatDays(activity.repeat_days);
+      }
     } catch (error) {
       console.error('加载活动失败', error);
     }
@@ -223,9 +242,17 @@ Page({
     });
   },
 
-  // 选择跑步类型
-  onRunTypeChange: function (e) {
-    const { value } = e.currentTarget.dataset;
+  // 获取类型标签
+  getRunTypeLabel: function (value) {
+    const types = this.data.runTypes;
+    const found = types.find(t => t.value === value);
+    return found ? found.label : '';
+  },
+
+  // 选择跑步类型（下拉）
+  onRunTypePickerChange: function (e) {
+    const index = e.detail.value;
+    const value = this.data.runTypes[index].value;
     this.setData({ 'formData.run_type': value });
     this.autoSaveDraft();
   },
@@ -299,24 +326,40 @@ Page({
   // 切换重复举办
   onRecurringChange: function (e) {
     this.setData({
-      'formData.is_recurring': e.detail.value,
-      'formData.repeat_days': e.detail.value ? this.data.formData.repeat_days : []
+      isRecurring: e.detail.value,
+      'formData.is_recurring': e.detail.value
     });
+    this.autoSaveDraft();
   },
 
   // 切换重复日期
   onDayToggle: function (e) {
-    const day = parseInt(e.currentTarget.dataset.day);
-    const days = [...this.data.formData.repeat_days];
-    const idx = days.indexOf(day);
-    if (idx !== -1) {
-      days.splice(idx, 1);
-    } else {
-      days.push(day);
-      days.sort();
-    }
-    this.setData({ 'formData.repeat_days': days });
+    const day = e.currentTarget.dataset.day;
+    const key = 'repeat' + day.charAt(0).toUpperCase() + day.slice(1);
+    this.setData({ [key]: !this.data[key] });
     this.autoSaveDraft();
+  },
+
+  // 获取选中的日期数字（1=周一 ... 7=周日）
+  getRepeatDays: function () {
+    const map = { mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 7 };
+    const days = [];
+    for (const [key, num] of Object.entries(map)) {
+      if (this.data['repeat' + key.charAt(0).toUpperCase() + key.slice(1)]) {
+        days.push(num);
+      }
+    }
+    return days.sort();
+  },
+
+  // 根据日期数字设置星期勾选
+  setRepeatDays: function (days) {
+    const map = { 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat', 7: 'sun' };
+    const update = {};
+    for (const [dayNum, key] of Object.entries(map)) {
+      update['repeat' + key.charAt(0).toUpperCase() + key.slice(1)] = days.includes(parseInt(dayNum));
+    }
+    this.setData(update);
   },
 
   // 切换报名费用类型
@@ -528,7 +571,7 @@ Page({
       refund_policy: formData.refund_policy,
       // 重复设置
       is_recurring: formData.is_recurring,
-      repeat_days: formData.is_recurring ? formData.repeat_days : []
+      repeat_days: formData.is_recurring ? this.getRepeatDays() : []
     };
 
     // 报名截止时间（可选）

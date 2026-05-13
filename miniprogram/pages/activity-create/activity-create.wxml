@@ -66,17 +66,14 @@
       <!-- 跑步类型 -->
       <view class="form-item">
         <text class="form-label required">跑步类型</text>
-        <view class="type-grid">
-          <view
-            class="type-item {{formData.run_type === item.value ? 'active' : ''}}"
-            wx:for="{{runTypes}}"
-            wx:key="value"
-            bindtap="onRunTypeChange"
-            data-value="{{item.value}}"
-          >
-            <text>{{item.label}}</text>
+        <picker class="form-picker" mode="selector" range="{{runTypes}}" range-key="label" bindchange="onRunTypePickerChange">
+          <view class="picker-row">
+            <text class="{{formData.run_type ? '' : 'placeholder'}}">
+              {{getRunTypeLabel(formData.run_type) || '请选择跑步类型'}}
+            </text>
+            <text class="picker-arrow">›</text>
           </view>
-        </view>
+        </picker>
       </view>
 
       <!-- Dress Code -->
@@ -132,74 +129,6 @@
     </view>
   </view>
 
-  <!-- 重复设置 -->
-  <view class="form-section">
-    <view class="section-title">重复设置</view>
-    <view class="section-card">
-      <view class="form-item">
-        <view class="switch-row">
-          <text class="switch-label">重复举办</text>
-          <switch checked="{{formData.is_recurring}}" bindchange="onRecurringChange" color="#1A1A1A" />
-        </view>
-      </view>
-
-      <view class="form-item" wx:if="{{formData.is_recurring}}">
-        <text class="form-label">重复日期</text>
-        <view class="day-grid">
-          <view
-            class="day-item {{formData.repeat_days.indexOf(1) !== -1 ? 'active' : ''}}"
-            data-day="1"
-            bindtap="onDayToggle"
-          >
-            <text>周一</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(2) !== -1 ? 'active' : ''}}"
-            data-day="2"
-            bindtap="onDayToggle"
-          >
-            <text>周二</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(3) !== -1 ? 'active' : ''}}"
-            data-day="3"
-            bindtap="onDayToggle"
-          >
-            <text>周三</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(4) !== -1 ? 'active' : ''}}"
-            data-day="4"
-            bindtap="onDayToggle"
-          >
-            <text>周四</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(5) !== -1 ? 'active' : ''}}"
-            data-day="5"
-            bindtap="onDayToggle"
-          >
-            <text>周五</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(6) !== -1 ? 'active' : ''}}"
-            data-day="6"
-            bindtap="onDayToggle"
-          >
-            <text>周六</text>
-          </view>
-          <view
-            class="day-item {{formData.repeat_days.indexOf(7) !== -1 ? 'active' : ''}}"
-            data-day="7"
-            bindtap="onDayToggle"
-          >
-            <text>周日</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <!-- 名额与积分 -->
   <view class="form-section">
     <view class="section-title">名额与积分</view>
@@ -244,8 +173,8 @@
         <text class="form-hint" wx:if="{{!formData.member_only}}">关闭后，游客也可报名（需填写手机号）</text>
       </view>
 
-      <!-- 退款政策 -->
-      <view class="form-item">
+      <!-- 退款政策（仅现金收费时显示） -->
+      <view class="form-item" wx:if="{{formData.registration_fee_type === 'cash'}}">
         <text class="form-label">退款政策</text>
         <view class="fee-type-grid">
           <view
@@ -287,6 +216,46 @@
             bindtap="showCashModal"
           >
             <text>{{formData.registration_fee_type === 'cash' && formData.registration_fee ? '¥' + formData.registration_fee_yuan : '现金'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 重复设置 -->
+  <view class="form-section">
+    <view class="section-title">重复设置</view>
+    <view class="section-card">
+      <view class="form-item">
+        <view class="switch-row">
+          <text class="switch-label">重复举办</text>
+          <switch checked="{{isRecurring}}" bindchange="onRecurringChange" color="#1A1A1A" />
+        </view>
+      </view>
+
+      <view class="form-item" wx:if="{{isRecurring}}">
+        <text class="form-label">重复日期</text>
+        <view class="day-grid">
+          <view class="day-item {{repeatMon ? 'active' : ''}}" bindtap="onDayToggle" data-day="mon">
+            <text>周一</text>
+          </view>
+          <view class="day-item {{repeatTue ? 'active' : ''}}" bindtap="onDayToggle" data-day="tue">
+            <text>周二</text>
+          </view>
+          <view class="day-item {{repeatWed ? 'active' : ''}}" bindtap="onDayToggle" data-day="wed">
+            <text>周三</text>
+          </view>
+          <view class="day-item {{repeatThu ? 'active' : ''}}" bindtap="onDayToggle" data-day="thu">
+            <text>周四</text>
+          </view>
+          <view class="day-item {{repeatFri ? 'active' : ''}}" bindtap="onDayToggle" data-day="fri">
+            <text>周五</text>
+          </view>
+          <view class="day-item {{repeatSat ? 'active' : ''}}" bindtap="onDayToggle" data-day="sat">
+            <text>周六</text>
+          </view>
+          <view class="day-item {{repeatSun ? 'active' : ''}}" bindtap="onDayToggle" data-day="sun">
+            <text>周日</text>
           </view>
         </view>
       </view>

@@ -103,6 +103,9 @@
 
       <!-- 底部操作区 -->
       <view class="footer-actions">
+        <!-- 客服按钮 -->
+        <button class="btn-contact" open-type="contact">联系客服</button>
+
         <!-- 报名已截止 -->
         <block wx:if="{{registrationClosed && !isRegistered}}">
           <view class="registration-closed">
