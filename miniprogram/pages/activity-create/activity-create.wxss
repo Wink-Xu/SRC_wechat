@@ -311,6 +311,33 @@ picker {
   display: block;
 }
 
+/* 星期选择 - 网格 */
+.day-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.day-item {
+  padding: 16rpx 24rpx;
+  border: 1rpx solid #E5E5E5;
+  border-radius: 8rpx;
+}
+
+.day-item.active {
+  background: #1A1A1A;
+  border-color: #1A1A1A;
+}
+
+.day-item text {
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.day-item.active text {
+  color: #FFFFFF;
+}
+
 /* 费用类型选择 */
 .fee-type-grid {
   display: flex;

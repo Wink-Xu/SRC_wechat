@@ -31,7 +31,10 @@ Page({
       member_only: false,      // 是否仅团员报名
       registration_fee_type: '', // '' | 'points' | 'cash'
       registration_fee: 0,       // 报名费用
-      registration_fee_yuan: ''  // 现金显示用（元）
+      registration_fee_yuan: '',  // 现金显示用（元）
+      // 重复设置
+      is_recurring: false,
+      repeat_days: []           // 1=周一, 2=周二, ... 7=周日
     },
     runTypes: [
       { value: 'road', label: '路跑' },
@@ -115,7 +118,10 @@ Page({
           registration_fee: activity.registration_fee || 0,
           registration_fee_yuan: activity.registration_fee_type === 'cash' && activity.registration_fee
             ? (activity.registration_fee / 100).toFixed(2)
-            : ''
+            : '',
+          // 重复设置
+          is_recurring: activity.is_recurring || false,
+          repeat_days: activity.repeat_days || []
         }
       });
     } catch (error) {
@@ -223,6 +229,28 @@ Page({
   // 切换仅团员报名
   onMemberOnlyChange: function (e) {
     this.setData({ 'formData.member_only': e.detail.value });
+  },
+
+  // 切换重复举办
+  onRecurringChange: function (e) {
+    this.setData({
+      'formData.is_recurring': e.detail.value,
+      'formData.repeat_days': e.detail.value ? this.data.formData.repeat_days : []
+    });
+  },
+
+  // 切换重复日期
+  onDayToggle: function (e) {
+    const day = parseInt(e.currentTarget.dataset.day);
+    const days = [...this.data.formData.repeat_days];
+    const idx = days.indexOf(day);
+    if (idx !== -1) {
+      days.splice(idx, 1);
+    } else {
+      days.push(day);
+      days.sort();
+    }
+    this.setData({ 'formData.repeat_days': days });
   },
 
   // 切换报名费用类型
@@ -418,7 +446,10 @@ Page({
       // 报名设置
       member_only: formData.member_only,
       registration_fee_type: formData.registration_fee_type,
-      registration_fee: formData.registration_fee_type ? formData.registration_fee : 0
+      registration_fee: formData.registration_fee_type ? formData.registration_fee : 0,
+      // 重复设置
+      is_recurring: formData.is_recurring,
+      repeat_days: formData.is_recurring ? formData.repeat_days : []
     };
 
     // 报名截止时间（可选）

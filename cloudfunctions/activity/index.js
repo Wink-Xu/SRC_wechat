@@ -108,14 +108,22 @@ async function handleCreate(data, wxContext, testOpenid) {
       const descOk = await checkContent(data.description || '');
       if (!titleOk || !descOk) {
         console.warn('[内容安全检测] 内容疑似违规', { title: data.title });
-        // 暂不阻止，仅记录
       }
     } catch (err) {
       console.error('[内容安全检测] 异常', err);
     }
 
+    const isRecurring = data.is_recurring && data.repeat_days && data.repeat_days.length > 0;
+    const { is_recurring, repeat_days, ...baseData } = data;
+
+    if (isRecurring) {
+      // 重复模式：为每个选中日期创建一个活动
+      return await createRecurringActivities(baseData, repeat_days, user);
+    }
+
+    // 单次活动
     const activity = {
-      ...data,
+      ...baseData,
       status: 'ongoing',
       created_by: user._id,
       registered_count: 0,
@@ -137,6 +145,60 @@ async function handleCreate(data, wxContext, testOpenid) {
     console.error('创建活动失败', error);
     return { code: -1, message: '创建失败' };
   }
+}
+
+// 创建重复活动
+async function createRecurringActivities(baseData, repeatDays, user) {
+  const createdIds = [];
+  const baseTime = new Date(baseData.start_time);
+  const baseDeadline = baseData.registration_deadline ? new Date(baseData.registration_deadline) : null;
+  const baseDayOfWeek = baseTime.getDay(); // 0=周日, 1-6=周一至周六
+
+  // map repeatDays from our format (1=周一...7=周日) to JS getDay() format (0=周日, 1=周一...6=周六)
+  const jsDayMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 0 };
+
+  for (const day of repeatDays) {
+    const targetDay = jsDayMap[day];
+    if (targetDay === undefined) continue;
+
+    // 计算距离目标日期的天数
+    let diff = targetDay - baseDayOfWeek;
+    if (diff < 0) diff += 7;
+
+    const activityTime = new Date(baseTime);
+    activityTime.setDate(activityTime.getDate() + diff);
+
+    const activityData = {
+      ...baseData,
+      start_time: activityTime.toISOString(),
+      is_recurring: true,
+      status: 'ongoing',
+      created_by: user._id,
+      registered_count: 0,
+      check_in_count: 0,
+      created_at: db.serverDate(),
+      updated_at: db.serverDate()
+    };
+
+    // 调整报名截止时间
+    if (baseDeadline) {
+      const deadlineTime = new Date(baseDeadline);
+      deadlineTime.setDate(deadlineTime.getDate() + diff);
+      activityData.registration_deadline = deadlineTime.toISOString();
+    }
+
+    const result = await db.collection('activities').add({
+      data: activityData
+    });
+
+    createdIds.push(result._id);
+  }
+
+  return {
+    code: 0,
+    data: { ids: createdIds, count: createdIds.length },
+    message: `已创建 ${createdIds.length} 个活动`
+  };
 }
 
 // 更新活动
