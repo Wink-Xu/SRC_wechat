@@ -51,7 +51,7 @@ Page({
   navigateToHome: function () {
     this.setData({ loading: false });
     wx.reLaunch({
-      url: '/pages/activities/activities'
+      url: '/pages/home/home'
     });
   }
 });

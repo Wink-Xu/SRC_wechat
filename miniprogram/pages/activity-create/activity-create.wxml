@@ -244,6 +244,27 @@
         <text class="form-hint" wx:if="{{!formData.member_only}}">关闭后，游客也可报名（需填写手机号）</text>
       </view>
 
+      <!-- 退款政策 -->
+      <view class="form-item">
+        <text class="form-label">退款政策</text>
+        <view class="fee-type-grid">
+          <view
+            class="fee-type-item {{formData.refund_policy === 'anytime' ? 'active' : ''}}"
+            bindtap="onRefundPolicyChange"
+            data-value="anytime"
+          >
+            <text>随时退</text>
+          </view>
+          <view
+            class="fee-type-item {{formData.refund_policy === 'half' ? 'active' : ''}}"
+            bindtap="onRefundPolicyChange"
+            data-value="half"
+          >
+            <text>退50%</text>
+          </view>
+        </view>
+      </view>
+
       <!-- 报名费用 -->
       <view class="form-item">
         <text class="form-label">报名费用</text>

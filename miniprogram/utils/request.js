@@ -86,7 +86,8 @@ const activityApi = {
   getCheckInQrCode: (data) => callFunction('activity', 'getCheckInQrCode', data, { showLoad: false }),
   finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data, { showErrorMsg: false }),
   restartActivity: (data) => callFunction('activity', 'restartActivity', data),
-  uploadPhotos: (data) => callFunction('activity', 'uploadPhotos', data)
+  uploadPhotos: (data) => callFunction('activity', 'uploadPhotos', data),
+  getWaitlist: (data) => callFunction('activity', 'getWaitlist', data)
 };
 
 // 积分相关接口

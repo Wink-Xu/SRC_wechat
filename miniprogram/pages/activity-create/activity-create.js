@@ -4,6 +4,8 @@ const { formatDate, showSuccess, showInfo } = require('../../utils/util');
 const { requireAdmin } = require('../../utils/auth');
 const app = getApp();
 
+const DRAFT_KEY = 'activity_create_draft';
+
 Page({
   data: {
     id: '', // 编辑时使用
@@ -32,6 +34,7 @@ Page({
       registration_fee_type: '', // '' | 'points' | 'cash'
       registration_fee: 0,       // 报名费用
       registration_fee_yuan: '',  // 现金显示用（元）
+      refund_policy: 'anytime',   // 退款政策: anytime | half
       // 重复设置
       is_recurring: false,
       repeat_days: []           // 1=周一, 2=周二, ... 7=周日
@@ -58,6 +61,56 @@ Page({
     if (options.id) {
       this.setData({ id: options.id, isEdit: true });
       this.loadActivity(options.id);
+      return;
+    }
+
+    // 检查草稿
+    const draft = this.checkDraft();
+    if (draft) {
+      const that = this;
+      wx.showModal({
+        title: '恢复草稿',
+        content: '检测到上次未提交的草稿，是否恢复？',
+        cancelText: '丢弃',
+        confirmText: '恢复',
+        success (res) {
+          if (res.confirm) {
+            that.setData({ formData: draft });
+          } else {
+            that.clearDraft();
+          }
+        }
+      });
+    }
+  },
+
+  // 自动保存草稿（仅在新建时）
+  autoSaveDraft: function () {
+    if (this.data.isEdit) return;
+    const { formData } = this.data;
+    try {
+      wx.setStorageSync(DRAFT_KEY, JSON.stringify(formData));
+    } catch (e) {
+      // 存储满时忽略
+    }
+  },
+
+  // 检测草稿
+  checkDraft: function () {
+    try {
+      const draft = wx.getStorageSync(DRAFT_KEY);
+      return draft ? JSON.parse(draft) : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  // 清除草稿
+  clearDraft: function () {
+    try {
+      wx.removeStorageSync(DRAFT_KEY);
+    } catch (e) {
+      // ignore
     }
   },
 
@@ -119,6 +172,7 @@ Page({
           registration_fee_yuan: activity.registration_fee_type === 'cash' && activity.registration_fee
             ? (activity.registration_fee / 100).toFixed(2)
             : '',
+          refund_policy: activity.refund_policy || 'anytime',
           // 重复设置
           is_recurring: activity.is_recurring || false,
           repeat_days: activity.repeat_days || []
@@ -132,16 +186,19 @@ Page({
   // 输入标题
   onTitleInput: function (e) {
     this.setData({ 'formData.title': e.detail.value });
+    this.autoSaveDraft();
   },
 
   // 输入描述
   onDescInput: function (e) {
     this.setData({ 'formData.description': e.detail.value });
+    this.autoSaveDraft();
   },
 
   // 输入地点
   onLocationInput: function (e) {
     this.setData({ 'formData.location': e.detail.value });
+    this.autoSaveDraft();
   },
 
   // 选择地图位置
@@ -158,6 +215,7 @@ Page({
           'formData.latitude': res.latitude,
           'formData.longitude': res.longitude
         });
+        that.autoSaveDraft();
       },
       fail: function (err) {
         console.error('选择位置失败', err);
@@ -169,11 +227,13 @@ Page({
   onRunTypeChange: function (e) {
     const { value } = e.currentTarget.dataset;
     this.setData({ 'formData.run_type': value });
+    this.autoSaveDraft();
   },
 
   // 输入 Dress Code
   onDressCodeInput: function (e) {
     this.setData({ 'formData.dress_code': e.detail.value });
+    this.autoSaveDraft();
   },
 
   // 选择活动时间（日期时间选择器）
@@ -189,6 +249,7 @@ Page({
       'formData.start_date': startDate,
       'formData.start_time': startTime
     });
+    this.autoSaveDraft();
   },
 
   // 选择报名截止时间（日期时间选择器）
@@ -204,6 +265,7 @@ Page({
       'formData.registration_deadline_date': deadlineDate,
       'formData.registration_deadline_time': deadlineTime
     });
+    this.autoSaveDraft();
   },
 
   // 选择报名截止日期
@@ -219,16 +281,19 @@ Page({
   // 输入名额
   onQuotaInput: function (e) {
     this.setData({ 'formData.quota': parseInt(e.detail.value) || 0 });
+    this.autoSaveDraft();
   },
 
   // 输入积分
   onPointsInput: function (e) {
     this.setData({ 'formData.points': parseInt(e.detail.value) || 0 });
+    this.autoSaveDraft();
   },
 
   // 切换仅团员报名
   onMemberOnlyChange: function (e) {
     this.setData({ 'formData.member_only': e.detail.value });
+    this.autoSaveDraft();
   },
 
   // 切换重复举办
@@ -251,6 +316,7 @@ Page({
       days.sort();
     }
     this.setData({ 'formData.repeat_days': days });
+    this.autoSaveDraft();
   },
 
   // 切换报名费用类型
@@ -261,6 +327,14 @@ Page({
       'formData.registration_fee_type': value,
       'formData.registration_fee': 0
     });
+    this.autoSaveDraft();
+  },
+
+  // 切换退款政策
+  onRefundPolicyChange: function (e) {
+    const { value } = e.currentTarget.dataset;
+    this.setData({ 'formData.refund_policy': value });
+    this.autoSaveDraft();
   },
 
   // 显示积分输入弹窗
@@ -309,6 +383,7 @@ Page({
       showPointsInputModal: false,
       tempFeeValue: ''
     });
+    this.autoSaveDraft();
   },
 
   // 确认现金
@@ -326,6 +401,7 @@ Page({
       showCashInputModal: false,
       tempFeeValue: ''
     });
+    this.autoSaveDraft();
   },
 
   // 输入报名费用
@@ -366,6 +442,7 @@ Page({
         that.setData({
           'formData.cover_image': uploadRes.fileID
         });
+        that.autoSaveDraft();
         showSuccess('封面上传成功');
       },
       fail: function (uploadErr) {
@@ -386,6 +463,7 @@ Page({
     this.setData({
       'formData.cover_image': ''
     });
+    this.autoSaveDraft();
   },
 
   // 提交表单
@@ -447,6 +525,7 @@ Page({
       member_only: formData.member_only,
       registration_fee_type: formData.registration_fee_type,
       registration_fee: formData.registration_fee_type ? formData.registration_fee : 0,
+      refund_policy: formData.refund_policy,
       // 重复设置
       is_recurring: formData.is_recurring,
       repeat_days: formData.is_recurring ? formData.repeat_days : []
@@ -466,6 +545,7 @@ Page({
         showSuccess('创建成功');
       }
 
+      this.clearDraft();
       setTimeout(() => {
         wx.navigateBack({
           delta: 1

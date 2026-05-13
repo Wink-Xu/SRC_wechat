@@ -183,25 +183,27 @@ Page({
   },
 
   // 执行报名
-  doRegister: async function (phone) {
+  doRegister: async function (phone, isWaitlist = false) {
     const { activity, isMember } = this.data;
 
-    // 收费活动确认
-    if (activity.registration_fee_type === 'points' && activity.registration_fee > 0) {
-      const confirm = await showConfirm(
-        '确认报名',
-        `此活动需要 ${activity.registration_fee} 积分报名，确认支付吗？`
-      );
-      if (!confirm) return;
-    } else if (activity.registration_fee_type === 'cash' && activity.registration_fee > 0) {
-      const confirmCash = await showConfirm(
-        '确认报名',
-        `此活动需要支付 ¥${activity.registration_fee_yuan}，支付后请点击确认报名`
-      );
-      if (!confirmCash) return;
-    } else {
-      const confirm = await showConfirm('确认报名', '确定要报名参加此活动吗？');
-      if (!confirm) return;
+    if (!isWaitlist) {
+      // 收费活动确认
+      if (activity.registration_fee_type === 'points' && activity.registration_fee > 0) {
+        const confirm = await showConfirm(
+          '确认报名',
+          `此活动需要 ${activity.registration_fee} 积分报名，确认支付吗？`
+        );
+        if (!confirm) return;
+      } else if (activity.registration_fee_type === 'cash' && activity.registration_fee > 0) {
+        const confirmCash = await showConfirm(
+          '确认报名',
+          `此活动需要支付 ¥${activity.registration_fee_yuan}，支付后请点击确认报名`
+        );
+        if (!confirmCash) return;
+      } else {
+        const confirm = await showConfirm('确认报名', '确定要报名参加此活动吗？');
+        if (!confirm) return;
+      }
     }
 
     try {
@@ -209,9 +211,12 @@ Page({
       if (!isMember && phone) {
         params.phone = phone;
       }
+      if (isWaitlist) {
+        params.waitlist = true;
+      }
 
       await activityApi.register(params);
-      showSuccess('报名成功');
+      showSuccess(isWaitlist ? '已加入候补名单' : '报名成功');
       this.setData({ showPhoneModal: false });
       this.loadActivity();
     } catch (error) {
@@ -224,6 +229,12 @@ Page({
           content: `报名需要 ${error.requirePoints} 积分，您当前积分不足`,
           showCancel: false
         });
+      } else if (error.waitlistAvailable) {
+        // 名额已满，询问是否加入候补
+        const confirm = await showConfirm('名额已满', '当前名额已满，是否加入候补名单？');
+        if (confirm) {
+          await this.doRegister(phone, true);
+        }
       }
     }
   },

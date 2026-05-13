@@ -65,6 +65,7 @@
         <view class="info-cell">
           <text class="info-label">报名人数</text>
           <text class="info-value"><text class="highlight">{{activity.registered_count || 0}}</text>/{{activity.quota}}人</text>
+          <text wx:if="{{activity.waitlist_count > 0}}" class="info-value waitlist-hint">（候补 {{activity.waitlist_count}}人）</text>
         </view>
         <!-- 报名条件 -->
         <view class="info-cell" wx:if="{{activity.registration_fee_type || activity.member_only}}">
@@ -74,6 +75,8 @@
             <text wx:if="{{activity.registration_fee_type === 'points'}}" class="condition-tag fee">{{activity.registration_fee}}积分</text>
             <text wx:elif="{{activity.registration_fee_type === 'cash'}}" class="condition-tag fee">¥{{activity.registration_fee_yuan || activity.registration_fee}}</text>
             <text wx:else class="condition-tag free">免费</text>
+            <text wx:if="{{activity.refund_policy === 'anytime'}}" class="condition-tag refund">随时退</text>
+            <text wx:elif="{{activity.refund_policy === 'half'}}" class="condition-tag refund">退50%</text>
           </view>
         </view>
       </view>

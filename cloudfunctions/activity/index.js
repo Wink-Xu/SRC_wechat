@@ -66,6 +66,8 @@ exports.main = async (event, context) => {
       return handleRestartActivity(data, wxContext, testOpenid);
     case 'uploadPhotos':
       return handleUploadPhotos(data, wxContext, testOpenid);
+    case 'getWaitlist':
+      return handleGetWaitlist(data, wxContext, testOpenid);
     case 'updateCoverImage':
       return handleUpdateCoverImage(data, wxContext, testOpenid);
     default:
@@ -647,7 +649,7 @@ async function handleGetDetail(data, wxContext, testOpenid) {
 
 // 报名活动
 async function handleRegister(data, wxContext, testOpenid) {
-  const { activityId, phone } = data;
+  const { activityId, phone, waitlist } = data;
 
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
@@ -690,9 +692,44 @@ async function handleRegister(data, wxContext, testOpenid) {
       return { code: -1, message: '请填写手机号', requirePhone: true };
     }
 
-    // 检查名额
+    // 检查名额已满时，进入候补
     if (activity.registered_count >= activity.quota) {
-      return { code: -1, message: '名额已满' };
+      if (!waitlist) {
+        return { code: -2, message: '名额已满，是否加入候补？', waitlistAvailable: true };
+      }
+
+      // 检查是否已在候补
+      const waitlistExist = await db.collection('registrations').where({
+        activity_id: activityId,
+        user_id: userId,
+        status: 'waitlisted'
+      }).get();
+
+      if (waitlistExist.data.length > 0) {
+        return { code: -1, message: '您已在候补列表中' };
+      }
+
+      // 创建候补记录
+      await db.collection('registrations').add({
+        data: {
+          activity_id: activityId,
+          user_id: userId,
+          status: 'waitlisted',
+          check_in_status: 'waitlisted',
+          points_awarded: false,
+          created_at: db.serverDate()
+        }
+      });
+
+      // 更新候补人数
+      await db.collection('activities').doc(activityId).update({
+        data: {
+          waitlist_count: _.inc(1),
+          updated_at: db.serverDate()
+        }
+      });
+
+      return { code: 0, message: '已加入候补名单' };
     }
 
     // 检查是否已报名
@@ -708,17 +745,14 @@ async function handleRegister(data, wxContext, testOpenid) {
 
     // 处理收费报名
     if (activity.registration_fee_type === 'points' && activity.registration_fee > 0) {
-      // 检查积分是否足够
       if (!user.points || user.points < activity.registration_fee) {
         return { code: -1, message: '积分不足', requirePoints: activity.registration_fee };
       }
 
-      // 扣除积分
       await db.collection('users').doc(userId).update({
         data: { points: _.inc(-activity.registration_fee) }
       });
 
-      // 记录积分日志
       await db.collection('point_logs').add({
         data: {
           user_id: userId,
@@ -741,7 +775,6 @@ async function handleRegister(data, wxContext, testOpenid) {
       created_at: db.serverDate()
     };
 
-    // 游客报名记录手机号
     if (!isMember && phone) {
       registrationData.guest_phone = phone;
     }
@@ -778,18 +811,20 @@ async function handleCancelRegistration(data, wxContext, testOpenid) {
 
     const userId = user._id;
 
-    // 查找报名记录
+    // 查找报名记录（含候补）
     const regResult = await db.collection('registrations').where({
       activity_id: activityId,
       user_id: userId,
-      status: 'registered'
+      status: _.in(['registered', 'checked_in', 'waitlisted'])
     }).get();
 
     if (regResult.data.length === 0) {
       return { code: -1, message: '未找到报名记录' };
     }
 
-    const regId = regResult.data[0]._id;
+    const reg = regResult.data[0];
+    const regId = reg._id;
+    const wasWaitlisted = reg.status === 'waitlisted';
 
     // 更新报名状态
     await db.collection('registrations').doc(regId).update({
@@ -799,13 +834,59 @@ async function handleCancelRegistration(data, wxContext, testOpenid) {
       }
     });
 
-    // 更新报名人数
-    await db.collection('activities').doc(activityId).update({
-      data: {
-        registered_count: _.inc(-1),
-        updated_at: db.serverDate()
+    if (wasWaitlisted) {
+      // 候补取消，减少候补人数
+      await db.collection('activities').doc(activityId).update({
+        data: {
+          waitlist_count: _.inc(-1),
+          updated_at: db.serverDate()
+        }
+      });
+    } else {
+      // 正式报名取消，减少报名人数并尝试从候补中递补
+      await db.collection('activities').doc(activityId).update({
+        data: {
+          registered_count: _.inc(-1),
+          updated_at: db.serverDate()
+        }
+      });
+
+      // 自动递补候补中最早的用户
+      try {
+        const waitlistResult = await db.collection('registrations')
+          .where({
+            activity_id: activityId,
+            status: 'waitlisted'
+          })
+          .orderBy('created_at', 'asc')
+          .limit(1)
+          .get();
+
+        if (waitlistResult.data.length > 0) {
+          const promoted = waitlistResult.data[0];
+
+          await db.collection('registrations').doc(promoted._id).update({
+            data: {
+              status: 'registered',
+              check_in_status: 'registered',
+              updated_at: db.serverDate()
+            }
+          });
+
+          await db.collection('activities').doc(activityId).update({
+            data: {
+              registered_count: _.inc(1),
+              waitlist_count: _.inc(-1),
+              updated_at: db.serverDate()
+            }
+          });
+
+          console.log('[候补递补] 用户', promoted.user_id, '从候补转为正式报名');
+        }
+      } catch (err) {
+        console.error('[候补递补] 失败', err);
       }
-    });
+    }
 
     return { code: 0, message: '已取消报名' };
   } catch (error) {
@@ -1257,5 +1338,33 @@ async function handleUploadPhotos(data, wxContext, testOpenid) {
   } catch (error) {
     console.error('上传照片失败', error);
     return { code: -1, message: '上传失败' };
+  }
+}
+
+// 获取候补列表
+async function handleGetWaitlist(data, wxContext, testOpenid) {
+  const { activityId } = data;
+
+  try {
+    const user = await getUser(wxContext.OPENID, testOpenid);
+    if (!user || !['activity_admin', 'leader'].includes(user.role)) {
+      return { code: -1, message: '没有权限' };
+    }
+
+    const result = await db.collection('registrations')
+      .where({
+        activity_id: activityId,
+        status: 'waitlisted'
+      })
+      .orderBy('created_at', 'asc')
+      .get();
+
+    return {
+      code: 0,
+      data: { list: result.data || [] }
+    };
+  } catch (error) {
+    console.error('获取候补列表失败', error);
+    return { code: -1, message: '获取失败' };
   }
 }

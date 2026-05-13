@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/splash/splash",
+    "pages/home/home",
     "pages/activities/activities",
     "pages/activity-detail/activity-detail",
     "pages/activity-participants/activity-participants",
@@ -42,6 +43,12 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
       {
         "pagePath": "pages/activities/activities",
         "text": "活动",
