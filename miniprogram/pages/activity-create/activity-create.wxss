@@ -290,6 +290,11 @@ picker {
   border: none;
 }
 
+.submit-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* 开关行 */
 .switch-row {
   display: flex;

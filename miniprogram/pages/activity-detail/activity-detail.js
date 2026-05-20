@@ -9,8 +9,11 @@ Page({
     activity: null,
     loading: true,
     isRegistered: false,
+    isWaitlisted: false,
+    isFull: false,
     registration: null,
     participants: [],
+    waitlistParticipants: [],
     runTypeText: '',
     canUploadPhotos: false,
     isMember: false,
@@ -63,13 +66,21 @@ Page({
       }
 
       // 跑步类型文本
-      const runTypeMap = {
-        road: '路跑',
-        trail: '越野跑',
-        hiking: '徒步',
-        brand: '品牌合作跑'
-      };
-      const runTypeText = runTypeMap[activity.run_type] || '路跑';
+      const runTypeText = '';
+
+      // 计算周期性活动文字
+      let recurringText = '';
+      if (activity.is_recurring && activity.repeat_days && activity.repeat_days.length > 0) {
+        const dayNames = { 1: '周一', 2: '周二', 3: '周三', 4: '周四', 5: '周五', 6: '周六', 7: '周日' };
+        const days = activity.repeat_days.map(d => dayNames[d] || '').filter(Boolean);
+        if (days.length === 7) {
+          recurringText = '每天';
+        } else {
+          recurringText = '每' + days.join('');
+        }
+      } else if (activity.is_recurring) {
+        recurringText = '周期性活动';
+      }
 
       // 检查用户状态
       const app = getApp();
@@ -106,13 +117,19 @@ Page({
         }
       }
 
+      const isFull = activity.registered_count >= activity.quota;
+
       this.setData({
         activity: { ...activity, photos: displayPhotos, cover_image: displayCoverImage },
         isRegistered: result.isRegistered,
+        isWaitlisted: result.isWaitlisted || false,
+        isFull,
         registration: result.registration,
         participants: result.participants || [],
+        waitlistParticipants: result.waitlistParticipants || [],
         checkedInParticipants: (result.participants || []).filter(p => p.check_in_status === 'checked_in'),
         runTypeText,
+        recurringText,
         canUploadPhotos,
         isMember,
         registrationClosed,
@@ -178,8 +195,8 @@ Page({
       return;
     }
 
-    // 确认报名
-    await this.doRegister();
+    // 确认报名（名额已满时直接候补）
+    await this.doRegister(undefined, this.data.isFull);
   },
 
   // 执行报名
@@ -251,7 +268,7 @@ Page({
       showInfo('请输入正确的手机号');
       return;
     }
-    await this.doRegister(guestPhone);
+    await this.doRegister(guestPhone, this.data.isFull);
   },
 
   // 取消手机号输入
@@ -261,7 +278,15 @@ Page({
 
   // 取消报名
   handleCancelRegistration: async function () {
-    const confirm = await showConfirm('取消报名', '确定要取消报名吗？');
+    const { activity } = this.data;
+    let refundText = '';
+    if (activity.refund_policy === 'anytime') {
+      refundText = '此活动随时可退';
+    } else if (activity.refund_policy === 'half') {
+      refundText = '此活动仅退50%';
+    }
+    const content = refundText ? `确定要取消报名吗？\n${refundText}` : '确定要取消报名吗？';
+    const confirm = await showConfirm('取消报名', content);
     if (!confirm) return;
 
     try {

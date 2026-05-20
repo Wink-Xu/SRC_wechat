@@ -212,11 +212,39 @@ page {
   color: #999999;
 }
 
+.recurring-tag {
+  display: inline-block;
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  background: #F5F5F5;
+  color: #1A1A1A;
+  margin-left: 8rpx;
+  vertical-align: middle;
+  max-width: 200rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .past-title {
   font-size: 30rpx;
   font-weight: 500;
   color: #1A1A1A;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 标题左部 - 标题和重复标签 */
+.title-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+  margin-right: 16rpx;
 }
 
 /* 标题行 - 标题和报名人数同一行 */

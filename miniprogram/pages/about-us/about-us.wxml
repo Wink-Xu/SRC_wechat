@@ -1,0 +1,6 @@
+<view class="page">
+  <view class="images-grid" wx:if="{{images.length > 0}}">
+    <image class="about-image" wx:for="{{images}}" wx:key="*this" src="{{item}}" mode="widthFix" bindtap="previewImage" data-index="{{index}}"></image>
+  </view>
+  <text class="about-text">{{text || 'Sunday Running Club 是一个以跑步为主题的社群，定期组织路跑、越野跑、徒步等各类活动。无论你是新手还是老手，都欢迎加入！'}}</text>
+</view>

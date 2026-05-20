@@ -8,6 +8,7 @@ const DRAFT_KEY = 'activity_create_draft';
 
 Page({
   data: {
+    submitting: false,
     id: '', // 编辑时使用
     isEdit: false,
     formData: {
@@ -16,8 +17,7 @@ Page({
       location: '',
       latitude: null,
       longitude: null,
-      run_type: 'road', // road | trail | hiking | brand
-      dress_code: '',
+      run_type: '',
       start_datetime: '', // ISO 格式
       start_datetime_display: '',
       start_date: '', // 保留用于提交
@@ -47,12 +47,9 @@ Page({
     repeatFri: false,
     repeatSat: false,
     repeatSun: false,
-    runTypes: [
-      { value: 'road', label: '路跑' },
-      { value: 'trail', label: '越野跑' },
-      { value: 'hiking', label: '徒步' },
-      { value: 'brand', label: '品牌合作跑' }
-    ],
+    runTypes: [],
+    runTypeIndex: 0,
+    runTypeLabel: '无限制',
     minDate: new Date().toISOString().split('T')[0],
     // 弹窗控制
     showPointsInputModal: false,
@@ -84,6 +81,7 @@ Page({
         success (res) {
           if (res.confirm) {
             that.setData({ formData: draft });
+            that.updateRunTypeDisplay(draft.run_type || '');
             if (draft.repeat_days && draft.repeat_days.length > 0) {
               that.setRepeatDays(draft.repeat_days);
             }
@@ -166,7 +164,6 @@ Page({
           location: activity.location,
           latitude: activity.latitude || null,
           longitude: activity.longitude || null,
-          run_type: activity.run_type || 'road',
           dress_code: activity.dress_code || '',
           start_datetime: startDatetime,
           start_datetime_display: startDatetimeDisplay,
@@ -242,19 +239,8 @@ Page({
     });
   },
 
-  // 获取类型标签
-  getRunTypeLabel: function (value) {
-    const types = this.data.runTypes;
-    const found = types.find(t => t.value === value);
-    return found ? found.label : '';
-  },
-
-  // 选择跑步类型（下拉）
-  onRunTypePickerChange: function (e) {
-    const index = e.detail.value;
-    const value = this.data.runTypes[index].value;
-    this.setData({ 'formData.run_type': value });
-    this.autoSaveDraft();
+  // 更新跑步类型显示
+  updateRunTypeDisplay: function (runType) {
   },
 
   // 输入 Dress Code
@@ -511,9 +497,11 @@ Page({
 
   // 提交表单
   handleSubmit: async function () {
+    if (this.data.submitting) return;
+
     const { formData, isEdit, id } = this.data;
 
-    // 验证表单
+    // 先验证，通过后再设置提交状态
     if (!formData.cover_image) {
       showInfo('请上传封面图');
       return;
@@ -528,10 +516,6 @@ Page({
     }
     if (!formData.location.trim()) {
       showInfo('请输入集合地点');
-      return;
-    }
-    if (!formData.run_type) {
-      showInfo('请选择跑步类型');
       return;
     }
     if (!formData.dress_code.trim()) {
@@ -551,6 +535,14 @@ Page({
       return;
     }
 
+    // 重复活动必须选择至少一个日期
+    if (formData.is_recurring && this.getRepeatDays().length === 0) {
+      showInfo('请至少选择一个重复日期');
+      return;
+    }
+
+    this.setData({ submitting: true });
+
     // 构建提交数据
     const submitData = {
       title: formData.title.trim(),
@@ -558,7 +550,7 @@ Page({
       location: formData.location.trim(),
       latitude: formData.latitude,
       longitude: formData.longitude,
-      run_type: formData.run_type,
+      run_type: '',
       dress_code: formData.dress_code.trim(),
       start_time: `${formData.start_date} ${formData.start_time}`,
       quota: formData.quota,
@@ -603,6 +595,8 @@ Page({
         content: errorMsg,
         showCancel: false
       });
+    } finally {
+      this.setData({ submitting: false });
     }
   }
 });

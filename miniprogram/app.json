@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/splash/splash",
     "pages/home/home",
+    "pages/splash/splash",
     "pages/activities/activities",
     "pages/activity-detail/activity-detail",
     "pages/activity-participants/activity-participants",
@@ -29,7 +29,10 @@
     "pages/admin-orders/admin-orders",
     "pages/admin-coffee/admin-coffee",
     "pages/admin-coffee-edit/admin-coffee-edit",
-    "pages/admin-coffee-orders/admin-coffee-orders"
+    "pages/admin-coffee-orders/admin-coffee-orders",
+    "pages/admin-home/admin-home",
+    "pages/contact-us/contact-us",
+    "pages/about-us/about-us"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -46,8 +49,8 @@
       {
         "pagePath": "pages/home/home",
         "text": "首页",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home-active.png"
+        "iconPath": "images/icon_857.png",
+        "selectedIconPath": "images/icon_857.png"
       },
       {
         "pagePath": "pages/activities/activities",

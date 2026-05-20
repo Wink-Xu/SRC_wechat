@@ -3,7 +3,7 @@
   <!-- 用户信息头部 -->
   <view class="header-section">
     <view class="header-top">
-      <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="previewAvatar" bindlongpress="changeAvatar"></image>
+      <image class="user-avatar" src="{{userInfo.displayAvatar || userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill" bindtap="changeAvatar"></image>
       <view class="user-info">
         <view class="nickname-row" bindtap="editNickname">
           <text class="nickname">{{userInfo.nickname || '未登录'}}</text>
@@ -84,6 +84,10 @@
         <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-activities/admin-activities">
           <view class="menu-grid-icon iconfont icon-activity"></view>
           <text class="menu-grid-title">活动管理</text>
+        </view>
+        <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-home/admin-home">
+          <image class="menu-grid-icon" src="/images/icon_857.png"></image>
+          <text class="menu-grid-title">首页管理</text>
         </view>
         <view class="menu-grid-item" bindtap="goToPage" data-path="/pages/admin-products/admin-products">
           <view class="menu-grid-icon iconfont icon-product"></view>

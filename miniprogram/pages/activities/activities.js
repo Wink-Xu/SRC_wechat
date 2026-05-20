@@ -12,7 +12,7 @@ Page({
     hasMore: true,
     page: 1,
     pageSize: 10,
-    hasLoaded: false
+    hasLoaded: false,
   },
 
   onLoad: function () {
@@ -20,12 +20,9 @@ Page({
   },
 
   onShow: function () {
-    // 如果已加载过，检查缓存时间，超过5分钟才刷新
+    // 每次显示时后台静默刷新，确保新创建的活动出现在列表中
     if (this.data.hasLoaded) {
-      const lastLoadTime = wx.getStorageSync('activities_last_load_time') || 0;
-      if (Date.now() - lastLoadTime > 5 * 60 * 1000) {
-        this.refreshActivities();
-      }
+      this.refreshActivitiesData(this.data.page, this.data.pageSize, true);
       return;
     }
     this.loadActivities();
@@ -130,11 +127,15 @@ Page({
       }
     }
 
-    // 处理正在报名的活动
-    const ongoingActivities = (result.ongoingList || []).map(item => this.formatActivity(item, tempUrlMap));
+    // 处理正在报名的活动（过滤已隐藏的）
+    const ongoingActivities = (result.ongoingList || [])
+      .filter(item => !item.hidden)
+      .map(item => this.formatActivity(item, tempUrlMap));
 
-    // 处理往期活动
-    const pastActivities = (result.endedList || []).map(item => this.formatActivity(item, tempUrlMap));
+    // 处理往期活动（过滤已隐藏的）
+    const pastActivities = (result.endedList || [])
+      .filter(item => !item.hidden)
+      .map(item => this.formatActivity(item, tempUrlMap));
 
     // 缓存第一页数据
     if (page === 1) {
@@ -166,12 +167,27 @@ Page({
       brand: '品牌合作跑'
     };
 
+    // 计算周期性活动文字
+    let recurringText = '';
+    if (item.is_recurring && item.repeat_days && item.repeat_days.length > 0) {
+      const dayNames = { 1: '周一', 2: '周二', 3: '周三', 4: '周四', 5: '周五', 6: '周六', 7: '周日' };
+      const days = item.repeat_days.map(d => dayNames[d] || '').filter(Boolean);
+      if (days.length === 7) {
+        recurringText = '每天';
+      } else {
+        recurringText = '每' + days.join('');
+      }
+    } else if (item.is_recurring) {
+      recurringText = '周期性';
+    }
+
     const formatted = {
       ...item,
       formattedTime: formatDate(item.start_time, 'MM 月 DD 日 HH:mm'),
       statusText: this.getStatusText(item.status),
       statusClass: this.getStatusClass(item.status),
-      runTypeText: runTypeMap[item.run_type] || ''
+      runTypeText: runTypeMap[item.run_type] || '',
+      recurringText
     };
 
     // 转换封面图 fileID 为临时 URL
@@ -234,8 +250,8 @@ Page({
         }
       }
 
-      const ongoingActivities = (result.ongoingList || []).map(item => this.formatActivity(item, tempUrlMap));
-      const pastActivities = (result.endedList || []).map(item => this.formatActivity(item, tempUrlMap));
+      const ongoingActivities = (result.ongoingList || []).filter(item => !item.hidden).map(item => this.formatActivity(item, tempUrlMap));
+      const pastActivities = (result.endedList || []).filter(item => !item.hidden).map(item => this.formatActivity(item, tempUrlMap));
 
       this.setData({
         ongoingActivities: [...this.data.ongoingActivities, ...ongoingActivities],

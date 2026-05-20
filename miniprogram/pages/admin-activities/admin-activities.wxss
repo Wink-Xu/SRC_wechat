@@ -73,6 +73,27 @@
   margin-bottom: 8rpx;
 }
 
+/* 开关行 */
+.activity-toggles {
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+  padding: 16rpx 0;
+  border-top: 1rpx solid #F5F5F5;
+  margin-top: 8rpx;
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.toggle-label {
+  font-size: 24rpx;
+  color: #666666;
+}
+
 .activity-actions {
   display: flex;
   justify-content: flex-end;

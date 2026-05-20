@@ -8,6 +8,30 @@ cloud.init({
 const db = cloud.database();
 const _ = db.command;
 
+// 初始化首页内容集合（首次保存时调用）
+async function ensureHomeContentCollection() {
+  try {
+    await db.createCollection('home_content');
+    console.log('[ensureCollection] 创建 home_content 成功');
+  } catch (e) {
+    if (e.message && e.message.includes('already exists')) {
+      console.log('[ensureCollection] home_content 已存在');
+      return;
+    }
+    // createCollection 可能不可用，尝试通过底层 SDK
+    console.log('[ensureCollection] createCollection 不可用:', e.message);
+    try {
+      const tcb = require('@cloudbase/node-sdk');
+      const app = tcb.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+      await app.database().createCollection('home_content');
+      console.log('[ensureCollection] 通过 @cloudbase/node-sdk 创建成功');
+    } catch (tcbErr) {
+      console.error('[ensureCollection] 所有方式均失败:', tcbErr.message);
+      throw tcbErr;
+    }
+  }
+}
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
@@ -30,6 +54,10 @@ exports.main = async (event, context) => {
       return handleUpdateOrderStatus(data, wxContext);
     case 'getOrders':
       return handleGetOrders(data, wxContext);
+    case 'getHomeContent':
+      return handleGetHomeContent(data, wxContext);
+    case 'saveHomeContent':
+      return handleSaveHomeContent(data, wxContext);
     default:
       return { code: -1, message: '未知操作: ' + action };
   }
@@ -262,5 +290,73 @@ async function handleGetOrders(data, wxContext) {
   } catch (error) {
     console.error('获取订单列表失败', error);
     return { code: -1, message: '获取失败' };
+  }
+}
+
+// 获取首页内容
+async function handleGetHomeContent(data, wxContext) {
+  let announcement = null;
+  let aboutUs = null;
+
+  try {
+    const r = await db.collection('home_content').doc('announcement').get();
+    announcement = r.data;
+  } catch (_) {}
+
+  try {
+    const r = await db.collection('home_content').doc('about_us').get();
+    aboutUs = r.data;
+  } catch (_) {}
+
+  return { code: 0, data: { announcement, aboutUs } };
+}
+
+// 保存首页内容（需管理员权限）
+async function handleSaveHomeContent(data, wxContext) {
+  const openid = wxContext.OPENID;
+
+  try {
+    const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+    const user = userResult.data[0];
+    if (!['activity_admin', 'leader'].includes(user.role)) {
+      return { code: -1, message: '没有权限' };
+    }
+
+    const { type, text, images } = data;
+    if (!type || !['announcement', 'about_us'].includes(type)) {
+      return { code: -1, message: '无效的类型' };
+    }
+
+    // 尝试创建集合（集合已存在时忽略错误）
+    try { await db.createCollection('home_content'); } catch (_) {}
+
+    const updateData = {
+      text: text || '',
+      updated_at: new Date(),
+      updated_by: String(user._id)
+    };
+
+    if (type === 'announcement') {
+      updateData.image = data.image || '';
+    } else if (type === 'about_us') {
+      updateData.images = images || [];
+    }
+
+    // 保存文档
+    try {
+      await db.collection('home_content').doc(type).set({ data: updateData });
+    } catch (setErr) {
+      // set 失败时尝试 add（兼容某些环境）
+      await db.collection('home_content').add({ data: { _id: type, ...updateData } });
+    }
+
+    return { code: 0, message: '保存成功' };
+  } catch (error) {
+    console.error('保存首页内容失败', JSON.stringify(error));
+    const detail = error.errMsg || error.message || '未知错误';
+    return { code: -1, message: '保存失败: ' + detail };
   }
 }

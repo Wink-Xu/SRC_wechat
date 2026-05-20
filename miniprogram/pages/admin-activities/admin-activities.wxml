@@ -23,6 +23,17 @@
         <text class="info-text">{{item.formattedTime}} | {{item.location}}</text>
         <text class="info-text">签到: {{item.check_in_count || 0}}/{{item.registered_count || 0}}人</text>
       </view>
+      <!-- 往期精彩 / 隐藏 开关 -->
+      <view class="activity-toggles">
+        <view class="toggle-item">
+          <text class="toggle-label">放入往期精彩</text>
+          <switch checked="{{item.highlight}}" data-id="{{item._id}}" data-field="highlight" bindchange="toggleActivityField" />
+        </view>
+        <view class="toggle-item">
+          <text class="toggle-label">隐藏活动</text>
+          <switch checked="{{item.hidden}}" data-id="{{item._id}}" data-field="hidden" bindchange="toggleActivityField" />
+        </view>
+      </view>
       <view class="activity-actions">
         <button
           wx:if="{{item.status === 'draft' || item.status === 'ongoing'}}"

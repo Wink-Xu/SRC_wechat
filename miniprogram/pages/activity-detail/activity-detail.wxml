@@ -50,10 +50,6 @@
             <text class="location-icon">▶</text>
           </view>
         </view>
-        <view class="info-cell">
-          <text class="info-label">跑步类型</text>
-          <text class="info-value">{{runTypeText}}</text>
-        </view>
         <view class="info-cell" wx:if="{{activity.registration_deadline}}">
           <text class="info-label">报名截止</text>
           <text class="info-value">{{activity.formattedRegistrationDeadline}}</text>
@@ -62,10 +58,9 @@
           <text class="info-label">DressCode</text>
           <text class="info-value">{{activity.dress_code}}</text>
         </view>
-        <view class="info-cell">
-          <text class="info-label">报名人数</text>
-          <text class="info-value"><text class="highlight">{{activity.registered_count || 0}}</text>/{{activity.quota}}人</text>
-          <text wx:if="{{activity.waitlist_count > 0}}" class="info-value waitlist-hint">（候补 {{activity.waitlist_count}}人）</text>
+        <view class="info-cell" wx:if="{{recurringText}}">
+          <text class="info-label">重复周期</text>
+          <text class="info-value">{{recurringText}}</text>
         </view>
         <!-- 报名条件 -->
         <view class="info-cell" wx:if="{{activity.registration_fee_type || activity.member_only}}">
@@ -84,9 +79,10 @@
       <!-- 已报名团员 -->
       <view class="section-card">
         <view class="card-header-simple">
-          <text class="card-title">已报名</text>
+          <text class="card-title">已报名 <text class="highlight-count">{{activity.registered_count || 0}}/{{activity.quota}}人</text></text>
+          <view wx:if="{{activity.waitlist_count > 0}}" class="waitlist-hint">候补 {{activity.waitlist_count}}人</view>
           <view class="view-all-btn" bindtap="viewParticipants" wx:if="{{participants.length > 0}}">
-            <text>全部 {{activity.registered_count || 0}}人</text>
+            <text>全部</text>
             <image class="arrow-icon" src="/images/arrow-right.png"></image>
           </view>
         </view>
@@ -101,35 +97,61 @@
         </view>
       </view>
 
+      <!-- 候补名单 -->
+      <view class="section-card" wx:if="{{waitlistParticipants.length > 0}}">
+        <view class="card-header-simple">
+          <text class="card-title">候补名单</text>
+          <text>{{waitlistParticipants.length}}人</text>
+        </view>
+        <view class="participants-list">
+          <view class="participant-item" wx:for="{{waitlistParticipants}}" wx:key="_id">
+            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+            <text class="participant-name">{{item.nickname}}</text>
+          </view>
+        </view>
+      </view>
+
       <!-- 底部操作区 -->
       <view class="footer-actions">
-        <!-- 客服按钮 -->
-        <button class="btn-contact" open-type="contact">联系客服</button>
+        <view class="footer-row">
+          <button class="btn-contact-icon" open-type="contact">
+            <image class="contact-icon-img" src="/images/xinxi.png" mode="aspectFill"></image>
+          </button>
 
-        <!-- 报名已截止 -->
-        <block wx:if="{{registrationClosed && !isRegistered}}">
-          <view class="registration-closed">
-            <text>报名已截止</text>
+          <view class="footer-main">
+            <!-- 报名已截止 -->
+            <block wx:if="{{registrationClosed && !isRegistered}}">
+              <view class="registration-closed">
+                <text>报名已截止</text>
+              </view>
+            </block>
+
+            <!-- 未报名用户显示报名/候补按钮 -->
+            <block wx:elif="{{!isRegistered && !isWaitlisted}}">
+              <button class="btn-register {{isFull ? 'btn-waitlist' : ''}}" bindtap="handleRegister">{{isFull ? '候补报名' : '立即报名'}}</button>
+            </block>
+
+            <!-- 已加入候补 -->
+            <block wx:elif="{{isWaitlisted}}">
+              <view class="checked-in-badge">
+                <text>已加入候补</text>
+              </view>
+            </block>
+
+            <!-- 已报名用户显示取消报名按钮 -->
+            <block wx:elif="{{isRegistered && registration.check_in_status !== 'checked_in'}}">
+              <button class="btn-cancel-register" bindtap="handleCancelRegistration">取消报名</button>
+            </block>
+
+            <!-- 已签到用户显示已签到标识 -->
+            <block wx:if="{{isRegistered && registration.check_in_status === 'checked_in'}}">
+              <view class="checked-in-badge">
+                <image class="badge-icon" src="/images/check.png"></image>
+                <text>已签到</text>
+              </view>
+            </block>
           </view>
-        </block>
-
-        <!-- 未报名用户显示报名按钮 -->
-        <block wx:elif="{{!isRegistered}}">
-          <button class="btn-register" bindtap="handleRegister">立即报名</button>
-        </block>
-
-        <!-- 已报名用户显示取消报名按钮 -->
-        <block wx:elif="{{isRegistered && registration.check_in_status !== 'checked_in'}}">
-          <button class="btn-cancel-register" bindtap="handleCancelRegistration">取消报名</button>
-        </block>
-
-        <!-- 已签到用户显示已签到标识 -->
-        <block wx:if="{{isRegistered && registration.check_in_status === 'checked_in'}}">
-          <view class="checked-in-badge">
-            <image class="badge-icon" src="/images/check.png"></image>
-            <text>已签到</text>
-          </view>
-        </block>
+        </view>
       </view>
     </block>
 

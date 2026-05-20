@@ -118,7 +118,9 @@ const adminApi = {
   getPendingMembers: (data) => callFunction('admin', 'getPendingMembers', data),
   manageProduct: (data) => callFunction('admin', 'manageProduct', data),
   updateOrderStatus: (data) => callFunction('admin', 'updateOrderStatus', data),
-  getOrders: (data) => callFunction('admin', 'getOrders', data, { showLoad: false })
+  getOrders: (data) => callFunction('admin', 'getOrders', data, { showLoad: false }),
+  getHomeContent: (data) => callFunction('admin', 'getHomeContent', data, { showLoad: false }),
+  saveHomeContent: (data) => callFunction('admin', 'saveHomeContent', data)
 };
 
 // 调试接口

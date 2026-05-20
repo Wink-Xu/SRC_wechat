@@ -1,150 +1,164 @@
-/* pages/home/home.wxss */
-.container {
-  min-height: 100vh;
-  background: #F8F8F8;
-  padding-bottom: 60rpx;
-}
+/* pages/home/home.wxss - 极简主义 */
 
-/* Banner */
-.banner {
-  position: relative;
-  width: 100%;
-  height: 360rpx;
-  overflow: hidden;
-}
-
-.banner-img {
-  width: 100%;
-  height: 100%;
-}
-
-.banner-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 40rpx 32rpx;
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-}
-
-.club-name {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-  display: block;
-  margin-bottom: 8rpx;
-}
-
-.club-slogan {
-  font-size: 26rpx;
-  color: rgba(255,255,255,0.8);
-  display: block;
-}
-
-/* Section */
-.section {
-  margin: 20rpx 24rpx 0;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  overflow: hidden;
-}
-
-.section-header {
+/* ===== 导航栏 ===== */
+.nav-bar {
   display: flex;
   align-items: center;
-  padding: 28rpx 28rpx;
-  gap: 16rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  background: #FFFFFF;
 }
 
-.section-icon {
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 8rpx;
-  flex-shrink: 0;
+.nav-logo {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 32rpx;
+  border-radius: 16rpx;
+}
+
+.nav-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+/* ===== 页面主体 ===== */
+.page {
+  background: #FFFFFF;
+  min-height: 100vh;
+}
+
+/* ===== 日期 ===== */
+.date-line {
+  padding: 24rpx 32rpx 0;
+}
+
+.date-text {
+  font-size: 26rpx;
+  color: #BBBBBB;
+  font-weight: 400;
+}
+
+/* ===== 板块标题 ===== */
+.section-head {
+  padding: 40rpx 32rpx 24rpx;
 }
 
 .section-title {
-  font-size: 30rpx;
-  font-weight: 600;
+  font-size: 38rpx;
+  font-weight: 700;
   color: #1A1A1A;
-  flex: 1;
 }
 
-.section-arrow {
-  font-size: 40rpx;
-  color: #CCCCCC;
-  transition: transform 0.3s;
-  transform: rotate(90deg);
+/* ===== 横向滚动卡片 ===== */
+.scroll-area {
+  padding-left: 32rpx;
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8rpx;
 }
 
-.section.expanded {
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+.scroll-area::-webkit-scrollbar {
+  display: none;
 }
 
-.section-body {
-  padding: 0 28rpx 32rpx;
+.scroll-card {
+  display: inline-block;
+  width: 520rpx;
+  margin-right: 20rpx;
+  vertical-align: top;
+  white-space: normal;
 }
 
-.section-cover {
+.scroll-card-image {
   width: 100%;
-  height: 280rpx;
-  border-radius: 12rpx;
-  margin-bottom: 20rpx;
+  height: 340rpx;
+  border-radius: 20rpx;
+  background: #F5F5F5;
 }
 
-.section-text {
+.scroll-card-image-wide {
+  width: 100%;
+  border-radius: 20rpx;
+  background: #F5F5F5;
+}
+
+.scroll-card-title {
   font-size: 28rpx;
-  color: #333333;
-  line-height: 1.7;
+  font-weight: 600;
+  color: #BBBBBB;
+  margin-top: 16rpx;
+  line-height: 1.4;
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* 联系我们 */
-.contact-row {
+/* ===== 公告居中 ===== */
+.announcement-wrap {
   display: flex;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #F0F0F0;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 32rpx;
 }
 
-.contact-label {
-  font-size: 26rpx;
-  color: #999999;
-  width: 160rpx;
-  flex-shrink: 0;
+.announcement-card {
+  width: 100%;
 }
 
-.contact-value {
+/* ===== 关于我们封面 ===== */
+.about-wrap {
+  padding: 0 32rpx;
+}
+
+.about-cover {
+  width: 100%;
+  height: 340rpx;
+  border-radius: 20rpx;
+  background: #F5F5F5;
+}
+
+/* ===== 联系我们 ===== */
+.contact-body {
+  padding: 0 32rpx 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contact-sub {
   font-size: 26rpx;
-  color: #1A1A1A;
+  color: #BBBBBB;
   flex: 1;
+  margin-right: 24rpx;
 }
 
 .contact-btn {
-  margin-top: 24rpx;
-  width: 100%;
-  height: 80rpx;
-  line-height: 80rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 28rpx;
   background: #1A1A1A;
   color: #FFFFFF;
-  font-size: 28rpx;
-  border-radius: 40rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  border-radius: 28rpx;
   border: none;
   text-align: center;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-chat-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 24rpx;
+  vertical-align: middle;
 }
 
 .contact-btn::after {
   border: none;
-}
-
-/* Footer */
-.footer {
-  margin-top: 40rpx;
-  padding: 0 24rpx;
-  text-align: center;
-}
-
-.footer-text {
-  font-size: 22rpx;
-  color: #CCCCCC;
-  font-style: italic;
 }

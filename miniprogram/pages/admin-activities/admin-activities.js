@@ -379,6 +379,27 @@ Page({
     });
   },
 
+  // 切换活动字段（往期精彩/隐藏）
+  toggleActivityField: async function (e) {
+    const id = e.currentTarget.dataset.id;
+    const field = e.currentTarget.dataset.field;
+    const value = e.detail.value;
+
+    try {
+      await activityApi.update({ id, [field]: value });
+      const activities = this.data.activities.map(a => {
+        if (a._id === id) {
+          return { ...a, [field]: value };
+        }
+        return a;
+      });
+      this.setData({ activities });
+      showSuccess(value ? '已开启' : '已关闭');
+    } catch (error) {
+      console.error(`更新${field}失败`, error);
+    }
+  },
+
   // 获取状态文本
   getStatusText: function (status) {
     const statusMap = {

@@ -63,19 +63,6 @@
         </view>
       </view>
 
-      <!-- 跑步类型 -->
-      <view class="form-item">
-        <text class="form-label required">跑步类型</text>
-        <picker class="form-picker" mode="selector" range="{{runTypes}}" range-key="label" bindchange="onRunTypePickerChange">
-          <view class="picker-row">
-            <text class="{{formData.run_type ? '' : 'placeholder'}}">
-              {{getRunTypeLabel(formData.run_type) || '请选择跑步类型'}}
-            </text>
-            <text class="picker-arrow">›</text>
-          </view>
-        </picker>
-      </view>
-
       <!-- Dress Code -->
       <view class="form-item">
         <text class="form-label required">Dress Code</text>
@@ -264,8 +251,8 @@
 
   <!-- 提交按钮 -->
   <view class="submit-wrapper">
-    <button class="submit-btn" bindtap="handleSubmit">
-      {{isEdit ? '保存修改' : '创建活动'}}
+    <button class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="handleSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : (isEdit ? '保存修改' : '创建活动')}}
     </button>
   </view>
 </view>

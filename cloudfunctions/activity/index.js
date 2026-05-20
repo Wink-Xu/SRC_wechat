@@ -174,6 +174,7 @@ async function createRecurringActivities(baseData, repeatDays, user) {
       ...baseData,
       start_time: activityTime.toISOString(),
       is_recurring: true,
+      repeat_days: repeatDays,
       status: 'ongoing',
       created_by: user._id,
       registered_count: 0,
@@ -390,7 +391,7 @@ async function handleDelete(data, wxContext, testOpenid) {
 
 // 获取活动列表
 async function handleGetList(data, wxContext, testOpenid) {
-  const { page = 1, limit = 20, status, registered, createdByMe, all, myActivities } = data;
+  const { page = 1, limit = 20, status, registered, createdByMe, all, myActivities, highlight, hidden } = data;
 
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
@@ -425,6 +426,16 @@ async function handleGetList(data, wxContext, testOpenid) {
       if (createdByMe && userId) {
         query = query.where({ created_by: userId });
       }
+    }
+
+    // 亮点活动筛选（首页往期精彩）
+    if (highlight !== undefined) {
+      query = query.where({ highlight: highlight === true || highlight === 'true' });
+    }
+
+    // 隐藏状态筛选
+    if (hidden !== undefined) {
+      query = query.where({ hidden: hidden === true || hidden === 'true' });
     }
 
     // 获取总数
@@ -482,7 +493,7 @@ async function handleGetList(data, wxContext, testOpenid) {
 
 // 获取活动列表（优化版：一次请求返回所有状态 + 批量查询报名数）
 async function handleGetListOptimized(data, wxContext, testOpenid) {
-  const { page = 1, limit = 20 } = data;
+  const { page = 1, limit = 20, startDate, endDate } = data;
 
   try {
     const user = await getUser(wxContext.OPENID, testOpenid);
@@ -490,6 +501,15 @@ async function handleGetListOptimized(data, wxContext, testOpenid) {
 
     // 一次性获取所有活动（不分状态），按创建时间倒序
     const query = db.collection('activities');
+
+    // 时间范围筛选
+    if (startDate) {
+      query = query.where({ start_time: _.gte(new Date(startDate + ' 00:00:00')) });
+    }
+    if (endDate) {
+      query = query.where({ start_time: _.lte(new Date(endDate + ' 23:59:59')) });
+    }
+
     const countResult = await query.count();
     const total = countResult.total;
 
@@ -591,6 +611,7 @@ async function handleGetDetail(data, wxContext, testOpenid) {
     // 检查是否已报名
     let isRegistered = false;
     let registration = null;
+    let isWaitlisted = false;
 
     if (userId) {
       const regResult = await db.collection('registrations').where({
@@ -603,6 +624,19 @@ async function handleGetDetail(data, wxContext, testOpenid) {
         isRegistered = true;
         registration = regResult.data[0];
       }
+
+      // 检查是否在候补中
+      if (!isRegistered) {
+        const waitlistResult = await db.collection('registrations').where({
+          activity_id: id,
+          user_id: userId,
+          status: 'waitlisted'
+        }).get();
+        if (waitlistResult.data.length > 0) {
+          isWaitlisted = true;
+          registration = waitlistResult.data[0];
+        }
+      }
     }
 
     // 获取已报名用户
@@ -613,8 +647,18 @@ async function handleGetDetail(data, wxContext, testOpenid) {
       })
       .get();
 
+    // 获取候补用户
+    const waitlistResult = await db.collection('registrations')
+      .where({
+        activity_id: id,
+        status: 'waitlisted'
+      })
+      .orderBy('created_at', 'asc')
+      .get();
+
     // 获取用户信息
-    const userIds = participantsResult.data.map(r => r.user_id);
+    const allRegs = [...participantsResult.data, ...waitlistResult.data];
+    const userIds = [...new Set(allRegs.map(r => r.user_id))];
     const usersResult = userIds.length > 0 ? await db.collection('users')
       .where({ _id: _.in(userIds) })
       .get() : { data: [] };
@@ -632,13 +676,23 @@ async function handleGetDetail(data, wxContext, testOpenid) {
       check_in_status: r.status
     }));
 
+    const waitlistParticipants = waitlistResult.data.map(r => ({
+      _id: r._id,
+      user_id: r.user_id,
+      nickname: userMap[r.user_id]?.nickname || '',
+      avatar: userMap[r.user_id]?.avatar || '',
+      created_at: r.created_at
+    }));
+
     return {
       code: 0,
       data: {
         activity,
         isRegistered,
+        isWaitlisted,
         registration,
-        participants
+        participants,
+        waitlistParticipants
       }
     };
   } catch (error) {

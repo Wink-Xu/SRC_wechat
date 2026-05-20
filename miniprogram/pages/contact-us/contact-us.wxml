@@ -1,0 +1,24 @@
+<view class="page">
+  <!-- 标语卡片 -->
+  <view class="slogan-card">
+    <text class="slogan-text">于SRC之壤，</text>
+    <text class="slogan-text">育更好之我。</text>
+  </view>
+
+  <!-- 联系方式卡片 -->
+  <view class="info-card">
+    <view class="info-item">
+      <text class="info-label">微信公众号</text>
+      <text class="info-value">SundayRunningClub</text>
+    </view>
+    <view class="info-divider"></view>
+    <view class="info-item">
+      <text class="info-label">联系邮箱</text>
+      <text class="info-value">sundayrunning@example.com</text>
+    </view>
+  </view>
+
+  <view class="cs-btn-wrap">
+    <button class="cs-btn" open-type="contact">在线客服</button>
+  </view>
+</view>

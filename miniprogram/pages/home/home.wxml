@@ -1,61 +1,69 @@
-<view class="container">
-  <!-- Banner -->
-  <view class="banner">
-    <image class="banner-img" src="/images/logo.jpg" mode="aspectFill"></image>
-    <view class="banner-overlay">
-      <text class="club-name">Sunday Running Club</text>
-      <text class="club-slogan">一起奔跑，一起成长</text>
-    </view>
+<view class="nav-bar" style="padding-top: {{navBarTop}}px;">
+  <image class="nav-logo" src="/images/logo.jpg" mode="aspectFill"></image>
+  <text class="nav-title">Sunday Running Club</text>
+</view>
+
+<view class="page" wx:if="{{loaded}}">
+  <!-- 日期 -->
+  <view class="date-line">
+    <text class="date-text">{{today}}</text>
   </view>
 
   <!-- 公告 -->
-  <view class="section {{showAnnouncements ? 'expanded' : ''}}" bindtap="onToggleAnnouncements">
-    <view class="section-header">
-      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
-      <text class="section-title">公告</text>
-      <text class="section-arrow {{showAnnouncements ? 'up' : ''}}">›</text>
+  <view wx:if="{{announcementCards.length > 0}}">
+    <view class="section-head">
+      <text class="section-title">广而告之</text>
     </view>
-    <view class="section-body" wx:if="{{showAnnouncements}}">
-      <image class="section-cover" src="/images/logo.jpg" mode="aspectFill"></image>
-      <text class="section-text">欢迎加入 Sunday Running Club！本活动群定期举办跑步活动，关注公众号获取最新消息。</text>
+    <view class="announcement-wrap">
+      <view class="announcement-card" wx:for="{{announcementCards}}" wx:key="index">
+        <image class="scroll-card-image-wide" src="{{item.image}}" mode="widthFix" bindtap="previewAnnouncementImage"></image>
+        <text class="scroll-card-title" wx:if="{{item.title}}">{{item.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 往期精彩 -->
+  <view wx:if="{{highlightCards.length > 0}}">
+    <view class="section-head">
+      <text class="section-title">往期精彩</text>
+    </view>
+    <view class="scroll-area">
+      <view class="scroll-card" wx:for="{{highlightCards}}" wx:for-index="idx" wx:key="activityId">
+        <image class="scroll-card-image" src="{{item.image}}" mode="aspectFill" bindtap="goToActivity" data-id="{{item.activityId}}"></image>
+        <text class="scroll-card-title">{{item.title}}</text>
+      </view>
     </view>
   </view>
 
   <!-- 关于我们 -->
-  <view class="section {{showAbout ? 'expanded' : ''}}" bindtap="onToggleAbout">
-    <view class="section-header">
-      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
+  <view wx:if="{{aboutImage}}">
+    <view class="section-head">
       <text class="section-title">关于我们</text>
-      <text class="section-arrow {{showAbout ? 'up' : ''}}">›</text>
     </view>
-    <view class="section-body" wx:if="{{showAbout}}">
-      <image class="section-cover" src="/images/logo.jpg" mode="aspectFill"></image>
-      <text class="section-text">Sunday Running Club 是一个以跑步为主题的社群，定期组织路跑、越野跑、徒步等各类活动。无论你是新手还是老手，都欢迎加入！</text>
+    <view class="about-wrap">
+      <image class="about-cover" src="{{aboutImage}}" mode="aspectFill" bindtap="goToAboutUs"></image>
     </view>
   </view>
 
   <!-- 联系我们 -->
-  <view class="section {{showContact ? 'expanded' : ''}}" bindtap="onToggleContact">
-    <view class="section-header">
-      <image class="section-icon" src="/images/logo.jpg" mode="aspectFill"></image>
-      <text class="section-title">联系我们</text>
-      <text class="section-arrow {{showContact ? 'up' : ''}}">›</text>
-    </view>
-    <view class="section-body" wx:if="{{showContact}}">
-      <view class="contact-row">
-        <text class="contact-label">微信公众号</text>
-        <text class="contact-value">SundayRunningClub</text>
-      </view>
-      <view class="contact-row">
-        <text class="contact-label">联系邮箱</text>
-        <text class="contact-value">sundayrunning@example.com</text>
-      </view>
-      <button class="contact-btn" open-type="contact">在线客服</button>
-    </view>
+  <view class="section-head">
+    <text class="section-title">联系我们</text>
   </view>
+  <view class="contact-body">
+    <text class="contact-sub">于SRC之壤，育更好之我。</text>
+    <button class="contact-btn" open-type="contact">
+      <image class="btn-chat-icon" src="/images/kefu-2.png" mode="aspectFill"></image>
+      <text>戳我唠嗑</text>
+    </button>
+  </view>
+</view>
 
-  <!-- 底部 -->
-  <view class="footer">
-    <text class="footer-text">In the soil of SRC we grow into our better selves.</text>
+<!-- 加载骨架 -->
+<view class="page" wx:else>
+  <view style="padding: 32rpx;">
+    <view style="width: 100%; height: 340rpx; background: #F5F5F5; border-radius: 20rpx; margin-bottom: 24rpx;"></view>
+    <view style="width: 60%; height: 32rpx; background: #F5F5F5; border-radius: 8rpx; margin-bottom: 48rpx;"></view>
+    <view style="width: 100%; height: 340rpx; background: #F5F5F5; border-radius: 20rpx; margin-bottom: 24rpx;"></view>
+    <view style="width: 80%; height: 32rpx; background: #F5F5F5; border-radius: 8rpx;"></view>
   </view>
 </view>

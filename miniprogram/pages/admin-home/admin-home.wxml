@@ -1,0 +1,44 @@
+<!--pages/admin-home/admin-home.wxml-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-box">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else>
+    <!-- 公告编辑 -->
+    <view class="form-section">
+      <view class="section-title">公告编辑</view>
+      <view class="section-card">
+        <view class="form-item">
+          <text class="form-label">公告图片</text>
+          <view class="image-wrapper">
+            <view class="image-preview" wx:if="{{announcement.image && !announcementTempImage}}">
+              <image class="preview-img" src="{{announcement.image}}" mode="aspectFill"></image>
+              <view class="image-remove" bindtap="removeAnnouncementImage">×</view>
+            </view>
+            <view class="image-preview" wx:if="{{announcementTempImage}}">
+              <image class="preview-img" src="{{announcementTempImage}}" mode="aspectFill"></image>
+            </view>
+            <view class="image-upload" bindtap="chooseAnnouncementImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-hint">{{announcement.image || announcementTempImage ? '重新选择' : '选择图片'}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">公告文字</text>
+          <textarea
+            class="form-textarea"
+            placeholder="输入公告内容"
+            value="{{announcement.text}}"
+            bindinput="onAnnouncementTextInput"
+            maxlength="500"
+          ></textarea>
+        </view>
+        <button class="save-btn" bindtap="saveAnnouncement" disabled="{{saving}}">
+          {{saving ? '保存中...' : '保存公告'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
