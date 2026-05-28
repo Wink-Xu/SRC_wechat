@@ -1,6 +1,6 @@
 // pages/admin-members/admin-members.js
 const { userApi } = require('../../utils/request');
-const { formatDate, formatPhone, showSuccess, showConfirm } = require('../../utils/util');
+const { formatDate, formatPhone, showSuccess, showConfirm, getHighResAvatarUrl } = require('../../utils/util');
 const { requireAdmin, isLeader } = require('../../utils/auth');
 
 Page({
@@ -93,7 +93,7 @@ Page({
         const processed = {
           ...item,
           formattedTime: formatDate(item.created_at, 'YYYY-MM-DD'),
-          formattedPhone: formatPhone(item.phone),
+          formattedPhone: item.phone || '',  // 管理员页面直接显示完整手机号
           roleText: this.getRoleText(item.role)
         };
         // 转换头像
@@ -234,5 +234,22 @@ Page({
       leader: '团长'
     };
     return roleMap[role] || role;
+  },
+
+  // 预览成员头像
+  previewAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const members = this.data.members;
+    const avatarUrls = members
+      .filter(m => m.displayAvatar || m.avatar)
+      .map(m => getHighResAvatarUrl(m.displayAvatar || m.avatar));
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = getHighResAvatarUrl(members[index]?.displayAvatar || members[index]?.avatar || avatarUrls[0]);
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
   }
 });

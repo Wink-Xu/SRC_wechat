@@ -1,6 +1,6 @@
 // pages/activity-detail/activity-detail.js
 const { activityApi } = require('../../utils/request');
-const { formatDate, showConfirm, showSuccess, showInfo } = require('../../utils/util');
+const { formatDate, showConfirm, showSuccess, showInfo, getHighResAvatarUrl } = require('../../utils/util');
 const { isAdmin } = require('../../utils/auth');
 
 Page({
@@ -232,8 +232,29 @@ Page({
         params.waitlist = true;
       }
 
-      await activityApi.register(params);
+      const result = await activityApi.register(params);
+
+      // 检查是否需要微信支付
+      if (result && result.paymentRequired) {
+        await this.doWechatPay(result);
+        return;
+      }
+
       showSuccess(isWaitlist ? '已加入候补名单' : '报名成功');
+
+      // 加入候补时，请求订阅消息授权
+      if (isWaitlist) {
+        wx.requestSubscribeMessage({
+          tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+          success: (res) => {
+            console.log('订阅消息授权结果:', res);
+          },
+          fail: (err) => {
+            console.log('订阅消息授权失败（用户可能拒绝）:', err);
+          }
+        });
+      }
+
       this.setData({ showPhoneModal: false });
       this.loadActivity();
     } catch (error) {
@@ -254,6 +275,33 @@ Page({
         }
       }
     }
+  },
+
+  // 执行微信支付（活动报名费）
+  doWechatPay: async function (payResult) {
+    wx.requestPayment({
+      timeStamp: payResult.timeStamp,
+      nonceStr: payResult.nonceStr,
+      package: payResult.package,
+      signType: payResult.signType,
+      paySign: payResult.paySign,
+      success: async () => {
+        // 支付成功，确认报名
+        try {
+          await activityApi.confirmRegistration({ orderNo: payResult.orderNo });
+          showSuccess('报名成功');
+          this.setData({ showPhoneModal: false });
+          this.loadActivity();
+        } catch (err) {
+          console.error('确认报名失败', err);
+          showInfo('支付成功，但确认报名失败，请联系管理员');
+        }
+      },
+      fail: (err) => {
+        console.error('支付失败', err);
+        showInfo('支付已取消');
+      }
+    });
   },
 
   // 输入手机号
@@ -334,10 +382,14 @@ Page({
 
       const fileIDs = await Promise.all(uploadPromises);
 
+      // 带上现有照片一起提交，避免云函数拼接导致重复
+      const currentPhotos = self.data.activity.photos || [];
+      const allPhotos = [...currentPhotos, ...fileIDs];
+
       // 调用云函数更新照片列表
       await activityApi.updatePhotos({
         id: self.data.id,
-        photos: fileIDs
+        photos: allPhotos
       });
 
       wx.hideLoading();
@@ -480,29 +532,13 @@ Page({
       const tempFile = chooseRes.tempFiles[0];
       if (!tempFile) return;
 
-      // 显示封面调整器
-      self.adjuster = self.selectComponent('#coverAdjuster');
-      self.adjuster.show(tempFile.tempFilePath);
-      self.tempCoverSrc = tempFile.tempFilePath;
-    } catch (err) {
-      console.error('选择图片失败', err);
-    }
-  },
-
-  // 封面调整确认
-  onCoverConfirm: async function (e) {
-    const self = this;
-    const { tempFilePath } = e.detail;
-
-    wx.showLoading({ title: '上传中...' });
-
-    try {
-      // 上传封面图到云存储
+      // 直接上传原图，保留原始比例
+      wx.showLoading({ title: '上传中...' });
       const cloudPath = `activity_covers/${self.data.id}/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
       const uploadRes = await new Promise((resolve, reject) => {
         wx.cloud.uploadFile({
           cloudPath: cloudPath,
-          filePath: tempFilePath,
+          filePath: tempFile.tempFilePath,
           isPrivate: false,
           success: resolve,
           fail: reject
@@ -525,11 +561,6 @@ Page({
       console.error('更换封面失败', err);
       wx.showToast({ title: '更换失败', icon: 'none' });
     }
-  },
-
-  // 封面调整取消
-  onCoverCancel: function () {
-    // 用户取消
   },
 
   // 查看报名名单
@@ -677,10 +708,27 @@ Page({
     const participants = this.data.participants;
     const avatarUrls = participants
       .filter(p => p.avatar)
-      .map(p => p.avatar);
+      .map(p => getHighResAvatarUrl(p.avatar));
 
     if (avatarUrls.length > 0) {
-      const currentAvatar = participants[index]?.avatar || avatarUrls[0];
+      const currentAvatar = getHighResAvatarUrl(participants[index]?.avatar || avatarUrls[0]);
+      wx.previewImage({
+        current: currentAvatar,
+        urls: avatarUrls
+      });
+    }
+  },
+
+  // 预览候补名单头像
+  previewWaitlistAvatar: function (e) {
+    const { index } = e.currentTarget.dataset;
+    const waitlist = this.data.waitlistParticipants;
+    const avatarUrls = waitlist
+      .filter(p => p.avatar)
+      .map(p => getHighResAvatarUrl(p.avatar));
+
+    if (avatarUrls.length > 0) {
+      const currentAvatar = getHighResAvatarUrl(waitlist[index]?.avatar || avatarUrls[0]);
       wx.previewImage({
         current: currentAvatar,
         urls: avatarUrls
@@ -694,10 +742,10 @@ Page({
     const checkedInParticipants = this.data.checkedInParticipants;
     const avatarUrls = checkedInParticipants
       .filter(p => p.avatar)
-      .map(p => p.avatar);
+      .map(p => getHighResAvatarUrl(p.avatar));
 
     if (avatarUrls.length > 0) {
-      const currentAvatar = checkedInParticipants[index]?.avatar || avatarUrls[0];
+      const currentAvatar = getHighResAvatarUrl(checkedInParticipants[index]?.avatar || avatarUrls[0]);
       wx.previewImage({
         current: currentAvatar,
         urls: avatarUrls

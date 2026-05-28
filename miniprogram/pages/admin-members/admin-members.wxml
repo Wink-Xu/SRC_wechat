@@ -29,7 +29,7 @@
       wx:key="_id"
     >
       <view class="member-info">
-        <image class="member-avatar" src="{{item.displayAvatar || item.avatar || '/images/default-avatar.png'}}"></image>
+        <image class="member-avatar" src="{{item.displayAvatar || item.avatar || '/images/default-avatar.png'}}" bindtap="previewAvatar" data-index="{{index}}"></image>
         <view class="member-text">
           <view class="member-header">
             <text class="member-name">{{item.nickname}}</text>

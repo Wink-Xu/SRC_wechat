@@ -58,6 +58,8 @@ exports.main = async (event, context) => {
       return handleGetHomeContent(data, wxContext);
     case 'saveHomeContent':
       return handleSaveHomeContent(data, wxContext);
+    case 'getOrderCounts':
+      return handleGetOrderCounts(wxContext);
     default:
       return { code: -1, message: '未知操作: ' + action };
   }
@@ -213,7 +215,7 @@ async function handleManageProduct(event, wxContext) {
 // 更新订单状态
 async function handleUpdateOrderStatus(data, wxContext) {
   const openid = wxContext.OPENID;
-  const { orderId, status } = data;
+  const { orderId, status, express_company, express_no } = data;
 
   try {
     // 检查权限（团长或活动管理员）
@@ -233,6 +235,36 @@ async function handleUpdateOrderStatus(data, wxContext) {
 
     if (status === 'shipped') {
       updateData.shipped_at = db.serverDate();
+      if (express_company) updateData.express_company = express_company;
+      if (express_no) updateData.express_no = express_no;
+    }
+
+    // 确认退款时恢复积分和库存
+    if (status === 'refunded') {
+      const orderResult = await db.collection('orders').doc(orderId).get();
+      const order = orderResult.data;
+      if (order) {
+        // 恢复积分
+        if (order.pay_method === 'points' && order.total_points > 0) {
+          await db.collection('users').doc(order.user_id).update({
+            data: { points: _.inc(order.total_points) }
+          });
+          await db.collection('point_logs').add({
+            data: {
+              user_id: order.user_id,
+              points: order.total_points,
+              type: 'refund',
+              related_id: orderId,
+              remark: '退款退回积分',
+              created_at: db.serverDate()
+            }
+          });
+        }
+        // 恢复库存
+        await db.collection('products').doc(order.product_id).update({
+          data: { stock: _.inc(order.quantity) }
+        });
+      }
     }
 
     await db.collection('orders').doc(orderId).update({
@@ -265,7 +297,14 @@ async function handleGetOrders(data, wxContext) {
     let query = db.collection('orders');
 
     if (status && status !== 'all') {
-      query = query.where({ status });
+      if (Array.isArray(status)) {
+        query = query.where({ status: _.in(status) });
+      } else {
+        query = query.where({ status });
+      }
+    } else {
+      // "全部"不显示待付款订单
+      query = query.where({ status: _.neq('pending') });
     }
 
     const countResult = await query.count();
@@ -358,5 +397,41 @@ async function handleSaveHomeContent(data, wxContext) {
     console.error('保存首页内容失败', JSON.stringify(error));
     const detail = error.errMsg || error.message || '未知错误';
     return { code: -1, message: '保存失败: ' + detail };
+  }
+}
+
+// 获取各状态订单数量（用于红点）
+async function handleGetOrderCounts(wxContext) {
+  const openid = wxContext.OPENID;
+
+  try {
+    const userResult = await db.collection('users').where({
+      openid,
+      role: _.in(['activity_admin', 'leader'])
+    }).get();
+
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '没有权限' };
+    }
+
+    const [paid, shipped, refundReview, refundProcess] = await Promise.all([
+      db.collection('orders').where({ status: 'paid' }).count(),
+      db.collection('orders').where({ status: 'shipped' }).count(),
+      db.collection('orders').where({ status: _.in(['refund_requested', 'refund_approved']) }).count(),
+      db.collection('orders').where({ status: 'returned' }).count()
+    ]);
+
+    return {
+      code: 0,
+      data: {
+        paid: paid.total,
+        shipped: shipped.total,
+        refund_review: refundReview.total,
+        refund_process: refundProcess.total
+      }
+    };
+  } catch (error) {
+    console.error('获取订单数量失败', error);
+    return { code: -1, message: '获取失败' };
   }
 }

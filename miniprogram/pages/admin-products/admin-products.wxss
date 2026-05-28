@@ -94,6 +94,14 @@
   font-weight: 500;
 }
 
+.btn-danger {
+  background: #FFFFFF;
+  color: #999999;
+  border: 1rpx solid #E0E0E0;
+  border-radius: 32rpx;
+  font-weight: 500;
+}
+
 /* 加载状态 */
 .loading-box,
 .loading-more {

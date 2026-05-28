@@ -38,7 +38,7 @@
     "showES6CompileOption": false,
     "minifyWXML": true
   },
-  "appid": "wxfab0c5bd74364f44",
+  "appid": "wx0a0394d8ed886987",
   "projectname": "SundayRunningClub",
   "description": "SundayRunningClub 跑团小程序",
   "condition": {},
@@ -55,6 +55,6 @@
   },
   "cloud": {
     "functionId": "",
-    "env": "cloud1-2gyhe7s5efa4155f"
+    "env": "xu-d4gjbs6ta5207acb7"
   }
 }

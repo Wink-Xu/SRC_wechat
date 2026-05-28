@@ -15,13 +15,25 @@ App({
       console.error('请使用 2.2.3 或以上的基础库以使用云开发');
     } else {
       wx.cloud.init({
-        env: 'cloud1-2gyhe7s5efa4155f',
+        env: 'xu-d4gjbs6ta5207acb7',
         traceUser: true
       });
     }
 
-    // 检查登录状态
+    // 检查登录状态（从缓存）
     this.checkLoginStatus();
+
+    // 静默自动登录（如果缓存有用户信息则无需真正登录）
+    if (this.globalData.isLoggedIn) {
+      this._loginPromise = Promise.resolve(this.globalData.userInfo);
+    } else {
+      this._loginPromise = this.autoLogin();
+    }
+  },
+
+  // 等待自动登录完成（供页面使用，避免闪现未登录状态）
+  waitForLogin: function () {
+    return this._loginPromise || Promise.resolve(null);
   },
 
   // 当小程序从微信主界面扫码进入时处理

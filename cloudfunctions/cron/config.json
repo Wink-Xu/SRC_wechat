@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [
+    {
+      "name": "autoConfirmReceipt",
+      "type": "timer",
+      "config": "0 0 3 * * *"
+    },
+    {
+      "name": "expirePayments",
+      "type": "timer",
+      "config": "*/5 * * * *"
+    }
+  ]
+}

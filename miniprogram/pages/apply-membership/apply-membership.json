@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "申请入团"
+  "navigationBarTitleText": "申请入团",
+  "usingComponents": {
+    "cover-adjuster": "/components/cover-adjuster/cover-adjuster"
+  }
 }

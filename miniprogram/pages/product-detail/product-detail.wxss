@@ -230,6 +230,13 @@
   border: none;
 }
 
+.contact-icon-img {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
+  vertical-align: middle;
+}
+
 .buy-btn {
   flex: 1;
   height: 88rpx;

@@ -22,8 +22,8 @@
       bindtap="goToDetail"
       data-id="{{item._id}}"
     >
-      <view class="cover-image">
-        <image class="cover-img" src="{{item.display_cover_image || item.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+      <view class="cover-image cover-ongoing">
+        <image class="cover-img" src="{{item.display_cover_image || item.cover_image || '/images/default-product.png'}}" mode="widthFix"></image>
       </view>
       <view class="past-info">
         <view class="title-row">

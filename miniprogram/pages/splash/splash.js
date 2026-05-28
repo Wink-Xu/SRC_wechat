@@ -8,7 +8,7 @@ Page({
     // 提前初始化云开发（在 app.js 之前触发，缩短等待）
     if (wx.cloud && !wx.cloud.Cloud) {
       wx.cloud.init({
-        env: 'cloud1-2gyhe7s5efa4155f',
+        env: 'xu-d4gjbs6ta5207acb7',
         traceUser: true
       });
     }

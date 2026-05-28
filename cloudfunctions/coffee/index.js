@@ -26,6 +26,12 @@ async function checkContent(text) {
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const { action, testOpenid, ...data } = event;
+
+  // 处理支付回调（微信支付异步通知）
+  if (event.outTradeNo && event.resultCode) {
+    return handleCoffeePayCallback(event, context);
+  }
+
   const openid = testOpenid || wxContext.OPENID;
 
   switch (action) {
@@ -381,7 +387,7 @@ async function handlePayOrderByPoints(data, openid) {
   }
 }
 
-// 现金支付（模拟，实际需要对接微信支付）
+// 微信支付
 async function handlePayOrderByCash(data, openid) {
   const { orderId } = data;
 
@@ -406,23 +412,67 @@ async function handlePayOrderByCash(data, openid) {
       return { code: -1, message: '订单状态不正确' };
     }
 
-    // 更新订单状态（模拟支付成功）
-    await db.collection('coffee_orders').doc(orderId).update({
-      data: {
-        status: 'paid',
-        payment_type: 'cash',
-        cash_paid: order.total_amount,
-        paid_at: db.serverDate()
-      }
+    if (order.total_amount <= 0) {
+      return { code: -1, message: '订单金额无效' };
+    }
+
+    // 调用微信支付统一下单
+    const payResult = await cloud.openapi.payment.unifiedOrder({
+      body: order.items.map(i => i.product_name).join('、'),
+      outTradeNo: order.order_no,
+      totalFee: order.total_amount,
+      spbillCreateIp: '127.0.0.1',
+      tradeType: 'JSAPI',
+      functionName: 'coffee',
+      envId: cloud.DYNAMIC_CURRENT_ENV,
     });
 
-    // 检查是否是充值套餐
-    await checkAndAddBalance(order);
-
-    return { code: 0, message: '支付成功' };
+    return {
+      code: 0,
+      data: {
+        timeStamp: payResult.timeStamp,
+        nonceStr: payResult.nonceStr,
+        package: payResult.package,
+        signType: payResult.signType,
+        paySign: payResult.paySign
+      }
+    };
   } catch (error) {
-    console.error('现金支付失败', error);
-    return { code: -1, message: '支付失败' };
+    console.error('微信支付失败', error);
+    return { code: -1, message: '支付失败: ' + (error.message || error.errMsg || '未知错误') };
+  }
+}
+
+// 咖啡支付回调
+async function handleCoffeePayCallback(event, context) {
+  const { outTradeNo, resultCode, transactionId } = event;
+  try {
+    if (resultCode === 'SUCCESS') {
+      const orderResult = await db.collection('coffee_orders').where({
+        order_no: outTradeNo
+      }).get();
+
+      if (orderResult.data.length > 0) {
+        const order = orderResult.data[0];
+        if (order.status === 'pending') {
+          await db.collection('coffee_orders').doc(order._id).update({
+            data: {
+              status: 'paid',
+              payment_type: 'cash',
+              cash_paid: order.total_amount,
+              paid_at: db.serverDate(),
+              transaction_id: transactionId || ''
+            }
+          });
+          // 检查是否是充值套餐
+          await checkAndAddBalance(order);
+        }
+      }
+    }
+    return { code: 0 };
+  } catch (error) {
+    console.error('咖啡支付回调处理失败', error);
+    return { code: -1 };
   }
 }
 

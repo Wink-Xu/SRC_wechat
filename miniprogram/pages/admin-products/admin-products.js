@@ -379,6 +379,23 @@ Page({
     this.setData({ showAddModal: false });
   },
 
+  // 删除商品
+  deleteProduct: async function (e) {
+    const { id } = e.currentTarget.dataset;
+
+    const confirm = await showConfirm('删除商品', '确定要删除该商品吗？删除后不可恢复。');
+    if (!confirm) return;
+
+    try {
+      await adminApi.manageProduct({ action: 'delete', data: { id } });
+      showSuccess('删除成功');
+      this.refreshProducts();
+    } catch (error) {
+      console.error('删除失败', error);
+      wx.showToast({ title: '删除失败', icon: 'none' });
+    }
+  },
+
   // 切换上架状态
   toggleStatus: async function (e) {
     const { id, status } = e.currentTarget.dataset;

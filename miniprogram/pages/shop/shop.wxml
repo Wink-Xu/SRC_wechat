@@ -37,7 +37,7 @@
               <text class="price-unit">积分</text>
             </view>
             <view wx:if="{{item.cash_price}}" class="cash-price">
-              <text class="price-label">或</text>
+              <text wx:if="{{item.points_price}}" class="price-label">或</text>
               <text class="price-value">¥{{item.cashPriceYuan}}</text>
             </view>
           </view>

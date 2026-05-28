@@ -13,7 +13,7 @@
             <text class="upload-hint">上传封面</text>
           </view>
           <view class="cover-preview" wx:if="{{formData.cover_image}}" bindtap="chooseImage">
-            <image class="cover-img" src="{{formData.cover_image}}" mode="aspectFill"></image>
+            <image class="cover-img" src="{{formData.cover_image}}" mode="widthFix"></image>
             <view class="cover-delete" catchtap="removeImage">×</view>
             <view class="cover-reupload">点击更换</view>
           </view>
@@ -34,15 +34,12 @@
       </view>
 
       <!-- 描述 -->
-      <view class="form-item">
+      <view class="form-item" bindtap="openDescEditor">
         <text class="form-label required">活动描述</text>
-        <textarea
-          class="form-textarea"
-          placeholder="请输入活动描述"
-          value="{{formData.description}}"
-          bindinput="onDescInput"
-          maxlength="500"
-        ></textarea>
+        <view class="desc-display {{formData.description ? '' : 'empty'}}">
+          <text wx:if="{{formData.description}}">{{formData.description}}</text>
+          <text wx:else>点击填写活动描述（可输入最多 500 字）</text>
+        </view>
       </view>
 
       <!-- 地点 -->
@@ -133,7 +130,7 @@
       </view>
 
       <view class="form-item inline">
-        <text class="form-label required">参与积分</text>
+        <text class="form-label required">参与可获得积分</text>
         <input
           class="form-input small"
           type="number"
@@ -257,14 +254,29 @@
   </view>
 </view>
 
-<!-- 封面调整组件 -->
-<cover-adjuster
-  id="coverAdjuster"
-  outputWidth="{{750}}"
-  outputHeight="{{422}}"
-  bind:confirm="onCoverConfirm"
-  bind:cancel="onCoverCancel"
-/>
+<!-- 全屏描述编辑弹窗 -->
+<view class="desc-modal" wx:if="{{showDescModal}}">
+  <view class="desc-modal-header">
+    <view class="desc-modal-header-btn" bindtap="cancelDesc">
+      <text>取消</text>
+    </view>
+    <text class="desc-modal-title">活动描述</text>
+    <view class="desc-modal-header-btn primary" bindtap="confirmDesc">
+      <text>完成</text>
+    </view>
+  </view>
+  <view class="desc-modal-body">
+    <textarea
+      class="desc-modal-textarea"
+      placeholder="请输入活动描述"
+      value="{{tempDescValue}}"
+      bindinput="onTempDescInput"
+      maxlength="500"
+      auto-focus
+    ></textarea>
+    <text class="desc-modal-count">{{tempDescValue.length}}/500</text>
+  </view>
+</view>
 
 <!-- 积分输入弹窗 -->
 <view class="fee-modal" wx:if="{{showPointsInputModal}}">

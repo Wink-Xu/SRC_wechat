@@ -1,6 +1,6 @@
 // pages/orders/orders.js
 const { shopApi } = require('../../utils/request');
-const { formatDate } = require('../../utils/util');
+const { formatDate, showSuccess, showInfo } = require('../../utils/util');
 const { requireMember } = require('../../utils/auth');
 
 Page({
@@ -14,11 +14,12 @@ Page({
     currentStatus: 'all',
     statusTabs: [
       { key: 'all', title: '全部' },
-      { key: 'pending', title: '待支付' },
-      { key: 'paid', title: '已支付' },
-      { key: 'shipped', title: '已发货' },
-      { key: 'completed', title: '已完成' }
-    ]
+      { key: 'pending', title: '待付款' },
+      { key: 'paid', title: '待发货' },
+      { key: 'shipped', title: '待收货' },
+      { key: 'refund', title: '待退款' }
+    ],
+    tabCounts: {}
   },
 
   onLoad: function () {
@@ -27,6 +28,7 @@ Page({
       return;
     }
     this.loadOrders();
+    this.loadOrderCounts();
   },
 
   onPullDownRefresh: function () {
@@ -58,7 +60,7 @@ Page({
     try {
       const params = { page, limit: pageSize };
       if (currentStatus !== 'all') {
-        params.status = currentStatus;
+        params.status = this.getStatusValue(currentStatus);
       }
 
       const result = await shopApi.getOrders(params);
@@ -122,6 +124,18 @@ Page({
     }
   },
 
+  // 加载各状态订单数量（红点）
+  loadOrderCounts: async function () {
+    try {
+      const result = await shopApi.getOrderCounts();
+      if (result) {
+        this.setData({ tabCounts: result });
+      }
+    } catch (error) {
+      console.error('获取订单数量失败', error);
+    }
+  },
+
   // 切换状态
   onTabChange: function (e) {
     const { key } = e.currentTarget.dataset;
@@ -142,14 +156,68 @@ Page({
     });
   },
 
+  // 跳转到商品详情
+  goToProduct: function (e) {
+    const { productId } = e.currentTarget.dataset;
+    if (productId) {
+      wx.navigateTo({
+        url: `/pages/product-detail/product-detail?id=${productId}`
+      });
+    }
+  },
+
+  // 去支付
+  payOrder: async function (e) {
+    const { id } = e.currentTarget.dataset;
+    // 阻止事件冒泡到卡片点击
+    if (e.stopPropagation) e.stopPropagation();
+
+    try {
+      const payResult = await shopApi.payOrderByWechat({ orderId: id });
+      wx.requestPayment({
+        timeStamp: payResult.timeStamp,
+        nonceStr: payResult.nonceStr,
+        package: payResult.package,
+        signType: payResult.signType,
+        paySign: payResult.paySign,
+        success: () => {
+          showSuccess('支付成功');
+          this.refreshOrders();
+        },
+        fail: (err) => {
+          console.error('支付失败', err);
+          showInfo('支付已取消');
+        }
+      });
+    } catch (error) {
+      console.error('支付失败', error);
+    }
+  },
+
+  // 获取状态值（支持多状态映射）
+  getStatusValue: function (key) {
+    const map = {
+      all: 'all',
+      pending: 'pending',
+      paid: 'paid',
+      shipped: 'shipped',
+      refund: ['refund_requested', 'refund_approved', 'returned']
+    };
+    return map[key] || key;
+  },
+
   // 获取状态文本
   getStatusText: function (status) {
     const statusMap = {
-      pending: '待支付',
-      paid: '已支付',
-      shipped: '已发货',
+      pending: '待付款',
+      paid: '待发货',
+      shipped: '待收货',
       completed: '已完成',
-      cancelled: '已取消'
+      cancelled: '已取消',
+      refund_requested: '退款审核中',
+      refund_approved: '已同意退货',
+      returned: '退货已收到',
+      refunded: '已退款'
     };
     return statusMap[status] || status;
   }

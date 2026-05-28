@@ -385,6 +385,21 @@ Page({
     const field = e.currentTarget.dataset.field;
     const value = e.detail.value;
 
+    // 往期精彩只能对已结束且未隐藏的活动设置
+    if (field === 'highlight' && value) {
+      const activity = this.data.activities.find(a => a._id === id);
+      if (activity) {
+        if (activity.hidden) {
+          showInfo('隐藏的活动不能放入往期精彩');
+          return;
+        }
+        if (activity.status !== 'ended') {
+          showInfo('只有已结束的活动可以放入往期精彩');
+          return;
+        }
+      }
+    }
+
     try {
       await activityApi.update({ id, [field]: value });
       const activities = this.data.activities.map(a => {

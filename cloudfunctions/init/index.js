@@ -25,7 +25,13 @@ exports.main = async (event, context) => {
       'products',        // 商品信息
       'orders',          // 订单信息
       'point_logs',      // 积分记录
-      'reviews'          // 评价
+      'reviews',         // 评价
+      // 咖啡模块集合
+      'coffee_products',
+      'coffee_orders',
+      'coffee_balances',
+      'coffee_pickup_numbers',
+      'coffee_shop_status'
     ];
 
     console.log('[初始化] 开始创建数据库集合...');

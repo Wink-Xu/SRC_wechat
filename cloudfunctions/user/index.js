@@ -27,7 +27,7 @@ async function checkContent(text) {
 // ============================================
 // 团长配置 - 将以下 openid 替换为实际团长的微信 openid
 // ============================================
-const LEADER_OPENID = 'oh2Vh7J6cD2DFe_eQQJ3f2f2BFVM';
+const LEADER_OPENID = 'oTLE33ddULOwbU7ks0DBN7WNSRpk';
 // ============================================
 
 // 云函数入口函数
@@ -85,8 +85,9 @@ async function handleLogin(data, wxContext, openid) {
 
       // 检查是否是团长 openid，如果是则自动设置为团长
       if (openid === LEADER_OPENID && LEADER_OPENID !== 'YOUR_LEADER_OPENID_HERE') {
-        if (user.role !== 'leader') {
+        if (user.role !== 'leader' || user.status !== 'approved') {
           updateData.role = 'leader';
+          updateData.status = 'approved';
           console.log('[自动团长] 用户已自动设置为团长:', openid);
         }
       }
@@ -230,6 +231,20 @@ async function handleApplyMembership(data, wxContext, openid) {
         updated_at: db.serverDate()
       }
     });
+
+    // 发送通知给团长和活动管理员
+    try {
+      await cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'sendMemberApplyNotification',
+          nickname,
+          phone
+        }
+      });
+    } catch (notifyErr) {
+      console.error('发送申请通知失败:', notifyErr);
+    }
 
     return { code: 0, message: '申请成功，请等待审核' };
   } catch (error) {

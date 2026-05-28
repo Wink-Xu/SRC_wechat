@@ -2,7 +2,8 @@
 Component({
   properties: {
     outputWidth: { type: Number, value: 750 },
-    outputHeight: { type: Number, value: 420 }
+    outputHeight: { type: Number, value: 420 },
+    shape: { type: String, value: 'rectangle' } // 'rectangle' | 'circle'
   },
 
   data: {
@@ -30,7 +31,7 @@ Component({
 
           // 裁剪框 = 屏幕宽度减去边距
           that.cropWidth = sys.windowWidth - 40;
-          that.cropHeight = that.cropWidth * 9 / 16;
+          that.cropHeight = that.data.shape === 'circle' ? that.cropWidth : that.cropWidth * 9 / 16;
 
           wx.getImageInfo({
             src: imageSrc,
@@ -172,10 +173,19 @@ Component({
       img.src = that.data.imageSrc;
 
       img.onload = () => {
+        const ow = that.data.outputWidth;
+        const oh = that.data.outputHeight;
+
+        if (that.data.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(ow / 2, oh / 2, ow / 2, 0, Math.PI * 2);
+          ctx.clip();
+        }
+
         ctx.drawImage(
           img,
           srcX, srcY, srcW, srcH,
-          0, 0, that.data.outputWidth, that.data.outputHeight
+          0, 0, ow, oh
         );
 
         wx.canvasToTempFilePath({

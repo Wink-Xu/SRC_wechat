@@ -87,7 +87,8 @@ const activityApi = {
   finishActivityWithCheckIn: (data) => callFunction('activity', 'finishActivityWithCheckIn', data, { showErrorMsg: false }),
   restartActivity: (data) => callFunction('activity', 'restartActivity', data),
   uploadPhotos: (data) => callFunction('activity', 'uploadPhotos', data),
-  getWaitlist: (data) => callFunction('activity', 'getWaitlist', data)
+  getWaitlist: (data) => callFunction('activity', 'getWaitlist', data),
+  confirmRegistration: (data) => callFunction('activity', 'confirmRegistration', data)
 };
 
 // 积分相关接口
@@ -109,7 +110,9 @@ const shopApi = {
   getOrders: (data) => callFunction('shop', 'getOrders', data, { showLoad: false }),
   getOrderDetail: (data) => callFunction('shop', 'getOrderDetail', data),
   cancelOrder: (data) => callFunction('shop', 'cancelOrder', data),
-  confirmReceipt: (data) => callFunction('shop', 'confirmReceipt', data)
+  confirmReceipt: (data) => callFunction('shop', 'confirmReceipt', data),
+  requestRefund: (data) => callFunction('shop', 'requestRefund', data),
+  getOrderCounts: (data) => callFunction('shop', 'getOrderCounts', data, { showLoad: false })
 };
 
 // 管理后台接口
@@ -120,7 +123,8 @@ const adminApi = {
   updateOrderStatus: (data) => callFunction('admin', 'updateOrderStatus', data),
   getOrders: (data) => callFunction('admin', 'getOrders', data, { showLoad: false }),
   getHomeContent: (data) => callFunction('admin', 'getHomeContent', data, { showLoad: false }),
-  saveHomeContent: (data) => callFunction('admin', 'saveHomeContent', data)
+  saveHomeContent: (data) => callFunction('admin', 'saveHomeContent', data),
+  getOrderCounts: (data) => callFunction('admin', 'getOrderCounts', data, { showLoad: false })
 };
 
 // 调试接口

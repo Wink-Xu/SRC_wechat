@@ -102,3 +102,74 @@ page {
   color: #CCCCCC;
   margin: 0 16rpx;
 }
+
+/* Tab 切换 */
+.tabs {
+  display: flex;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  padding: 6rpx;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #999;
+  border-radius: 12rpx;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 分组区块 */
+.section-block {
+  margin-bottom: 24rpx;
+}
+
+.section-block .section-title {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  display: block;
+  padding-left: 8rpx;
+}
+
+/* 标题行（标题 + 状态标签） */
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.title-row .activity-title {
+  flex: 1;
+  margin-bottom: 0;
+  margin-right: 16rpx;
+}
+
+/* 状态标签 */
+.status-tag {
+  flex-shrink: 0;
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.status-tag.checked {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-tag.pending {
+  background: #FFF8E1;
+  color: #CC7722;
+}

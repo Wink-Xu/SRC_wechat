@@ -137,9 +137,10 @@
       </view>
     </view>
 
-    <!-- 用户取消按钮 -->
+    <!-- 用户操作按钮 -->
     <view class="user-action" wx:if="{{!isAdmin && order.status === 'pending'}}">
       <button class="cancel-order-btn" bindtap="cancelOrder">取消订单</button>
+      <button class="pay-order-btn" bindtap="payOrder">去支付</button>
     </view>
   </block>
 </view>

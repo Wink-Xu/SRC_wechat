@@ -130,20 +130,45 @@ Page({
       // 根据支付方式支付
       if (paymentType === 'points') {
         await coffeeApi.payOrderByPoints({ orderId });
+        // 清空购物车
+        wx.removeStorageSync('coffee_cart');
+        wx.showToast({ title: '支付成功', icon: 'success' });
+        setTimeout(() => {
+          wx.redirectTo({ url: `/pages/coffee-order-detail/coffee-order-detail?id=${orderId}` });
+        }, 1500);
       } else if (paymentType === 'balance') {
         await coffeeApi.payOrderByBalance({ orderId });
+        // 清空购物车
+        wx.removeStorageSync('coffee_cart');
+        wx.showToast({ title: '支付成功', icon: 'success' });
+        setTimeout(() => {
+          wx.redirectTo({ url: `/pages/coffee-order-detail/coffee-order-detail?id=${orderId}` });
+        }, 1500);
       } else {
-        await coffeeApi.payOrderByCash({ orderId });
+        // 微信支付
+        const payResult = await coffeeApi.payOrderByCash({ orderId });
+        wx.requestPayment({
+          timeStamp: payResult.timeStamp,
+          nonceStr: payResult.nonceStr,
+          package: payResult.package,
+          signType: payResult.signType,
+          paySign: payResult.paySign,
+          success: () => {
+            // 清空购物车
+            wx.removeStorageSync('coffee_cart');
+            wx.showToast({ title: '支付成功', icon: 'success' });
+            setTimeout(() => {
+              wx.redirectTo({ url: `/pages/coffee-order-detail/coffee-order-detail?id=${orderId}` });
+            }, 1500);
+          },
+          fail: (err) => {
+            console.error('支付失败', err);
+            wx.showToast({ title: '支付已取消', icon: 'none' });
+            this.setData({ loading: false });
+          }
+        });
+        return; // 异步支付，不继续执行
       }
-
-      // 清空购物车
-      wx.removeStorageSync('coffee_cart');
-
-      wx.showToast({ title: '支付成功', icon: 'success' });
-
-      setTimeout(() => {
-        wx.redirectTo({ url: `/pages/coffee-order-detail/coffee-order-detail?id=${orderId}` });
-      }, 1500);
     } catch (error) {
       console.error('结算失败', error);
       wx.showToast({ title: error.message || '支付失败', icon: 'none' });

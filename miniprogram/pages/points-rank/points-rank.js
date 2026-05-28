@@ -1,5 +1,6 @@
 // pages/points-rank/points-rank.js
 const { pointsApi } = require('../../utils/request');
+const { getHighResAvatarUrl } = require('../../utils/util');
 
 Page({
   data: {
@@ -78,8 +79,8 @@ Page({
     if (avatarUrls.length > 0) {
       const currentAvatar = ranking[index]?.displayAvatar || ranking[index]?.avatar || avatarUrls[0];
       wx.previewImage({
-        current: currentAvatar,
-        urls: avatarUrls
+        current: getHighResAvatarUrl(currentAvatar),
+        urls: avatarUrls.map(url => getHighResAvatarUrl(url))
       });
     }
   }

@@ -21,7 +21,7 @@
           <text class="price-unit">积分</text>
         </view>
         <view wx:if="{{product.cash_price}}" class="cash-price">
-          <text class="price-label">或</text>
+          <text wx:if="{{product.points_price}}" class="price-label">或</text>
           <text class="price-value">¥{{product.cashPriceYuan}}</text>
         </view>
       </view>
@@ -43,7 +43,8 @@
     <!-- 底部操作 -->
     <view class="footer-actions">
       <button class="btn btn-contact" open-type="contact">
-        <text>客服</text>
+        <image class="contact-icon-img" src="/images/kefu.png" mode="aspectFill"></image>
+        <text>联系商家</text>
       </button>
       <button class="btn btn-primary buy-btn" bindtap="showBuyConfirm">
         立即购买

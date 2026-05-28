@@ -287,19 +287,32 @@ page {
   color: #666666;
 }
 
-/* 用户取消 */
+/* 用户操作 */
 .user-action {
   margin-top: 32rpx;
+  display: flex;
+  gap: 20rpx;
 }
 
 .cancel-order-btn {
-  width: 100%;
+  flex: 1;
   background: #F5F5F5;
   color: #666666;
   font-size: 30rpx;
   padding: 28rpx 0;
   border-radius: 12rpx;
   border: none;
+}
+
+.pay-order-btn {
+  flex: 1;
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  padding: 28rpx 0;
+  border-radius: 12rpx;
+  border: none;
+  font-weight: 600;
 }
 
 /* 加载状态 */

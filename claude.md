@@ -3,8 +3,8 @@
 ## 项目概述
 
 - **项目名称**: SundayRunningClub
-- **AppID**: wxfab0c5bd74364f44
-- **云开发环境 ID**: cloud1-2gyhe7s5efa4155f
+- **AppID**: wx0a0394d8ed886987
+- **云开发环境 ID**: xu-d4gjbs6ta5207acb7
 - **项目路径**: /Users/xu/Documents/SRC_wechat
 
 ---
@@ -34,7 +34,7 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 
 ```bash
 /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
-  --env "cloud1-2gyhe7s5efa4155f" \
+  --env "xu-d4gjbs6ta5207acb7" \
   --names "<函数名>" \
   --project "/Users/xu/Documents/SRC_wechat"
 ```
@@ -43,7 +43,7 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 ```bash
 # 部署 user 云函数
 /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
-  --env "cloud1-2gyhe7s5efa4155f" \
+  --env "xu-d4gjbs6ta5207acb7" \
   --names "user" \
   --project "/Users/xu/Documents/SRC_wechat"
 ```
@@ -54,7 +54,7 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 
 ```bash
 /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions list \
-  --env "cloud1-2gyhe7s5efa4155f" \
+  --env "xu-d4gjbs6ta5207acb7" \
   --project "/Users/xu/Documents/SRC_wechat"
 ```
 
@@ -124,7 +124,7 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 3. **执行部署命令**：
    ```bash
    /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions deploy \
-     --env "cloud1-2gyhe7s5efa4155f" \
+     --env "xu-d4gjbs6ta5207acb7" \
      --names "<函数名>" \
      --project "/Users/xu/Documents/SRC_wechat"
    ```
@@ -134,7 +134,7 @@ CLI_PATH="/Applications/wechatwebdevtools.app/Contents/MacOS/cli"
 5. **验证部署**：
    ```bash
    /Applications/wechatwebdevtools.app/Contents/MacOS/cli cloud functions list \
-     --env "cloud1-2gyhe7s5efa4155f" \
+     --env "xu-d4gjbs6ta5207acb7" \
      --project "/Users/xu/Documents/SRC_wechat"
    ```
 

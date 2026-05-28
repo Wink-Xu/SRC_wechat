@@ -21,13 +21,45 @@
       </view>
     </view>
 
+    <!-- 物流信息 -->
+    <view class="product-card" wx:if="{{order.express_company || order.express_no}}">
+      <view class="product-header">
+        <text class="header-title">物流信息</text>
+      </view>
+      <view class="logistics-content">
+        <text class="logistics-text" wx:if="{{order.express_company}}">快递公司: {{order.express_company}}</text>
+        <text class="logistics-text" wx:if="{{order.express_no}}">快递单号: {{order.express_no}}</text>
+      </view>
+    </view>
+
+    <!-- 退款进度 -->
+    <view class="product-card" wx:if="{{order.status === 'refund_requested' || order.status === 'refund_approved' || order.status === 'returned'}}">
+      <view class="product-header">
+        <text class="header-title">退款进度</text>
+      </view>
+      <view class="refund-steps">
+        <view class="refund-step {{order.status !== 'refund_requested' ? 'done' : ''}}">
+          <text class="step-dot"></text>
+          <text class="step-text">已申请退款</text>
+        </view>
+        <view class="refund-step {{order.status === 'returned' || order.status === 'refunded' ? 'done' : ''}}">
+          <text class="step-dot"></text>
+          <text class="step-text">卖家已同意退货</text>
+        </view>
+        <view class="refund-step {{order.status === 'refunded' ? 'done' : ''}}">
+          <text class="step-dot"></text>
+          <text class="step-text">退款完成</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 商品信息 -->
     <view class="product-card">
       <view class="product-header">
         <text class="header-title">商品信息</text>
       </view>
       <view class="product-content">
-        <image class="product-image" src="{{order.display_product_image || order.product_image || '/images/default-product.png'}}"></image>
+        <image class="product-image" src="{{order.display_product_image || order.product_image || '/images/default-product.png'}}" catchtap="goToProduct" data-product-id="{{order.product_id}}"></image>
         <view class="product-info">
           <text class="product-name">{{order.product_name}}</text>
           <view class="product-meta">
@@ -71,13 +103,23 @@
     </view>
 
     <!-- 底部操作 -->
-    <view class="footer-actions" wx:if="{{order.status === 'pending' || order.status === 'shipped'}}">
+    <view class="footer-actions" wx:if="{{order.status === 'pending' || order.status === 'paid' || order.status === 'shipped' || order.status === 'refund_requested' || order.status === 'refund_approved' || order.status === 'returned'}}">
       <button wx:if="{{order.status === 'pending'}}" class="btn btn-secondary" bindtap="handleCancel">
         取消订单
       </button>
-      <button wx:if="{{order.status === 'shipped'}}" class="btn btn-primary" bindtap="handleConfirmReceipt">
-        确认收货
+      <button wx:if="{{order.status === 'pending' && order.total_cash > 0}}" class="btn btn-primary" bindtap="handlePay">
+        去支付
       </button>
+      <block wx:elif="{{order.status === 'paid'}}">
+        <button class="btn btn-secondary" bindtap="handleRequestRefund">申请退款</button>
+      </block>
+      <block wx:elif="{{order.status === 'shipped'}}">
+        <button class="btn btn-secondary" bindtap="handleRequestRefund">申请退款</button>
+        <button class="btn btn-primary" bindtap="handleConfirmReceipt">确认收货</button>
+      </block>
+      <view wx:else class="refund-status-hint">
+        <text>{{order.statusText}}</text>
+      </view>
     </view>
   </block>
 </view>

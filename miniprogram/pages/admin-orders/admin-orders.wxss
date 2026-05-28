@@ -1,11 +1,11 @@
-/* pages/admin-orders/admin-orders.wxss - On Running 极简风格 */
+/* pages/admin-orders/admin-orders.wxss - 极简风格 */
 
 .container {
   min-height: 100vh;
-  background: var(--background);
+  background: #F8F8F8;
 }
 
-/* 状态选项卡 */
+/* ===== 状态选项卡 ===== */
 .status-tabs {
   display: flex;
   background: #FFFFFF;
@@ -20,8 +20,8 @@
   flex: 1;
   text-align: center;
   padding: 16rpx 0;
-  font-size: 28rpx;
-  color: #666666;
+  font-size: 26rpx;
+  color: #999;
   position: relative;
 }
 
@@ -30,154 +30,298 @@
   font-weight: 600;
 }
 
+.tab-badge {
+  position: absolute;
+  top: 0;
+  right: 50%;
+  margin-right: -52rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  background: #EE0A24;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  line-height: 32rpx;
+  text-align: center;
+  border-radius: 16rpx;
+  padding: 0 6rpx;
+}
+
 .tab-item.active::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 40rpx;
+  width: 32rpx;
   height: 4rpx;
   background: #1A1A1A;
   border-radius: 2rpx;
 }
 
-/* 订单列表 */
+/* ===== 订单列表 ===== */
 .order-list {
   padding: 20rpx 30rpx;
 }
 
 .order-card {
   background: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
-  border: 1rpx solid #F0F0F0;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 16rpx;
 }
 
-.order-header {
+/* 卡片顶部：订单号 + 状态 */
+.card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
 }
 
 .order-no {
   font-size: 24rpx;
-  color: #999999;
+  color: #BBB;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  background: #F5F5F5;
+  color: #666;
+}
+
+.status-paid { background: #F5F5F5; color: #1A1A1A; }
+.status-shipped { background: #F5F5F5; color: #1A1A1A; }
+.status-completed { background: #E8F5E9; color: #2E7D32; }
+.status-cancelled { background: #F5F5F5; color: #BBB; }
+.status-refund_requested,
+.status-refund_approved { background: #FFF3E0; color: #E65100; }
+.status-returned { background: #FFF3E0; color: #E65100; }
+.status-refunded { background: #E8F5E9; color: #2E7D32; }
+
+/* 卡片主体 */
+.card-body {
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.4;
+}
+
+.info-line:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  color: #BBB;
+  width: 3em;
+  flex-shrink: 0;
+}
+
+.value {
+  color: #1A1A1A;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value.addr {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.price {
+  color: #1A1A1A;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #1A1A1A;
+  font-size: 30rpx;
+}
+
+.user-phone {
+  color: #999;
+  font-size: 26rpx;
+}
+
+/* 卡片底部 */
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20rpx;
 }
 
 .order-time {
   font-size: 24rpx;
-  color: #999999;
+  color: #CCC;
 }
 
-.order-user {
-  margin-bottom: 12rpx;
+.actions {
+  flex-shrink: 0;
 }
 
-.user-name {
-  font-size: 30rpx;
-  font-weight: 500;
-  color: #1A1A1A;
-  margin-right: 16rpx;
+.btn-group {
+  display: flex;
+  gap: 12rpx;
 }
 
-.user-phone {
+/* ===== 按钮 ===== */
+.btn {
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 28rpx;
   font-size: 26rpx;
-  color: #666666;
+  border-radius: 30rpx;
+  font-weight: 500;
+  margin: 0;
+  border: none;
 }
 
-.order-product {
+.btn-primary {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  color: #E65100;
+  border: 1rpx solid #E65100;
+}
+
+.btn-danger {
+  background: #F44336;
+  color: #FFFFFF;
+}
+
+.btn-cancel {
+  background: #F5F5F5;
+  color: #999;
+}
+
+/* ===== 发货弹窗 ===== */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
-  padding: 16rpx 0;
-  border-top: 1rpx solid #F5F5F5;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 85%;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
   border-bottom: 1rpx solid #F5F5F5;
 }
 
-.product-name {
-  flex: 1;
-  font-size: 28rpx;
-  color: #1A1A1A;
-  font-weight: 500;
-}
-
-.product-quantity {
-  font-size: 26rpx;
-  color: #999999;
-  margin-right: 20rpx;
-}
-
-.product-price {
-  font-size: 28rpx;
+.modal-title {
+  font-size: 32rpx;
   font-weight: 600;
   color: #1A1A1A;
 }
 
-.order-address {
-  padding: 16rpx 0;
-  font-size: 26rpx;
-  color: #666666;
+.modal-close {
+  font-size: 48rpx;
+  color: #CCC;
+  line-height: 1;
 }
 
-.order-footer {
+.modal-body {
+  padding: 32rpx;
+}
+
+.field {
+  margin-bottom: 28rpx;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.field-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 24rpx;
+  background: #F5F5F5;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+  box-sizing: border-box;
+}
+
+.modal-ft {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 16rpx;
+  gap: 20rpx;
+  padding: 24rpx 32rpx;
   border-top: 1rpx solid #F5F5F5;
 }
 
-.status-tag {
-  padding: 4rpx 16rpx;
-  border-radius: 16rpx;
-  font-size: 22rpx;
-  font-weight: 500;
-  background: #F5F5F5;
-  color: #666666;
+.modal-ft .btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  border-radius: 40rpx;
 }
 
-.status-paid {
-  background: #F5F5F5;
-  color: #1A1A1A;
-}
-
-.status-shipped {
-  background: #F5F5F5;
-  color: #1A1A1A;
-}
-
-.status-completed {
-  background: #F5F5F5;
-  color: #2E7D32;
-}
-
-.status-cancelled {
-  background: #F5F5F5;
-  color: #999999;
-}
-
-/* 加载状态 */
+/* ===== 状态 ===== */
 .loading-box,
 .loading-more {
   text-align: center;
-  padding: 40rpx;
-  color: #999999;
+  padding: 60rpx;
+  color: #CCC;
 }
 
 .no-more {
   text-align: center;
   padding: 30rpx;
-  color: #999999;
+  color: #CCC;
   font-size: 24rpx;
 }
 
 .empty-box {
   text-align: center;
-  padding: 60rpx;
+  padding: 100rpx 0;
 }
 
 .empty-text {
-  color: #999999;
+  color: #CCC;
+  font-size: 28rpx;
 }

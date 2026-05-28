@@ -109,7 +109,7 @@ async function main() {
     console.error('\n💡 请先:');
     console.error('   1. 打开微信开发者工具');
     console.error('   2. 加载本项目');
-    console.error('   3. 在工具栏选择云环境：cloud1-2gyhe7s5efa4155f');
+    console.error('   3. 在工具栏选择云环境：xu-d4gjbs6ta5207acb7');
     process.exit(1);
   }
 

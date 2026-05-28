@@ -13,6 +13,11 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const { action, testOpenid, ...data } = event;
 
+  // 处理支付回调（微信支付异步通知）
+  if (event.outTradeNo && event.resultCode) {
+    return handleShopPayCallback(event, context);
+  }
+
   // 获取当前用户 openid：优先使用 testOpenid（测试用户），否则使用真实 openid
   const openid = testOpenid || wxContext.OPENID;
 
@@ -35,6 +40,10 @@ exports.main = async (event, context) => {
       return handleCancelOrder(data, openid);
     case 'confirmReceipt':
       return handleConfirmReceipt(data, openid);
+    case 'requestRefund':
+      return handleRequestRefund(data, openid);
+    case 'getOrderCounts':
+      return handleGetOrderCounts(data, openid);
     default:
       return { code: -1, message: '未知操作' };
   }
@@ -140,7 +149,7 @@ async function handleCreateOrder(data, openid) {
       user_id: userId,
       product_id: productId,
       product_name: product.name,
-      product_image: product.image,
+      product_image: product.cover_image || (product.images && product.images[0]) || product.image || '',
       quantity,
       size: size || '',
       total_points: totalPoints,
@@ -234,6 +243,22 @@ async function handlePayOrderByPoints(data, openid) {
       }
     });
 
+    // 发送通知给团长
+    try {
+      await cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'sendShopOrderNotification',
+          orderNo: order.order_no,
+          userName: userResult.data[0].nickname || '',
+          productName: order.product_name,
+          totalFee: (order.total_cash / 100).toFixed(2)
+        }
+      });
+    } catch (notifyErr) {
+      console.error('发送订单通知失败:', notifyErr);
+    }
+
     return { code: 0, message: '支付成功' };
   } catch (error) {
     console.error('积分支付失败', error);
@@ -243,9 +268,114 @@ async function handlePayOrderByPoints(data, openid) {
 
 // 微信支付
 async function handlePayOrderByWechat(data, openid) {
-  // 微信支付需要配置商户号等信息
-  // 这里只返回模拟数据，实际使用时需要对接微信支付 API
-  return { code: -1, message: '微信支付功能待配置' };
+  const { orderId } = data;
+
+  try {
+    // 获取当前用户
+    const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在，请先登录' };
+    }
+    const userId = userResult.data[0]._id;
+
+    // 获取订单
+    const orderResult = await db.collection('orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
+    const order = orderResult.data;
+
+    if (order.user_id !== userId) {
+      return { code: -1, message: '订单不存在' };
+    }
+
+    if (order.status !== 'pending') {
+      return { code: -1, message: '订单状态不正确' };
+    }
+
+    if (order.total_cash <= 0) {
+      return { code: -1, message: '订单金额无效' };
+    }
+
+    // 调用微信支付统一下单
+    const payResult = await cloud.openapi.payment.unifiedOrder({
+      body: order.product_name,
+      outTradeNo: order.order_no,
+      totalFee: order.total_cash,
+      spbillCreateIp: '127.0.0.1',
+      tradeType: 'JSAPI',
+      functionName: 'shopPayCallback',
+      envId: cloud.DYNAMIC_CURRENT_ENV,
+    });
+
+    return {
+      code: 0,
+      data: {
+        timeStamp: payResult.timeStamp,
+        nonceStr: payResult.nonceStr,
+        package: payResult.package,
+        signType: payResult.signType,
+        paySign: payResult.paySign
+      }
+    };
+  } catch (error) {
+    console.error('微信支付失败', error);
+    return { code: -1, message: '支付失败: ' + (error.message || error.errMsg || '未知错误') };
+  }
+}
+
+// 微信支付回调
+async function handleShopPayCallback(event, context) {
+  const { outTradeNo, resultCode, transactionId, attach } = event;
+  try {
+    if (resultCode === 'SUCCESS') {
+      // 查找订单并更新状态
+      const orderResult = await db.collection('orders').where({
+        order_no: outTradeNo
+      }).get();
+
+      if (orderResult.data.length > 0) {
+        const order = orderResult.data[0];
+        const productResult = await db.collection('products').doc(order.product_id).get();
+        if (productResult.data && productResult.data.stock >= order.quantity) {
+          // 扣减库存
+          await db.collection('products').doc(order.product_id).update({
+            data: { stock: _.inc(-order.quantity) }
+          });
+        }
+        // 更新订单状态
+        await db.collection('orders').doc(order._id).update({
+          data: {
+            status: 'paid',
+            paid_at: db.serverDate(),
+            transaction_id: transactionId || ''
+          }
+        });
+
+        // 发送通知给团长
+        try {
+          const userSnap = await db.collection('users').doc(order.user_id).get();
+          const userName = userSnap.data ? userSnap.data.nickname || '' : '';
+          await cloud.callFunction({
+            name: 'notification',
+            data: {
+              action: 'sendShopOrderNotification',
+              orderNo: order.order_no,
+              userName,
+              productName: order.product_name,
+              totalFee: (order.total_cash / 100).toFixed(2)
+            }
+          });
+        } catch (notifyErr) {
+          console.error('发送订单通知失败:', notifyErr);
+        }
+      }
+    }
+    return { code: 0 };
+  } catch (error) {
+    console.error('支付回调处理失败', error);
+    return { code: -1 };
+  }
 }
 
 // 获取订单列表
@@ -263,7 +393,11 @@ async function handleGetOrders(data, openid) {
     let query = db.collection('orders').where({ user_id: userId });
 
     if (status && status !== 'all') {
-      query = query.where({ status });
+      if (Array.isArray(status)) {
+        query = query.where({ status: _.in(status) });
+      } else {
+        query = query.where({ status });
+      }
     }
 
     const countResult = await query.count();
@@ -276,10 +410,29 @@ async function handleGetOrders(data, openid) {
       .limit(limit)
       .get();
 
+    // 对缺少图片的订单补充商品图片
+    const orders = listResult.data || [];
+    const missingImageOrders = orders.filter(o => !o.product_image);
+    if (missingImageOrders.length > 0) {
+      const productIds = [...new Set(missingImageOrders.map(o => o.product_id))];
+      const productSnap = await db.collection('products')
+        .where({ _id: _.in(productIds) })
+        .get();
+      const productMap = {};
+      (productSnap.data || []).forEach(p => {
+        productMap[p._id] = p.cover_image || (p.images && p.images[0]) || '';
+      });
+      orders.forEach(order => {
+        if (!order.product_image && productMap[order.product_id]) {
+          order.product_image = productMap[order.product_id];
+        }
+      });
+    }
+
     return {
       code: 0,
       data: {
-        list: listResult.data,
+        list: orders,
         total,
         page,
         limit
@@ -307,6 +460,18 @@ async function handleGetOrderDetail(data, openid) {
 
     if (order.user_id !== userId) {
       return { code: -1, message: '订单不存在' };
+    }
+
+    // 对缺少图片的订单补充商品图片
+    if (!order.product_image && order.product_id) {
+      try {
+        const productSnap = await db.collection('products').doc(order.product_id).get();
+        if (productSnap.data) {
+          order.product_image = productSnap.data.cover_image || (productSnap.data.images && productSnap.data.images[0]) || '';
+        }
+      } catch (e) {
+        // ignore
+      }
     }
 
     return {
@@ -388,6 +553,74 @@ async function handleConfirmReceipt(data, openid) {
   } catch (error) {
     console.error('确认收货失败', error);
     return { code: -1, message: '确认失败' };
+  }
+}
+
+// 申请退款
+async function handleRequestRefund(data, openid) {
+  const { orderId } = data;
+
+  try {
+    const userResult = await db.collection('users').where({ openid }).get();
+    const userId = userResult.data[0]._id;
+
+    const orderResult = await db.collection('orders').doc(orderId).get();
+    if (!orderResult.data) {
+      return { code: -1, message: '订单不存在' };
+    }
+    const order = orderResult.data;
+
+    if (order.user_id !== userId) {
+      return { code: -1, message: '订单不存在' };
+    }
+
+    if (order.status !== 'shipped' && order.status !== 'paid') {
+      return { code: -1, message: '当前订单状态不允许申请退款' };
+    }
+
+    await db.collection('orders').doc(orderId).update({
+      data: {
+        status: 'refund_requested',
+        refund_requested_at: db.serverDate(),
+        updated_at: db.serverDate()
+      }
+    });
+
+    return { code: 0, message: '退款申请已提交' };
+  } catch (error) {
+    console.error('申请退款失败', error);
+    return { code: -1, message: '申请失败' };
+  }
+}
+
+// 获取订单各状态数量（用于红点）
+async function handleGetOrderCounts(data, openid) {
+  try {
+    const userResult = await db.collection('users').where({ openid }).get();
+    if (userResult.data.length === 0) {
+      return { code: -1, message: '用户不存在' };
+    }
+    const userId = userResult.data[0]._id;
+
+    const [pending, paid, shipped, refund] = await Promise.all([
+      db.collection('orders').where({ user_id: userId, status: 'pending' }).count(),
+      db.collection('orders').where({ user_id: userId, status: 'paid' }).count(),
+      db.collection('orders').where({ user_id: userId, status: 'shipped' }).count(),
+      db.collection('orders').where({ user_id: userId, status: _.in(['refund_requested', 'refund_approved', 'returned']) }).count()
+    ]);
+
+    return {
+      code: 0,
+      data: {
+        pending: pending.total,
+        paid: paid.total,
+        shipped: shipped.total,
+        refund: refund.total
+      }
+    };
+  } catch (error) {
+    console.error('获取订单数量失败', error);
+    return { code: -1, message: '获取失败' };
   }
 }
 

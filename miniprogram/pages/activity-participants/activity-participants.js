@@ -1,5 +1,6 @@
 // pages/activity-participants/activity-participants.js
 const { activityApi } = require('../../utils/request');
+const { getHighResAvatarUrl } = require('../../utils/util');
 
 Page({
   data: {
@@ -78,8 +79,8 @@ Page({
     if (avatarUrls.length > 0) {
       const currentAvatar = participants[index]?.displayAvatar || participants[index]?.avatar || avatarUrls[0];
       wx.previewImage({
-        current: currentAvatar,
-        urls: avatarUrls
+        current: getHighResAvatarUrl(currentAvatar),
+        urls: avatarUrls.map(url => getHighResAvatarUrl(url))
       });
     }
   }

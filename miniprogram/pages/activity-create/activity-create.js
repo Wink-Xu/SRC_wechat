@@ -54,6 +54,8 @@ Page({
     // 弹窗控制
     showPointsInputModal: false,
     showCashInputModal: false,
+    showDescModal: false,
+    tempDescValue: '',
     tempFeeValue: ''
   },
 
@@ -209,6 +211,36 @@ Page({
   onDescInput: function (e) {
     this.setData({ 'formData.description': e.detail.value });
     this.autoSaveDraft();
+  },
+
+  // 打开全屏描述编辑器
+  openDescEditor: function () {
+    this.setData({
+      showDescModal: true,
+      tempDescValue: this.data.formData.description
+    });
+  },
+
+  // 描述编辑器输入
+  onTempDescInput: function (e) {
+    this.setData({ tempDescValue: e.detail.value });
+  },
+
+  // 确认描述
+  confirmDesc: function () {
+    this.setData({
+      'formData.description': this.data.tempDescValue,
+      showDescModal: false
+    });
+    this.autoSaveDraft();
+  },
+
+  // 取消描述编辑
+  cancelDesc: function () {
+    this.setData({
+      showDescModal: false,
+      tempDescValue: ''
+    });
   },
 
   // 输入地点
@@ -444,47 +476,31 @@ Page({
       sourceType: ['album', 'camera'],
       success: function (res) {
         const tempFilePath = res.tempFilePaths[0];
-        // 显示调整器
-        that.adjuster = that.selectComponent('#coverAdjuster');
-        that.adjuster.show(tempFilePath);
-        that.tempImageSrc = tempFilePath;
+        // 直接上传原图，保留原始比例
+        wx.showLoading({ title: '上传中...' });
+        wx.cloud.uploadFile({
+          cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`,
+          filePath: tempFilePath,
+          isPrivate: false,
+          success: function (uploadRes) {
+            wx.hideLoading();
+            that.setData({
+              'formData.cover_image': uploadRes.fileID
+            });
+            that.autoSaveDraft();
+            showSuccess('封面上传成功');
+          },
+          fail: function (uploadErr) {
+            wx.hideLoading();
+            console.error('上传图片失败', uploadErr);
+            wx.showToast({ title: '上传失败', icon: 'none' });
+          }
+        });
       },
       fail: function (err) {
         console.error('选择图片失败', err);
       }
     });
-  },
-
-  // 封面调整确认
-  onCoverConfirm: function (e) {
-    const that = this;
-    const { tempFilePath } = e.detail;
-
-    wx.showLoading({ title: '上传中...' });
-
-    wx.cloud.uploadFile({
-      cloudPath: `activity_covers/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`,
-      filePath: tempFilePath,
-      isPrivate: false,
-      success: function (uploadRes) {
-        wx.hideLoading();
-        that.setData({
-          'formData.cover_image': uploadRes.fileID
-        });
-        that.autoSaveDraft();
-        showSuccess('封面上传成功');
-      },
-      fail: function (uploadErr) {
-        wx.hideLoading();
-        console.error('上传图片失败', uploadErr);
-        wx.showToast({ title: '上传失败', icon: 'none' });
-      }
-    });
-  },
-
-  // 封面调整取消
-  onCoverCancel: function () {
-    // 用户取消
   },
 
   // 删除封面图
@@ -497,81 +513,84 @@ Page({
 
   // 提交表单
   handleSubmit: async function () {
-    if (this.data.submitting) return;
-
-    const { formData, isEdit, id } = this.data;
-
-    // 先验证，通过后再设置提交状态
-    if (!formData.cover_image) {
-      showInfo('请上传封面图');
-      return;
-    }
-    if (!formData.title.trim()) {
-      showInfo('请输入活动标题');
-      return;
-    }
-    if (!formData.description.trim()) {
-      showInfo('请输入活动描述');
-      return;
-    }
-    if (!formData.location.trim()) {
-      showInfo('请输入集合地点');
-      return;
-    }
-    if (!formData.dress_code.trim()) {
-      showInfo('请输入 Dress Code');
-      return;
-    }
-    if (!formData.start_datetime) {
-      showInfo('请选择活动时间');
-      return;
-    }
-    if (formData.quota <= 0) {
-      showInfo('名额必须大于 0');
-      return;
-    }
-    if (formData.points <= 0) {
-      showInfo('积分必须大于 0');
-      return;
-    }
-
-    // 重复活动必须选择至少一个日期
-    if (formData.is_recurring && this.getRepeatDays().length === 0) {
-      showInfo('请至少选择一个重复日期');
-      return;
-    }
-
-    this.setData({ submitting: true });
-
-    // 构建提交数据
-    const submitData = {
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      location: formData.location.trim(),
-      latitude: formData.latitude,
-      longitude: formData.longitude,
-      run_type: '',
-      dress_code: formData.dress_code.trim(),
-      start_time: `${formData.start_date} ${formData.start_time}`,
-      quota: formData.quota,
-      points: formData.points,
-      cover_image: formData.cover_image,
-      // 报名设置
-      member_only: formData.member_only,
-      registration_fee_type: formData.registration_fee_type,
-      registration_fee: formData.registration_fee_type ? formData.registration_fee : 0,
-      refund_policy: formData.refund_policy,
-      // 重复设置
-      is_recurring: formData.is_recurring,
-      repeat_days: formData.is_recurring ? this.getRepeatDays() : []
-    };
-
-    // 报名截止时间（可选）
-    if (formData.registration_deadline) {
-      submitData.registration_deadline = `${formData.registration_deadline_date} ${formData.registration_deadline_time}`;
-    }
-
     try {
+      if (this.data.submitting || this._submitting) return;
+
+      const { formData, isEdit, id } = this.data;
+      if (!formData) {
+        wx.showModal({ title: '提示', content: '表单数据异常，请重试', showCancel: false });
+        return;
+      }
+
+      // 先验证，通过后再设置提交状态
+      if (!formData.cover_image) {
+        wx.showModal({ title: '提示', content: '封面图没有上传', showCancel: false });
+        return;
+      }
+      if (!formData.title || !formData.title.trim()) {
+        wx.showModal({ title: '提示', content: '活动标题没有填写', showCancel: false });
+        return;
+      }
+      if (!formData.description || !formData.description.trim()) {
+        wx.showModal({ title: '提示', content: '活动描述没有填写', showCancel: false });
+        return;
+      }
+      if (!formData.location || !formData.location.trim()) {
+        wx.showModal({ title: '提示', content: '集合地点没有填写', showCancel: false });
+        return;
+      }
+      if (!formData.dress_code || !formData.dress_code.trim()) {
+        wx.showModal({ title: '提示', content: 'Dress Code 没有填写', showCancel: false });
+        return;
+      }
+      if (!formData.start_datetime) {
+        wx.showModal({ title: '提示', content: '请选择活动时间', showCancel: false });
+        return;
+      }
+      if (formData.quota <= 0) {
+        wx.showModal({ title: '提示', content: '名额必须大于 0', showCancel: false });
+        return;
+      }
+      if (formData.points < 0) {
+        wx.showModal({ title: '提示', content: '积分不能为负数', showCancel: false });
+        return;
+      }
+
+      // 重复活动必须选择至少一个日期
+      if (formData.is_recurring && this.getRepeatDays().length === 0) {
+        wx.showModal({ title: '提示', content: '请至少选择一个重复日期', showCancel: false });
+        return;
+      }
+
+      this._submitting = true;
+      this.setData({ submitting: true });
+
+      // 构建提交数据
+      const submitData = {
+        title: (formData.title || '').trim(),
+        description: (formData.description || '').trim(),
+        location: (formData.location || '').trim(),
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        run_type: '',
+        dress_code: (formData.dress_code || '').trim(),
+        start_time: `${formData.start_date || ''} ${formData.start_time || ''}`.trim(),
+        quota: formData.quota || 0,
+        points: formData.points || 0,
+        cover_image: formData.cover_image || '',
+        member_only: !!formData.member_only,
+        registration_fee_type: formData.registration_fee_type || '',
+        registration_fee: formData.registration_fee_type ? (formData.registration_fee || 0) : 0,
+        refund_policy: formData.refund_policy || 'anytime',
+        is_recurring: !!formData.is_recurring,
+        repeat_days: formData.is_recurring ? this.getRepeatDays() : []
+      };
+
+      // 报名截止时间（可选）
+      if (formData.registration_deadline) {
+        submitData.registration_deadline = `${formData.registration_deadline_date || ''} ${formData.registration_deadline_time || ''}`.trim();
+      }
+
       if (isEdit) {
         await activityApi.update({ id, ...submitData });
         showSuccess('保存成功');
@@ -596,6 +615,7 @@ Page({
         showCancel: false
       });
     } finally {
+      this._submitting = false;
       this.setData({ submitting: false });
     }
   }

@@ -137,6 +137,7 @@
   id="avatarAdjuster"
   outputWidth="{{800}}"
   outputHeight="{{800}}"
+  shape="circle"
   bind:confirm="onAvatarConfirm"
   bind:cancel="onAvatarCancel"
 />

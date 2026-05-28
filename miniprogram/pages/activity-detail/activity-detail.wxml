@@ -7,8 +7,8 @@
   <!-- 非团员查看往期活动提示 -->
   <block wx:elif="{{activity && activity.status === 'ended' && !isMember}}">
     <view class="permission-denied">
-      <text class="denied-icon">🔒</text>
-      <text class="denied-title">仅团员可查看</text>
+      <image class="denied-icon" src="/images/logo.jpg" mode="aspectFill"></image>
+      <text class="denied-title">加入 SRC，一起奔跑</text>
       <text class="denied-desc">成为团员后可查看往期活动详情</text>
       <button class="btn-apply" bindtap="goToApply">申请入团</button>
     </view>
@@ -18,8 +18,8 @@
     <!-- 正在报名的活动：显示完整信息 -->
     <block wx:if="{{activity.status === 'ongoing'}}">
       <!-- 封面图头部 -->
-      <view class="cover-header">
-        <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+      <view class="cover-header cover-ongoing">
+        <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="widthFix"></image>
         <view class="cover-content">
           <view class="points-tag">
             <text class="points-value">+{{activity.points}}</text>
@@ -105,7 +105,7 @@
         </view>
         <view class="participants-list">
           <view class="participant-item" wx:for="{{waitlistParticipants}}" wx:key="_id">
-            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}"></image>
+            <image class="participant-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" bindtap="previewWaitlistAvatar" data-index="{{index}}"></image>
             <text class="participant-name">{{item.nickname}}</text>
           </view>
         </view>
@@ -159,7 +159,7 @@
     <block wx:else>
       <!-- 封面图头部 -->
       <view class="cover-header past-cover">
-        <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="aspectFill"></image>
+        <image class="cover-image" src="{{activity.cover_image || '/images/default-product.png'}}" mode="widthFix"></image>
         <view class="cover-actions" wx:if="{{canUploadPhotos}}">
           <button class="btn-change-cover" bindtap="changeCoverImage">更换封面</button>
         </view>
@@ -234,14 +234,6 @@
 </view>
 
 <!-- 封面调整组件 -->
-<cover-adjuster
-  id="coverAdjuster"
-  outputWidth="{{750}}"
-  outputHeight="{{422}}"
-  bind:confirm="onCoverConfirm"
-  bind:cancel="onCoverCancel"
-/>
-
 <!-- 游客报名手机号弹窗 -->
 <view class="phone-modal" wx:if="{{showPhoneModal}}">
   <view class="phone-modal-mask" bindtap="cancelPhoneInput"></view>

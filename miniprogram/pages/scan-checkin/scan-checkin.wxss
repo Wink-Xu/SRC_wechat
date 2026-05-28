@@ -1,4 +1,4 @@
-/* pages/scan-checkin/scan-checkin.wxss - On Running 极简风格 */
+/* pages/scan-checkin/scan-checkin.wxss - 简约风格 */
 
 page {
   background: #F8F8F8;
@@ -7,123 +7,135 @@ page {
 
 .container {
   min-height: 100vh;
-  padding: 30rpx;
+  padding: 0;
 }
 
+/* 加载 */
 .loading-box {
   text-align: center;
-  padding: 100rpx;
-  color: #999999;
+  padding: 200rpx 0;
+  color: #999;
   font-size: 28rpx;
 }
 
 /* 错误状态 */
 .error-box {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 100rpx 30rpx;
+  padding: 200rpx 40rpx 0;
 }
 
-.error-icon {
-  width: 80rpx;
-  height: 80rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.5;
+.error-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 60rpx 48rpx;
+  text-align: center;
+  width: 100%;
+}
+
+.error-icon-text {
+  display: block;
+  width: 100rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  background: #F5F5F5;
+  border-radius: 50%;
+  font-size: 48rpx;
+  color: #999;
+  font-weight: 600;
+  margin: 0 auto 24rpx;
 }
 
 .error-text {
+  display: block;
   font-size: 28rpx;
-  color: #666666;
+  color: #666;
   margin-bottom: 40rpx;
+}
+
+/* 标题区域 */
+.hero-section {
+  padding: 60rpx 40rpx 20rpx;
   text-align: center;
 }
 
-/* 活动卡片 */
-.activity-card {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-}
-
-.card-header {
-  margin-bottom: 24rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #F5F5F5;
-}
-
-.activity-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #1A1A1A;
+.hero-title {
   display: block;
+  font-size: 26rpx;
+  color: #999;
+  font-weight: 500;
+  margin-bottom: 12rpx;
+}
+
+.hero-subtitle {
+  display: block;
+  font-size: 36rpx;
+  color: #1A1A1A;
+  font-weight: 600;
   line-height: 1.4;
 }
 
-.activity-info {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+/* 信息卡片 */
+.info-card {
+  margin: 20rpx 32rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 28rpx 32rpx;
 }
 
-.info-item {
+.info-row {
   display: flex;
   align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
 }
 
 .info-icon {
   width: 32rpx;
   height: 32rpx;
-  margin-right: 12rpx;
-  opacity: 0.7;
+  margin-right: 16rpx;
+  opacity: 0.5;
 }
 
 .info-text {
   font-size: 28rpx;
-  color: #666666;
+  color: #4A4A4A;
 }
 
-/* 签到区域 */
-.checkin-section {
+/* 操作区 */
+.action-section {
+  padding: 0 32rpx;
+}
+
+/* 已签到卡片 */
+.checked-in-card {
   background: #FFFFFF;
   border-radius: 16rpx;
-  padding: 48rpx 32rpx;
-}
-
-.checkin-box {
+  padding: 80rpx 40rpx;
   text-align: center;
 }
 
-.checkin-title {
-  display: block;
-  font-size: 34rpx;
+.check-icon-circle {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #7BC67E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32rpx;
+}
+
+.check-mark {
+  font-size: 56rpx;
+  color: #FFFFFF;
   font-weight: 600;
-  color: #1A1A1A;
-  margin-bottom: 12rpx;
 }
 
-.checkin-desc {
-  display: block;
-  font-size: 26rpx;
-  color: #999999;
-  margin-bottom: 40rpx;
-}
-
-/* 已签到样式 */
-.checked-in-box {
-  text-align: center;
-  padding: 40rpx 0;
-}
-
-.checked-icon {
-  width: 64rpx;
-  height: 64rpx;
-  margin-bottom: 24rpx;
-}
-
-.checked-title {
+.checked-in-title {
   display: block;
   font-size: 36rpx;
   font-weight: 600;
@@ -131,26 +143,21 @@ page {
   margin-bottom: 12rpx;
 }
 
-.checked-desc {
+.checked-in-desc {
   display: block;
   font-size: 26rpx;
-  color: #999999;
+  color: #999;
 }
 
-/* 未报名样式 */
-.not-registered-box {
+/* 未报名卡片 */
+.not-registered-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 60rpx 40rpx;
   text-align: center;
-  padding: 40rpx 0;
 }
 
-.warning-icon {
-  width: 64rpx;
-  height: 64rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.5;
-}
-
-.warning-title {
+.not-reg-title {
   display: block;
   font-size: 32rpx;
   font-weight: 600;
@@ -158,46 +165,72 @@ page {
   margin-bottom: 12rpx;
 }
 
-.warning-desc {
+.not-reg-desc {
   display: block;
   font-size: 26rpx;
-  color: #999999;
+  color: #999;
+  margin-bottom: 40rpx;
 }
 
-/* 按钮 */
-.btn-primary {
+/* 签到按钮区域 */
+.checkin-btn-section {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+}
+
+.checkin-prompt {
+  display: block;
+  font-size: 30rpx;
+  color: #4A4A4A;
+  margin-bottom: 48rpx;
+}
+
+/* 按钮通用 */
+.btn {
   width: 100%;
   height: 96rpx;
-  background: #1A1A1A;
-  color: #FFFFFF;
+  border-radius: 48rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 32rpx;
   font-weight: 600;
-  border-radius: 48rpx;
-  border: none;
   margin-bottom: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.btn-primary::after {
+.btn::after {
   border: none;
 }
 
-.btn-back {
-  width: 100%;
-  height: 96rpx;
+.btn-primary {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}
+
+.btn-large {
+  height: 112rpx;
+  border-radius: 56rpx;
+  font-size: 36rpx;
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+  font-weight: 700;
+}
+
+.btn-secondary {
   background: #F5F5F5;
-  color: #666666;
-  font-size: 32rpx;
-  font-weight: 500;
-  border-radius: 48rpx;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #666;
 }
 
-.btn-back::after {
-  border: none;
+.btn-secondary:active {
+  background: #EEEEEE;
 }

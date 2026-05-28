@@ -6,7 +6,7 @@
       <text>取消</text>
     </view>
     <view class="header-title">
-      <text>调整封面</text>
+      <text>{{shape === 'circle' ? '调整头像' : '调整封面'}}</text>
     </view>
     <view class="header-btn primary" bindtap="onConfirm">
       <text>完成</text>
@@ -41,7 +41,7 @@
     </movable-area>
 
     <!-- 裁剪框 - 位置通过 JS 动态设置 -->
-    <view class="crop-frame" style="top:{{cropTop}}px;height:{{cropHeight}}px;"></view>
+    <view class="crop-frame {{shape === 'circle' ? 'crop-circle' : ''}}" style="top:{{cropTop}}px;height:{{cropHeight}}px;"></view>
   </view>
 
   <!-- 提示 -->

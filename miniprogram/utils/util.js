@@ -138,6 +138,21 @@ const throttle = (fn, delay = 300) => {
  * @param {string} phone 手机号
  * @returns {boolean} 是否有效
  */
+/**
+ * 获取高清头像 URL
+ * 微信头像 URL 以尺寸数字结尾（如 /132），改为 /0 获取原图
+ * @param {string} url 原始头像 URL
+ * @returns {string} 高清头像 URL
+ */
+const getHighResAvatarUrl = (url) => {
+  if (!url) return url;
+  // 微信第三方头像 URL，替换尺寸参数为 0（原图）
+  if (url.includes('thirdwx.qlogo.cn') || url.includes('wx.qlogo.cn')) {
+    return url.replace(/\/\d+$/, '/0');
+  }
+  return url;
+};
+
 const isValidPhone = (phone) => {
   return /^1[3-9]\d{9}$/.test(phone);
 };
@@ -252,5 +267,6 @@ module.exports = {
   showSuccess,
   showError,
   showInfo,
-  showConfirm
+  showConfirm,
+  getHighResAvatarUrl
 };

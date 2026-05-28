@@ -65,10 +65,15 @@ Page({
       const startDate = new Date(activity.start_time);
       const formattedTime = `${startDate.getMonth() + 1}月${startDate.getDate()}日 ${startDate.getHours().toString().padStart(2, '0')}:${startDate.getMinutes().toString().padStart(2, '0')}`;
 
+      // 非团员签到不给积分提示
+      const isMember = app.globalData.isMember;
+      const pointsText = isMember ? `活动结束后将获得 ${activity.points || 20} 积分` : '';
+
       this.setData({
         activity: {
           ...activity,
-          formattedTime
+          formattedTime,
+          pointsText
         },
         loading: false,
         isRegistered: result.isRegistered
@@ -105,16 +110,6 @@ Page({
       return;
     }
 
-    // 检查是否是团员
-    const userInfo = app.globalData.userInfo;
-    if (!userInfo || userInfo.status !== 'approved') {
-      wx.showToast({
-        title: '仅限正式团员签到',
-        icon: 'none'
-      });
-      return;
-    }
-
     wx.showLoading({ title: '签到中...' });
 
     try {
@@ -127,9 +122,10 @@ Page({
         checkInTime: new Date().toISOString()
       });
 
+      const pointsText = result.points > 0 ? `活动结束后将获得 ${result.points} 积分` : '';
       wx.showModal({
         title: '签到成功',
-        content: `签到成功！活动结束后将获得 ${result.points} 积分`,
+        content: '签到成功！' + (pointsText ? '\n' + pointsText : ''),
         showCancel: false,
         success: () => {
           wx.navigateBack();

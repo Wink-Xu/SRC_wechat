@@ -6,6 +6,8 @@ const app = getApp();
 Page({
   data: {
     checkedInActivities: [],
+    registeredActivities: [],
+    currentTab: 'all',
     loading: true
   },
 
@@ -17,19 +19,26 @@ Page({
     this.loadActivities();
   },
 
+  // 切换 Tab
+  switchTab: function (e) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({ currentTab: tab });
+  },
+
   loadActivities: async function () {
     this.setData({ loading: true });
 
     try {
-      // 获取已报名的活动
+      // 获取已报名的活动（包含 registered 和 checked_in）
       const result = await activityApi.getList({ registered: true });
       const activities = result.list || [];
 
-      // 筛选出已签到的活动
-      let checkedInActivities = activities.filter(activity => activity.user_checked_in);
+      // 区分已签到和未签到
+      const checkedInActivities = activities.filter(a => a.user_checked_in);
+      const registeredActivities = activities.filter(a => !a.user_checked_in);
 
       // 收集需要转换的封面图 fileID
-      const coverImageFileIDs = checkedInActivities
+      const coverImageFileIDs = activities
         .filter(item => item.cover_image && item.cover_image.startsWith('cloud://'))
         .map(item => item.cover_image);
 
@@ -49,20 +58,21 @@ Page({
       }
 
       // 格式化并转换图片
-      checkedInActivities = checkedInActivities.map(activity => {
+      const formatItem = activity => {
         const formatted = {
           ...activity,
-          formattedTime: formatDate(activity.start_time, 'YYYY 年 MM 月 DD 日')
+          formattedTime: formatDate(activity.start_time, 'YYYY 年 MM 月 DD 日'),
+          isCheckedIn: !!activity.user_checked_in
         };
-        // 转换封面图
         if (activity.cover_image && activity.cover_image.startsWith('cloud://') && tempUrlMap[activity.cover_image]) {
           formatted.display_cover_image = tempUrlMap[activity.cover_image];
         }
         return formatted;
-      });
+      };
 
       this.setData({
-        checkedInActivities,
+        checkedInActivities: checkedInActivities.map(formatItem),
+        registeredActivities: registeredActivities.map(formatItem),
         loading: false
       });
     } catch (error) {

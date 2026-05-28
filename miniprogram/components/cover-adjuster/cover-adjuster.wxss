@@ -79,6 +79,12 @@
   z-index: 10;
 }
 
+/* 圆形裁剪框（头像） */
+.crop-frame.crop-circle {
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+}
+
 /* 底部 - 最高层级 */
 .adjuster-footer {
   position: relative;

@@ -97,6 +97,31 @@ Page({
     }
   },
 
+  // 去支付（微信支付）
+  payOrder: async function () {
+    const orderId = this.data.order._id;
+    try {
+      const payResult = await coffeeApi.payOrderByCash({ orderId });
+      wx.requestPayment({
+        timeStamp: payResult.timeStamp,
+        nonceStr: payResult.nonceStr,
+        package: payResult.package,
+        signType: payResult.signType,
+        paySign: payResult.paySign,
+        success: () => {
+          wx.showToast({ title: '支付成功', icon: 'success' });
+          this.loadOrder(orderId);
+        },
+        fail: (err) => {
+          console.error('支付失败', err);
+          wx.showToast({ title: '支付已取消', icon: 'none' });
+        }
+      });
+    } catch (error) {
+      wx.showToast({ title: error.message || '支付失败', icon: 'none' });
+    }
+  },
+
   getPaymentText: function (type) {
     const map = {
       cash: '微信支付',

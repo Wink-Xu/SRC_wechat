@@ -19,10 +19,29 @@ Page({
   },
 
   onLoad: function () {
-    // 初始状态
+    // 从缓存同步登录状态，避免首次渲染闪现未登录
+    const app = getApp();
+    const userInfo = app.globalData.userInfo;
+    const isLoggedIn = app.globalData.isLoggedIn;
+    if (isLoggedIn && userInfo) {
+      const role = userInfo.role || '';
+      this.setData({
+        isLoggedIn: true,
+        userInfo,
+        isLeader: app.globalData.isLeader,
+        isMember: app.globalData.isMember,
+        isPending: userInfo.status === 'pending'
+      });
+    }
   },
 
-  onShow: function () {
+  onShow: async function () {
+    const app = getApp();
+
+    // 等待自动登录完成（避免闪现未登录）
+    const loginResult = await app.waitForLogin();
+
+    // 如果自动登录成功了但 refreshUserInfo 需要的 shouldRefreshStatus 已通过 login 完成
     this.refreshUserInfo(true);
   },
 

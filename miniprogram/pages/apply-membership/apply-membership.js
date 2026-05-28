@@ -12,21 +12,46 @@ Page({
   },
 
   onLoad: function () {
-    // 加载当前用户信息
+    // 只加载头像，昵称让用户自己填写
     const app = getApp();
     const userInfo = app.globalData.userInfo;
-    if (userInfo) {
-      this.setData({
-        nickname: userInfo.nickname || '',
-        avatarUrl: userInfo.avatar || ''
-      });
+    if (userInfo && userInfo.avatar) {
+      this.setData({ avatarUrl: userInfo.avatar });
     }
   },
 
   // 选择头像
-  onChooseAvatar: function (e) {
-    const { avatarUrl } = e.detail;
-    this.setData({ avatarUrl });
+  chooseAvatar: function () {
+    const that = this;
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sizeType: ['original'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        const tempFile = res.tempFiles[0];
+        if (!tempFile) return;
+        // 显示圆形裁剪器
+        const adjuster = that.selectComponent('#avatarAdjuster');
+        if (adjuster) {
+          adjuster.show(tempFile.tempFilePath);
+        }
+      },
+      fail: function (err) {
+        console.error('选择图片失败', err);
+      }
+    });
+  },
+
+  // 头像裁剪确认
+  onAvatarConfirm: function (e) {
+    const { tempFilePath } = e.detail;
+    this.setData({ avatarUrl: tempFilePath });
+  },
+
+  // 头像裁剪取消
+  onAvatarCancel: function () {
+    // 用户取消
   },
 
   // 输入昵称

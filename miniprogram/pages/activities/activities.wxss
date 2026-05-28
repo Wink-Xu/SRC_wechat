@@ -147,10 +147,17 @@ page {
 .cover-image {
   position: relative;
   width: 100%;
-  /* 16:9 比例 */
+  /* 16:9 比例（往期活动） */
   height: 0;
   padding-bottom: 56.25%;
   overflow: hidden;
+}
+
+/* 正在报名的活动：原始比例 */
+.cover-image.cover-ongoing {
+  height: auto;
+  padding-bottom: 0;
+  background: #F0F0F0;
 }
 
 .cover-img {
@@ -159,6 +166,11 @@ page {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.cover-ongoing .cover-img {
+  position: relative;
+  height: auto;
 }
 
 /* 右下角标签 */

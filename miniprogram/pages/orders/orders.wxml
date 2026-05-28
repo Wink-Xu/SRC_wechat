@@ -10,6 +10,7 @@
       bindtap="onTabChange"
     >
       <text>{{item.title}}</text>
+      <text wx:if="{{tabCounts[item.key] > 0}}" class="tab-badge">{{tabCounts[item.key] > 99 ? '99+' : tabCounts[item.key]}}</text>
     </view>
   </view>
 
@@ -37,7 +38,7 @@
       </view>
 
       <view class="order-product">
-        <image class="product-image" src="{{item.display_product_image || item.product_image || '/images/default-product.png'}}"></image>
+        <image class="product-image" src="{{item.display_product_image || item.product_image || '/images/default-product.png'}}" catchtap="goToProduct" data-product-id="{{item.product_id}}"></image>
         <view class="product-info">
           <text class="product-name">{{item.product_name}}</text>
           <view class="product-meta">
@@ -48,12 +49,19 @@
         </view>
       </view>
 
+      <view class="order-express" wx:if="{{item.express_company || item.express_no}}">
+        <text>{{item.express_company}} {{item.express_no}}</text>
+      </view>
+
       <view class="order-footer">
         <text class="order-time">{{item.formattedTime}}</text>
-        <view class="order-total">
-          <text class="total-label">合计:</text>
-          <text class="total-value" wx:if="{{item.pay_method === 'points'}}">{{item.total_points}} 积分</text>
-          <text class="total-value" wx:else>¥{{item.total_cash / 100}}</text>
+        <view class="order-footer-right">
+          <view class="order-total">
+            <text class="total-label">合计:</text>
+            <text class="total-value" wx:if="{{item.pay_method === 'points'}}">{{item.total_points}} 积分</text>
+            <text class="total-value" wx:else>¥{{item.total_cash / 100}}</text>
+          </view>
+          <button wx:if="{{item.status === 'pending' && item.pay_method !== 'points' && item.total_cash > 0}}" class="btn-pay" bindtap="payOrder" data-id="{{item._id}}">去支付</button>
         </view>
       </view>
     </view>

@@ -31,6 +31,11 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const { action, testOpenid, ...data } = event;
 
+  // 处理支付回调（微信支付异步通知）
+  if (event.outTradeNo && event.resultCode) {
+    return handleActivityPayCallback(event, context);
+  }
+
   switch (action) {
     case 'create':
       return handleCreate(data, wxContext, testOpenid);
@@ -70,6 +75,8 @@ exports.main = async (event, context) => {
       return handleGetWaitlist(data, wxContext, testOpenid);
     case 'updateCoverImage':
       return handleUpdateCoverImage(data, wxContext, testOpenid);
+    case 'confirmRegistration':
+      return handleConfirmRegistration(data, wxContext, testOpenid);
     default:
       return { code: -1, message: '未知操作' };
   }
@@ -226,6 +233,21 @@ async function handleUpdate(data, wxContext, testOpenid) {
       console.error('[内容安全检测] 异常', err);
     }
 
+    // 往期精彩只能对已结束且未隐藏的活动设置
+    if (updateData.highlight === true || updateData.highlight === 'true') {
+      const activityResult = await db.collection('activities').doc(id).get();
+      const activity = activityResult.data;
+      if (!activity) {
+        return { code: -1, message: '活动不存在' };
+      }
+      if (activity.hidden) {
+        return { code: -1, message: '隐藏的活动不能放入往期精彩' };
+      }
+      if (activity.status !== 'ended') {
+        return { code: -1, message: '只有已结束的活动可以放入往期精彩' };
+      }
+    }
+
     await db.collection('activities').doc(id).update({
       data: {
         ...updateData,
@@ -259,7 +281,8 @@ async function handleUpdatePhotos(data, wxContext, testOpenid) {
     }
 
     const activity = activityResult.data;
-    const newPhotos = activity.photos ? activity.photos.concat(photos) : photos;
+    // 直接替换 photos 数组，避免重复拼接
+    const newPhotos = photos || [];
 
     const updateData = {
       photos: newPhotos,
@@ -267,8 +290,8 @@ async function handleUpdatePhotos(data, wxContext, testOpenid) {
     };
 
     // 如果没有封面图，使用第一张照片
-    if (!activity.cover_image && photos.length > 0) {
-      updateData.cover_image = photos[0];
+    if (!activity.cover_image && newPhotos.length > 0) {
+      updateData.cover_image = newPhotos[0];
     }
 
     await db.collection('activities').doc(id).update({
@@ -412,7 +435,7 @@ async function handleGetList(data, wxContext, testOpenid) {
         const regResult = await db.collection('registrations').where({
           user_id: userId,
           status: _.in(['registered', 'checked_in'])
-        }).get();
+        }).limit(100).get();
 
         const activityIds = regResult.data.map(r => r.activity_id);
         if (activityIds.length > 0) {
@@ -786,14 +809,19 @@ async function handleRegister(data, wxContext, testOpenid) {
       return { code: 0, message: '已加入候补名单' };
     }
 
-    // 检查是否已报名
+    // 检查是否已报名或已支付（含待支付）
     const existResult = await db.collection('registrations').where({
       activity_id: activityId,
       user_id: userId,
-      status: _.in(['registered', 'checked_in'])
+      status: _.in(['registered', 'checked_in', 'pending_payment'])
     }).get();
 
     if (existResult.data.length > 0) {
+      const existReg = existResult.data[0];
+      // 如果存在待支付的报名，重新生成支付参数
+      if (existReg.status === 'pending_payment') {
+        return await handlePendingPaymentRegistration(existReg, activity);
+      }
       return { code: -1, message: '您已报名' };
     }
 
@@ -817,6 +845,51 @@ async function handleRegister(data, wxContext, testOpenid) {
           created_at: db.serverDate()
         }
       });
+    }
+
+    // 处理收费报名 - 现金支付
+    if (activity.registration_fee_type === 'cash' && activity.registration_fee > 0) {
+      // 生成订单号
+      const orderNo = `ACT${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+
+      // 创建待支付报名记录
+      await db.collection('registrations').add({
+        data: {
+          activity_id: activityId,
+          user_id: userId,
+          status: 'pending_payment',
+          check_in_status: 'pending_payment',
+          points_awarded: false,
+          guest_phone: (!isMember && phone) ? phone : '',
+          order_no: orderNo,
+          order_amount: activity.registration_fee,
+          created_at: db.serverDate()
+        }
+      });
+
+      // 调用微信支付统一下单
+      const payResult = await cloud.openapi.payment.unifiedOrder({
+        body: '活动报名费：' + (activity.title || ''),
+        outTradeNo: orderNo,
+        totalFee: activity.registration_fee,
+        spbillCreateIp: '127.0.0.1',
+        tradeType: 'JSAPI',
+        functionName: 'activity',
+        envId: cloud.DYNAMIC_CURRENT_ENV,
+      });
+
+      return {
+        code: 0,
+        data: {
+          paymentRequired: true,
+          orderNo,
+          timeStamp: payResult.timeStamp,
+          nonceStr: payResult.nonceStr,
+          package: payResult.package,
+          signType: payResult.signType,
+          paySign: payResult.paySign
+        }
+      };
     }
 
     // 创建报名记录
@@ -845,6 +918,21 @@ async function handleRegister(data, wxContext, testOpenid) {
       }
     });
 
+    // 发送通知给管理员（免费或积分报名）
+    try {
+      await cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'sendActivityRegistrationNotification',
+          activityName: activity.title || '',
+          userName: user.nickname || '',
+          activityId: activityId
+        }
+      });
+    } catch (notifyErr) {
+      console.error('发送报名通知失败:', notifyErr);
+    }
+
     return { code: 0, message: '报名成功' };
   } catch (error) {
     console.error('报名失败', error);
@@ -869,7 +957,7 @@ async function handleCancelRegistration(data, wxContext, testOpenid) {
     const regResult = await db.collection('registrations').where({
       activity_id: activityId,
       user_id: userId,
-      status: _.in(['registered', 'checked_in', 'waitlisted'])
+      status: _.in(['registered', 'checked_in', 'waitlisted', 'pending_payment'])
     }).get();
 
     if (regResult.data.length === 0) {
@@ -907,6 +995,9 @@ async function handleCancelRegistration(data, wxContext, testOpenid) {
 
       // 自动递补候补中最早的用户
       try {
+        const activitySnap = await db.collection('activities').doc(activityId).get();
+        const activityData = activitySnap.data;
+
         const waitlistResult = await db.collection('registrations')
           .where({
             activity_id: activityId,
@@ -918,24 +1009,73 @@ async function handleCancelRegistration(data, wxContext, testOpenid) {
 
         if (waitlistResult.data.length > 0) {
           const promoted = waitlistResult.data[0];
+          const isCashFee = activityData && activityData.registration_fee_type === 'cash' && activityData.registration_fee > 0;
 
-          await db.collection('registrations').doc(promoted._id).update({
-            data: {
-              status: 'registered',
-              check_in_status: 'registered',
-              updated_at: db.serverDate()
+          if (isCashFee) {
+            // 付费活动：设为待支付，30分钟支付时限
+            const paymentDeadline = new Date();
+            paymentDeadline.setMinutes(paymentDeadline.getMinutes() + 30);
+
+            const orderNo = `ACT${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+
+            await db.collection('registrations').doc(promoted._id).update({
+              data: {
+                status: 'pending_payment',
+                check_in_status: 'pending_payment',
+                order_no: orderNo,
+                order_amount: activityData.registration_fee,
+                payment_deadline: paymentDeadline,
+                updated_at: db.serverDate()
+              }
+            });
+
+            await db.collection('activities').doc(activityId).update({
+              data: {
+                waitlist_count: _.inc(-1),
+                updated_at: db.serverDate()
+              }
+            });
+
+            // 发送微信通知给被晋升的用户
+            try {
+              const promotedUser = await db.collection('users').doc(promoted.user_id).get();
+              if (promotedUser.data && promotedUser.data.openid) {
+                await cloud.callFunction({
+                  name: 'notification',
+                  data: {
+                    action: 'sendWaitlistPromotion',
+                    openid: promotedUser.data.openid,
+                    activityName: activityData.title,
+                    activityId: activityId,
+                    orderNo: orderNo
+                  }
+                });
+              }
+            } catch (notifyErr) {
+              console.error('[候补递补] 发送通知失败:', notifyErr);
             }
-          });
 
-          await db.collection('activities').doc(activityId).update({
-            data: {
-              registered_count: _.inc(1),
-              waitlist_count: _.inc(-1),
-              updated_at: db.serverDate()
-            }
-          });
+            console.log('[候补递补] 用户', promoted.user_id, '从候补转为待支付（30分钟时限）');
+          } else {
+            // 免费或积分活动：直接转为正式报名
+            await db.collection('registrations').doc(promoted._id).update({
+              data: {
+                status: 'registered',
+                check_in_status: 'registered',
+                updated_at: db.serverDate()
+              }
+            });
 
-          console.log('[候补递补] 用户', promoted.user_id, '从候补转为正式报名');
+            await db.collection('activities').doc(activityId).update({
+              data: {
+                registered_count: _.inc(1),
+                waitlist_count: _.inc(-1),
+                updated_at: db.serverDate()
+              }
+            });
+
+            console.log('[候补递补] 用户', promoted.user_id, '从候补转为正式报名');
+          }
         }
       } catch (err) {
         console.error('[候补递补] 失败', err);
@@ -1086,9 +1226,7 @@ async function handleSelfCheckIn(data, wxContext, testOpenid) {
       return { code: -1, message: '请先登录' };
     }
 
-    if (user.status !== 'approved') {
-      return { code: -1, message: '您还不是正式团员' };
-    }
+    // 非团员也可以签到，但不给积分（下面根据 status 判断）
 
     // 检查活动状态
     const activityResult = await db.collection('activities').doc(activityId).get();
@@ -1144,7 +1282,9 @@ async function handleSelfCheckIn(data, wxContext, testOpenid) {
       }
     });
 
-    return { code: 0, message: '签到成功', data: { points: activity.points || 20 } };
+    // 非团员签到不给积分
+    const earnedPoints = (user.status === 'approved') ? (activity.points || 20) : 0;
+    return { code: 0, message: '签到成功', data: { points: earnedPoints } };
   } catch (error) {
     console.error('签到失败', error);
     return { code: -1, message: '签到失败' };
@@ -1420,5 +1560,193 @@ async function handleGetWaitlist(data, wxContext, testOpenid) {
   } catch (error) {
     console.error('获取候补列表失败', error);
     return { code: -1, message: '获取失败' };
+  }
+}
+
+// 处理已存在但未支付的报名（重新生成支付参数）
+async function handlePendingPaymentRegistration(registration, activity) {
+  try {
+    const orderNo = registration.order_no || `ACT${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+
+    // 如果之前没有 order_no，更新
+    if (!registration.order_no) {
+      await db.collection('registrations').doc(registration._id).update({
+        data: { order_no: orderNo }
+      });
+    }
+
+    // 重新生成支付参数
+    const payResult = await cloud.openapi.payment.unifiedOrder({
+      body: '活动报名费：' + (activity.title || ''),
+      outTradeNo: orderNo,
+      totalFee: activity.registration_fee,
+      spbillCreateIp: '127.0.0.1',
+      tradeType: 'JSAPI',
+      functionName: 'activity',
+      envId: cloud.DYNAMIC_CURRENT_ENV,
+    });
+
+    return {
+      code: 0,
+      data: {
+        paymentRequired: true,
+        orderNo,
+        timeStamp: payResult.timeStamp,
+        nonceStr: payResult.nonceStr,
+        package: payResult.package,
+        signType: payResult.signType,
+        paySign: payResult.paySign
+      }
+    };
+  } catch (error) {
+    console.error('重新生成支付参数失败', error);
+    return { code: -1, message: '支付参数获取失败' };
+  }
+}
+
+// 确认报名（支付成功后调用）
+async function handleConfirmRegistration(data, wxContext, testOpenid) {
+  const { orderNo } = data;
+
+  if (!orderNo) {
+    return { code: -1, message: '参数错误' };
+  }
+
+  try {
+    const user = await getUser(wxContext.OPENID, testOpenid);
+    if (!user) {
+      return { code: -1, message: '用户不存在' };
+    }
+
+    // 查找待支付报名记录
+    const regResult = await db.collection('registrations').where({
+      order_no: orderNo,
+      user_id: user._id,
+      status: 'pending_payment'
+    }).get();
+
+    if (regResult.data.length === 0) {
+      return { code: -1, message: '报名记录不存在或已处理' };
+    }
+
+    const registration = regResult.data[0];
+
+    // 检查活动名额
+    const activityResult = await db.collection('activities').doc(registration.activity_id).get();
+    const activity = activityResult.data;
+    if (!activity) {
+      return { code: -1, message: '活动不存在' };
+    }
+
+    if (activity.status !== 'ongoing') {
+      return { code: -1, message: '活动状态不允许报名' };
+    }
+
+    // 检查名额（防止支付期间名额被占满）
+    if (activity.registered_count >= activity.quota) {
+      // 名额已满，退款处理（简化为退款提示）
+      return { code: -1, message: '很抱歉，活动名额已满，请联系管理员退款' };
+    }
+
+    // 更新报名状态为已报名
+    await db.collection('registrations').doc(registration._id).update({
+      data: {
+        status: 'registered',
+        check_in_status: 'registered',
+        updated_at: db.serverDate()
+      }
+    });
+
+    // 更新报名人数
+    await db.collection('activities').doc(registration.activity_id).update({
+      data: {
+        registered_count: _.inc(1),
+        updated_at: db.serverDate()
+      }
+    });
+
+    // 发送通知给管理员
+    try {
+      await cloud.callFunction({
+        name: 'notification',
+        data: {
+          action: 'sendActivityRegistrationNotification',
+          activityName: activity.title || '',
+          userName: user.nickname || '',
+          activityId: registration.activity_id
+        }
+      });
+    } catch (notifyErr) {
+      console.error('发送报名通知失败:', notifyErr);
+    }
+
+    return { code: 0, message: '报名成功' };
+  } catch (error) {
+    console.error('确认报名失败', error);
+    return { code: -1, message: '确认失败' };
+  }
+}
+
+// 活动支付回调（微信支付异步通知）
+async function handleActivityPayCallback(event, context) {
+  const { outTradeNo, resultCode, transactionId } = event;
+  try {
+    if (resultCode === 'SUCCESS') {
+      // 查找待支付报名记录
+      const regResult = await db.collection('registrations').where({
+        order_no: outTradeNo,
+        status: 'pending_payment'
+      }).get();
+
+      if (regResult.data.length > 0) {
+        const registration = regResult.data[0];
+
+        // 检查活动是否还存在且名额未满
+        const activityResult = await db.collection('activities').doc(registration.activity_id).get();
+        const activity = activityResult.data;
+
+        if (activity && activity.status === 'ongoing' && activity.registered_count < activity.quota) {
+          // 确认报名
+          await db.collection('registrations').doc(registration._id).update({
+            data: {
+              status: 'registered',
+              check_in_status: 'registered',
+              transaction_id: transactionId || '',
+              updated_at: db.serverDate()
+            }
+          });
+
+          await db.collection('activities').doc(registration.activity_id).update({
+            data: {
+              registered_count: _.inc(1),
+              updated_at: db.serverDate()
+            }
+          });
+
+          // 获取用户信息并发送通知给管理员
+          try {
+            const paidUser = await db.collection('users').doc(registration.user_id).get();
+            if (paidUser.data) {
+              await cloud.callFunction({
+                name: 'notification',
+                data: {
+                  action: 'sendActivityRegistrationNotification',
+                  activityName: activity.title || '',
+                  userName: paidUser.data.nickname || '',
+                  activityId: registration.activity_id
+                }
+              });
+            }
+          } catch (notifyErr) {
+            console.error('发送报名通知失败:', notifyErr);
+          }
+        }
+        // 如果名额已满，记录日志但保留待支付状态，需要人工处理
+      }
+    }
+    return { code: 0 };
+  } catch (error) {
+    console.error('活动支付回调处理失败', error);
+    return { code: -1 };
   }
 }
