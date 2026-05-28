@@ -421,6 +421,7 @@ async function handleGetList(data, wxContext, testOpenid) {
     const userId = user ? user._id : null;
 
     let query = db.collection('activities');
+    let regStatusMap = {};
 
     // 全部模式（用于管理后台）
     if (!all) {
@@ -443,6 +444,14 @@ async function handleGetList(data, wxContext, testOpenid) {
         } else {
           return { code: 0, data: { list: [], total: 0, page, limit } };
         }
+
+        // 构建 activity_id → 报名状态的映射（与后续查询保持一致，避免二次查询状态不一致）
+        regResult.data.forEach(function(r) {
+          // 同一个活动有多条记录时，取 checked_in 优先
+          if (!regStatusMap[r.activity_id] || r.status === 'checked_in') {
+            regStatusMap[r.activity_id] = r.status;
+          }
+        });
       }
 
       // 我创建的活动
@@ -482,19 +491,26 @@ async function handleGetList(data, wxContext, testOpenid) {
       }).count();
       activity.registered_count = regCount.total;
 
-      // 获取当前用户在该活动的状态
+      // 获取当前用户在该活动的状态（优先使用已缓存的报名状态，避免二次查询不一致）
       if (userId) {
-        const userRegResult = await db.collection('registrations').where({
-          activity_id: activity._id,
-          user_id: userId
-        }).get();
-
-        if (userRegResult.data.length > 0) {
-          activity.user_status = userRegResult.data[0].status;
-          activity.user_checked_in = userRegResult.data[0].status === 'checked_in';
+        var regStatus = regStatusMap[activity._id];
+        if (regStatus) {
+          activity.user_status = regStatus;
+          activity.user_checked_in = regStatus === 'checked_in';
         } else {
-          activity.user_status = null;
-          activity.user_checked_in = false;
+          // 降级：手动查询（兼容非 registered 模式进入此循环的情况）
+          const userRegResult = await db.collection('registrations').where({
+            activity_id: activity._id,
+            user_id: userId
+          }).get();
+
+          if (userRegResult.data.length > 0) {
+            activity.user_status = userRegResult.data[0].status;
+            activity.user_checked_in = userRegResult.data[0].status === 'checked_in';
+          } else {
+            activity.user_status = null;
+            activity.user_checked_in = false;
+          }
         }
       }
     }
