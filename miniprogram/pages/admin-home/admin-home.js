@@ -15,7 +15,9 @@ Page({
     announcementTempImage: '',
     // 那些一起奔跑的岁月
     runnerYearsImages: [],
-    runnerYearsTempImages: []
+    runnerYearsTempImages: [],
+    runnerYearsCoverImage: '',
+    runnerYearsCoverTempImage: ''
   },
 
   onLoad: function () {
@@ -38,8 +40,13 @@ Page({
           });
         }
         // 跑者岁月图片
-        if (result.runnerYears && result.runnerYears.images) {
-          this.setData({ runnerYearsImages: result.runnerYears.images });
+        if (result.runnerYears) {
+          if (result.runnerYears.images) {
+            this.setData({ runnerYearsImages: result.runnerYears.images });
+          }
+          if (result.runnerYears.cover_image) {
+            this.setData({ runnerYearsCoverImage: result.runnerYears.cover_image });
+          }
         }
       }
     } catch (error) {
@@ -119,6 +126,26 @@ Page({
     }
   },
 
+  // ===== 跑者岁月封面 =====
+  chooseRunnerYearsCover: function () {
+    const that = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        that.setData({ runnerYearsCoverTempImage: res.tempFilePaths[0] });
+      }
+    });
+  },
+
+  removeRunnerYearsCover: function () {
+    this.setData({
+      runnerYearsCoverImage: '',
+      runnerYearsCoverTempImage: ''
+    });
+  },
+
   // ===== 跑者岁月图片 =====
   chooseRunnerYearsImage: function () {
     const that = this;
@@ -148,6 +175,7 @@ Page({
 
     try {
       let images = [...this.data.runnerYearsImages];
+      let coverImage = this.data.runnerYearsCoverImage;
 
       // 上传新图片
       const tempImages = this.data.runnerYearsTempImages;
@@ -159,14 +187,22 @@ Page({
         images = images.concat(newFileIDs);
       }
 
+      // 上传封面图
+      if (this.data.runnerYearsCoverTempImage) {
+        coverImage = await this.uploadImage(this.data.runnerYearsCoverTempImage, 'runner_years_cover');
+      }
+
       await adminApi.saveHomeContent({
         type: 'runner_years',
-        images
+        images,
+        cover_image: coverImage
       });
 
       this.setData({
         runnerYearsImages: images,
-        runnerYearsTempImages: []
+        runnerYearsTempImages: [],
+        runnerYearsCoverImage: coverImage,
+        runnerYearsCoverTempImage: ''
       });
 
       showSuccess('图片保存成功');

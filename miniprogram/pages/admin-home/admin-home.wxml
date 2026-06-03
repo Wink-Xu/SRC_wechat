@@ -45,6 +45,22 @@
       <view class="section-title">那些一起奔跑的岁月</view>
       <view class="section-card">
         <view class="form-item">
+          <text class="form-label">封面图</text>
+          <view class="image-wrapper">
+            <view class="image-preview" wx:if="{{runnerYearsCoverImage && !runnerYearsCoverTempImage}}">
+              <image class="preview-img" src="{{runnerYearsCoverImage}}" mode="aspectFill"></image>
+              <view class="image-remove" bindtap="removeRunnerYearsCover">×</view>
+            </view>
+            <view class="image-preview" wx:if="{{runnerYearsCoverTempImage}}">
+              <image class="preview-img" src="{{runnerYearsCoverTempImage}}" mode="aspectFill"></image>
+            </view>
+            <view class="image-upload" bindtap="chooseRunnerYearsCover">
+              <text class="upload-icon">+</text>
+              <text class="upload-hint">{{runnerYearsCoverImage || runnerYearsCoverTempImage ? '重新选择' : '选择封面'}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="form-item">
           <text class="form-label">图片（建议尺寸：750×500px，最多 30 张）</text>
           <view class="image-grid">
             <view class="image-preview" wx:for="{{runnerYearsImages}}" wx:key="*this">

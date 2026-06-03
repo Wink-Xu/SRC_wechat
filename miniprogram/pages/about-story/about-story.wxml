@@ -1,5 +1,5 @@
 <view class="page">
-  <image class="cover-image" src="/images/fengmianpic.jpg" mode="widthFix" bindtap="previewCover"></image>
+  <image class="cover-image" src="{{coverImage || '/images/fengmianpic.jpg'}}" mode="widthFix" bindtap="previewCover"></image>
 
   <view class="content-section">
     <image class="logo-image" src="/images/piclogo.jpg" mode="widthFix"></image>

@@ -390,6 +390,9 @@ async function handleSaveHomeContent(data, wxContext) {
       updateData.images = images || [];
     } else if (type === 'runner_years') {
       updateData.images = data.images || [];
+      if (data.cover_image !== undefined) {
+        updateData.cover_image = data.cover_image;
+      }
     }
 
     // 保存文档

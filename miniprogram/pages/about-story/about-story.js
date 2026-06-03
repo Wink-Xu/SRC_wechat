@@ -3,7 +3,8 @@ const { adminApi } = require('../../utils/request');
 
 Page({
   data: {
-    runnerYearsImages: []
+    runnerYearsImages: [],
+    coverImage: ''
   },
 
   onLoad: function () {
@@ -13,8 +14,15 @@ Page({
   loadRunnerYears: async function () {
     try {
       const result = await adminApi.getHomeContent({});
-      if (result && result.runnerYears && result.runnerYears.images) {
-        this.setData({ runnerYearsImages: result.runnerYears.images });
+      if (result && result.runnerYears) {
+        const setData = {};
+        if (result.runnerYears.images) {
+          setData.runnerYearsImages = result.runnerYears.images;
+        }
+        if (result.runnerYears.cover_image) {
+          setData.coverImage = result.runnerYears.cover_image;
+        }
+        this.setData(setData);
       }
     } catch (error) {
       console.error('加载跑者岁月图片失败', error);
@@ -30,9 +38,10 @@ Page({
   },
 
   previewCover: function () {
+    const cover = this.data.coverImage || '/images/fengmianpic.jpg';
     wx.previewImage({
-      current: '/images/fengmianpic.jpg',
-      urls: ['/images/fengmianpic.jpg']
+      current: cover,
+      urls: [cover]
     });
   }
 });
