@@ -50,8 +50,9 @@ Page({
         }
         this.setData({ announcementCards: cards });
 
-        // 关于我们 — 封面图
-        this.setData({ aboutImage: '/images/fengmianpic.jpg' });
+        // 关于我们 — 封面图（优先使用跑团故事封面）
+        const storyCover = result.runnerYears && result.runnerYears.cover_image;
+        this.setData({ aboutImage: storyCover || '/images/fengmianpic.jpg' });
       }
     } catch (error) {
       console.error('加载首页内容失败', error);
