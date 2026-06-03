@@ -44,7 +44,7 @@
   color: #1A1A1A;
   display: block;
   margin-bottom: 24rpx;
-  text-align: center;
+  text-align: left;
 }
 
 .runner-years-scroll {
