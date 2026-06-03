@@ -336,6 +336,7 @@ async function handleGetOrders(data, wxContext) {
 async function handleGetHomeContent(data, wxContext) {
   let announcement = null;
   let aboutUs = null;
+  let runnerYears = null;
 
   try {
     const r = await db.collection('home_content').doc('announcement').get();
@@ -347,7 +348,12 @@ async function handleGetHomeContent(data, wxContext) {
     aboutUs = r.data;
   } catch (_) {}
 
-  return { code: 0, data: { announcement, aboutUs } };
+  try {
+    const r = await db.collection('home_content').doc('runner_years').get();
+    runnerYears = r.data;
+  } catch (_) {}
+
+  return { code: 0, data: { announcement, aboutUs, runnerYears } };
 }
 
 // 保存首页内容（需管理员权限）
@@ -365,7 +371,7 @@ async function handleSaveHomeContent(data, wxContext) {
     }
 
     const { type, text, images } = data;
-    if (!type || !['announcement', 'about_us'].includes(type)) {
+    if (!type || !['announcement', 'about_us', 'runner_years'].includes(type)) {
       return { code: -1, message: '无效的类型' };
     }
 
@@ -382,6 +388,8 @@ async function handleSaveHomeContent(data, wxContext) {
       updateData.image = data.image || '';
     } else if (type === 'about_us') {
       updateData.images = images || [];
+    } else if (type === 'runner_years') {
+      updateData.images = data.images || [];
     }
 
     // 保存文档

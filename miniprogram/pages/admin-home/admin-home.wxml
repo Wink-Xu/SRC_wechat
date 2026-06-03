@@ -40,5 +40,30 @@
         </button>
       </view>
     </view>
+    <!-- 那些一起奔跑的岁月 -->
+    <view class="form-section">
+      <view class="section-title">那些一起奔跑的岁月</view>
+      <view class="section-card">
+        <view class="form-item">
+          <text class="form-label">图片（建议尺寸：750×500px，最多 30 张）</text>
+          <view class="image-grid">
+            <view class="image-preview" wx:for="{{runnerYearsImages}}" wx:key="*this">
+              <image class="preview-img" src="{{item}}" mode="aspectFill"></image>
+              <view class="image-remove" bindtap="removeRunnerYearsImage" data-index="{{index}}">×</view>
+            </view>
+            <view class="image-preview" wx:for="{{runnerYearsTempImages}}" wx:key="*this">
+              <image class="preview-img" src="{{item}}" mode="aspectFill"></image>
+            </view>
+            <view class="image-upload" bindtap="chooseRunnerYearsImage" wx:if="{{(runnerYearsImages.length + runnerYearsTempImages.length) < 30}}">
+              <text class="upload-icon">+</text>
+              <text class="upload-hint">添加图片</text>
+            </view>
+          </view>
+        </view>
+        <button class="save-btn" bindtap="saveRunnerYears" disabled="{{saving}}">
+          {{saving ? '保存中...' : '保存图片'}}
+        </button>
+      </view>
+    </view>
   </view>
 </view>

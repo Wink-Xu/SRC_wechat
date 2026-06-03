@@ -12,7 +12,10 @@ Page({
       text: '',
       image: ''
     },
-    announcementTempImage: ''
+    announcementTempImage: '',
+    // 那些一起奔跑的岁月
+    runnerYearsImages: [],
+    runnerYearsTempImages: []
   },
 
   onLoad: function () {
@@ -33,6 +36,10 @@ Page({
             'announcement.text': result.announcement.text || '',
             'announcement.image': result.announcement.image || ''
           });
+        }
+        // 跑者岁月图片
+        if (result.runnerYears && result.runnerYears.images) {
+          this.setData({ runnerYearsImages: result.runnerYears.images });
         }
       }
     } catch (error) {
@@ -105,6 +112,66 @@ Page({
       showSuccess('公告保存成功');
     } catch (error) {
       console.error('保存公告失败', error);
+      const msg = error && error.message ? error.message : '保存失败，请重试';
+      showInfo(msg);
+    } finally {
+      this.setData({ saving: false });
+    }
+  },
+
+  // ===== 跑者岁月图片 =====
+  chooseRunnerYearsImage: function () {
+    const that = this;
+    wx.chooseImage({
+      count: 9,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        const newTempImages = res.tempFilePaths || [];
+        that.setData({
+          runnerYearsTempImages: that.data.runnerYearsTempImages.concat(newTempImages)
+        });
+      }
+    });
+  },
+
+  removeRunnerYearsImage: function (e) {
+    const index = e.currentTarget.dataset.index;
+    const images = [...this.data.runnerYearsImages];
+    images.splice(index, 1);
+    this.setData({ runnerYearsImages: images });
+  },
+
+  saveRunnerYears: async function () {
+    if (this.data.saving) return;
+    this.setData({ saving: true });
+
+    try {
+      let images = [...this.data.runnerYearsImages];
+
+      // 上传新图片
+      const tempImages = this.data.runnerYearsTempImages;
+      if (tempImages.length > 0) {
+        const uploadPromises = tempImages.map(tempPath =>
+          this.uploadImage(tempPath, 'runner_years')
+        );
+        const newFileIDs = await Promise.all(uploadPromises);
+        images = images.concat(newFileIDs);
+      }
+
+      await adminApi.saveHomeContent({
+        type: 'runner_years',
+        images
+      });
+
+      this.setData({
+        runnerYearsImages: images,
+        runnerYearsTempImages: []
+      });
+
+      showSuccess('图片保存成功');
+    } catch (error) {
+      console.error('保存跑者岁月图片失败', error);
       const msg = error && error.message ? error.message : '保存失败，请重试';
       showInfo(msg);
     } finally {

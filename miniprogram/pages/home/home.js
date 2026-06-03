@@ -17,6 +17,7 @@ Page({
     announcementCards: [],
     highlightCards: [],
     aboutImage: '',
+    runnerYearsImages: [],
     navBarTop: 0
   },
 
@@ -50,11 +51,12 @@ Page({
         }
         this.setData({ announcementCards: cards });
 
-        // 关于我们 — 单张封面图
-        if (result.aboutUs && result.aboutUs.images && result.aboutUs.images.length > 0) {
-          this.setData({ aboutImage: result.aboutUs.images[0] });
-        } else {
-          this.setData({ aboutImage: '/images/logo.jpg' });
+        // 关于我们 — 封面图
+        this.setData({ aboutImage: '/images/fengmianpic.jpg' });
+
+        // 那些一起奔跑的岁月
+        if (result.runnerYears && result.runnerYears.images) {
+          this.setData({ runnerYearsImages: result.runnerYears.images });
         }
       }
     } catch (error) {
@@ -88,7 +90,15 @@ Page({
   },
 
   goToAboutUs: function () {
-    wx.navigateTo({ url: '/pages/about-us/about-us' });
+    wx.navigateTo({ url: '/pages/about-story/about-story' });
+  },
+
+  previewRunnerYearsImage: function (e) {
+    const index = e.currentTarget.dataset.index;
+    wx.previewImage({
+      current: this.data.runnerYearsImages[index],
+      urls: this.data.runnerYearsImages
+    });
   },
 
   previewAnnouncementImage: function () {
