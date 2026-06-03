@@ -1,0 +1,33 @@
+<view class="page">
+  <image class="cover-image" src="/images/fengmianpic.jpg" mode="widthFix" bindtap="previewCover"></image>
+
+  <view class="content-section">
+    <image class="logo-image" src="/images/piclogo.jpg" mode="widthFix"></image>
+
+    <text class="story-text">我们出生武汉，名为星期天跑步俱乐部，
+Sunday 作为时间的刻度，是约定俗成的默契。
+我们包容彼此的同时探索奔跑的美学！
+武汉的咖啡店和过早铺全都留下过我们的足迹，
+Sunday 的浪漫藏在跑后咖啡的香味里，在
+跑步时滴落的汗水里，在看过的日出和踏过的树影里，在山野的泥土与落叶里。
+樱花下落的速度，风吹过的温度，都被我们用跑步记录。
+SRC 始于跑步，但不止于跑步。
+我们也把跑步的热情变成了打开世界和打开自我的勇气。对另一种陌生城市的探索，一起爬
+过陡峭的山脊，一起徒步过绝美的的高地…
+每一次出发都是一群人的冒险！
+跑步从来不是一个人的事。Sunday，既是时间的标尺，也是我们在一起的理由：它让我们彼
+此依靠，在汗水里长出信任，在成长中互相滋养。以跑步为纽带，以凝聚为土壤，我们跑得
+更远，也跑进了彼此的生活！
+故事还在继续，跑步也不会停止…</text>
+
+    <!-- 那些一起奔跑的岁月 -->
+    <view class="runner-years-section" wx:if="{{runnerYearsImages && runnerYearsImages.length > 0}}">
+      <text class="runner-years-title">那些一起奔跑的岁月</text>
+      <view class="runner-years-scroll">
+        <view class="ry-card" wx:for="{{runnerYearsImages}}" wx:key="*this" bindtap="previewRunnerYearsImage" data-index="{{index}}">
+          <image class="ry-image" src="{{item}}" mode="aspectFill"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

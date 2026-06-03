@@ -45,18 +45,6 @@
     </view>
   </view>
 
-  <!-- 那些一起奔跑的岁月 -->
-  <view wx:if="{{runnerYearsImages.length > 0}}">
-    <view class="section-head">
-      <text class="section-title">那些一起奔跑的岁月</text>
-    </view>
-    <view class="runner-years-scroll">
-      <view class="ry-card" wx:for="{{runnerYearsImages}}" wx:key="*this" bindtap="previewRunnerYearsImage" data-index="{{index}}">
-        <image class="ry-image" src="{{item}}" mode="aspectFill"></image>
-      </view>
-    </view>
-  </view>
-
   <!-- 联系我们 -->
   <view class="section-head">
     <text class="section-title">联系我们</text>

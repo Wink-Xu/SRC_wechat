@@ -1,0 +1,75 @@
+/* pages/about-story/about-story.wxss */
+
+.page {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding-bottom: 80rpx;
+}
+
+.cover-image {
+  width: 100%;
+  display: block;
+}
+
+.content-section {
+  padding: 40rpx 32rpx 60rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-image {
+  width: 240rpx;
+  margin-bottom: 40rpx;
+}
+
+.story-text {
+  font-size: 28rpx;
+  color: #444444;
+  line-height: 2;
+  letter-spacing: 2rpx;
+  text-align: justify;
+  white-space: pre-wrap;
+}
+
+/* 那些一起奔跑的岁月 */
+.runner-years-section {
+  width: 100%;
+  margin-top: 60rpx;
+}
+
+.runner-years-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  display: block;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.runner-years-scroll {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8rpx;
+}
+
+.runner-years-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ry-card {
+  display: inline-block;
+  width: 480rpx;
+  height: 320rpx;
+  margin-right: 16rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.ry-image {
+  width: 100%;
+  height: 100%;
+  background: #F5F5F5;
+}

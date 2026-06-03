@@ -17,7 +17,6 @@ Page({
     announcementCards: [],
     highlightCards: [],
     aboutImage: '',
-    runnerYearsImages: [],
     navBarTop: 0
   },
 
@@ -53,11 +52,6 @@ Page({
 
         // 关于我们 — 封面图
         this.setData({ aboutImage: '/images/fengmianpic.jpg' });
-
-        // 那些一起奔跑的岁月
-        if (result.runnerYears && result.runnerYears.images) {
-          this.setData({ runnerYearsImages: result.runnerYears.images });
-        }
       }
     } catch (error) {
       console.error('加载首页内容失败', error);
@@ -91,14 +85,6 @@ Page({
 
   goToAboutUs: function () {
     wx.navigateTo({ url: '/pages/about-story/about-story' });
-  },
-
-  previewRunnerYearsImage: function (e) {
-    const index = e.currentTarget.dataset.index;
-    wx.previewImage({
-      current: this.data.runnerYearsImages[index],
-      urls: this.data.runnerYearsImages
-    });
   },
 
   previewAnnouncementImage: function () {
