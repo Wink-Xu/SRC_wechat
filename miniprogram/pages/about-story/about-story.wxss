@@ -24,13 +24,15 @@
   margin-bottom: 40rpx;
 }
 
-.story-text {
+.story-paragraph {
   font-size: 28rpx;
   color: #444444;
   line-height: 2;
   letter-spacing: 2rpx;
   text-align: justify;
-  white-space: pre-wrap;
+  text-indent: 2em;
+  margin-bottom: 24rpx;
+  width: 100%;
 }
 
 /* 那些一起奔跑的岁月 */
