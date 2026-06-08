@@ -116,6 +116,13 @@ Page({
 
       showSuccess('申请成功，请等待审核');
 
+      // 请求订阅消息授权（审批结果通知）
+      wx.requestSubscribeMessage({
+        tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+        success: (res) => { console.log('订阅消息授权结果:', res); },
+        fail: (err) => { console.log('订阅消息授权失败:', err); }
+      });
+
       setTimeout(() => {
         wx.navigateBack();
       }, 1500);

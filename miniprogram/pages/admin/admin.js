@@ -25,6 +25,36 @@ Page({
 
   onShow: function () {
     this.loadStatistics();
+    // 管理员订阅通知（新成员、新订单等）
+    this.requestAdminSubscribe();
+  },
+
+  // 管理员订阅通知
+  requestAdminSubscribe: function () {
+    const hasSubscribed = wx.getStorageSync('admin_subscribed');
+    if (hasSubscribed) return;
+    // 延迟弹出，避免干扰首次加载
+    setTimeout(() => {
+      wx.showModal({
+        title: '开启通知',
+        content: '是否开启新成员申请和新订单提醒？开启后团长和管理员可及时收到通知',
+        confirmText: '开启',
+        cancelText: '暂不',
+        success: (res) => {
+          if (res.confirm) {
+            wx.requestSubscribeMessage({
+              tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+              success: (res) => {
+                if (res.errMsg === 'requestSubscribeMessage:ok') {
+                  wx.setStorageSync('admin_subscribed', true);
+                }
+              },
+              fail: (err) => { console.log('订阅授权失败:', err); }
+            });
+          }
+        }
+      });
+    }, 2000);
   },
 
   // 加载用户信息

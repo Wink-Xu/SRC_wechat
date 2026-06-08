@@ -242,18 +242,17 @@ Page({
 
       showSuccess(isWaitlist ? '已加入候补名单' : '报名成功');
 
-      // 加入候补时，请求订阅消息授权
-      if (isWaitlist) {
-        wx.requestSubscribeMessage({
-          tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
-          success: (res) => {
-            console.log('订阅消息授权结果:', res);
-          },
-          fail: (err) => {
-            console.log('订阅消息授权失败（用户可能拒绝）:', err);
-          }
-        });
-      }
+      // 请求订阅消息授权（活动相关通知）
+      const subscribeTmplIds = ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'];
+      wx.requestSubscribeMessage({
+        tmplIds: subscribeTmplIds,
+        success: (res) => {
+          console.log('订阅消息授权结果:', res);
+        },
+        fail: (err) => {
+          console.log('订阅消息授权失败（用户可能拒绝）:', err);
+        }
+      });
 
       this.setData({ showPhoneModal: false });
       this.loadActivity();
@@ -290,6 +289,12 @@ Page({
         try {
           await activityApi.confirmRegistration({ orderNo: payResult.orderNo });
           showSuccess('报名成功');
+          // 支付报名成功后也请求订阅
+          wx.requestSubscribeMessage({
+            tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+            success: (res) => { console.log('订阅消息授权结果:', res); },
+            fail: (err) => { console.log('订阅消息授权失败:', err); }
+          });
           this.setData({ showPhoneModal: false });
           this.loadActivity();
         } catch (err) {

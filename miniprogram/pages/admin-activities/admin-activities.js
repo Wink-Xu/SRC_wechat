@@ -24,6 +24,32 @@ Page({
       return;
     }
     this.loadActivities();
+    this.requestActivitySubscribe();
+  },
+
+  // 活动管理订阅通知
+  requestActivitySubscribe: function () {
+    const hasSubscribed = wx.getStorageSync('admin_activity_subscribed');
+    if (hasSubscribed) return;
+    wx.showModal({
+      title: '报名提醒',
+      content: '是否开启活动报名提醒？开启后有人报名活动时可收到通知',
+      confirmText: '开启',
+      cancelText: '暂不',
+      success: (res) => {
+        if (res.confirm) {
+          wx.requestSubscribeMessage({
+            tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+            success: (res) => {
+              if (res.errMsg === 'requestSubscribeMessage:ok' || res['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'] === 'accept') {
+                wx.setStorageSync('admin_activity_subscribed', true);
+              }
+            },
+            fail: (err) => { console.log('订阅授权失败:', err); }
+          });
+        }
+      }
+    });
   },
 
   onPullDownRefresh: function () {

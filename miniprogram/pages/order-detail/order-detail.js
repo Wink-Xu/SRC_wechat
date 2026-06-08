@@ -77,6 +77,11 @@ Page({
         paySign: payResult.paySign,
         success: () => {
           showSuccess('支付成功');
+          wx.requestSubscribeMessage({
+            tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
+            success: (res) => { console.log('订阅消息授权结果:', res); },
+            fail: (err) => { console.log('订阅消息授权失败:', err); }
+          });
           this.loadOrder();
         },
         fail: (err) => {
