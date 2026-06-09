@@ -11,7 +11,7 @@ const _ = db.command;
 // 订阅消息模板 ID（需要在微信公众平台申请）
 // 申请路径：微信公众平台 -> 功能 -> 订阅通知 -> 添加模板
 // 推荐模板：订单支付通知 (模板 ID 需要根据实际申请填写)
-const TEMPLATE_ID = 'PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U';
+const TEMPLATE_ID = 'DhgaV9rp_Cd9Iwj9OrbHu5MCM-954nzKfInFHsVDpUg';
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -73,7 +73,7 @@ async function handleSendOrderNotification(data, wxContext) {
           data: {
             thing1: { value: itemName.length > 20 ? itemName.substring(0, 20) + '...' : itemName },
             thing2: { value: orderNo },
-            amount3: { value: totalPrice },
+            thing3: { value: '金额: ¥' + totalPrice },
             thing4: { value: '新订单待处理' },
             time5: { value: createTime || new Date().toLocaleString('zh-CN') }
           }
@@ -125,8 +125,8 @@ async function handleSendShopOpenNotification(data, wxContext) {
           data: {
             thing1: { value: '店铺已开始营业' },
             thing2: { value: '营业通知' },
-            amount3: { value: '-' },
-            thing4: { value: '新的一天开始啦' },
+            thing3: { value: '新的一天开始啦' },
+            thing4: { value: '欢迎下单' },
             time5: { value: openTime }
           }
         });
@@ -187,7 +187,7 @@ async function handleSendShopOrderNotification(data, wxContext) {
           data: {
             thing1: { value: ('新周边订单 ' + orderNo).substring(0, 20) },
             thing2: { value: ('买家: ' + (userName || '未知')).substring(0, 20) },
-            amount3: { value: totalFee ? '¥' + totalFee : '¥0.00' },
+            thing3: { value: totalFee ? '金额: ¥' + totalFee : '金额: ¥0.00' },
             thing4: { value: (productName || '周边商品').substring(0, 20) },
             time5: { value: new Date().toLocaleString('zh-CN') }
           }
@@ -223,6 +223,8 @@ async function handleSendWaitlistPromotion(data, wxContext) {
       data: {
         thing1: { value: ('候补成功 - ' + (activityName || '活动')).substring(0, 20) },
         thing2: { value: '您已候补晋升，请尽快完成缴费，否则名额将顺延' },
+        thing3: { value: '请及时处理' },
+        thing4: { value: (activityName || '').substring(0, 20) },
         time5: { value: new Date().toLocaleString('zh-CN') }
       }
     });
@@ -261,6 +263,8 @@ async function handleSendMemberApplyNotification(data, wxContext) {
           data: {
             thing1: { value: ('新成员申请: ' + (nickname || '未知')).substring(0, 20) },
             thing2: { value: ('手机号: ' + (phone || '未填写')).substring(0, 20) },
+            thing3: { value: '请尽快审批' },
+            thing4: { value: '成员管理 → 待审批' },
             time5: { value: new Date().toLocaleString('zh-CN') }
           }
         });
@@ -310,6 +314,8 @@ async function handleSendActivityRegistrationNotification(data, wxContext) {
           data: {
             thing1: { value: ('新报名: ' + (activityName || '活动')).substring(0, 20) },
             thing2: { value: ('报名者: ' + (userName || '未知')).substring(0, 20) },
+            thing3: { value: '查看详情' },
+            thing4: { value: (activityName || '').substring(0, 20) },
             time5: { value: new Date().toLocaleString('zh-CN') }
           }
         });

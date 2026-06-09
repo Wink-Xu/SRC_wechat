@@ -35,31 +35,16 @@ Page({
     }
     this.loadOrders();
     this.loadOrderCounts();
-    this.requestOrderSubscribe();
+    // 静默补充订阅授权
+    this.renewSubscribe();
   },
 
-  // 订单管理订阅通知
-  requestOrderSubscribe: function () {
-    const hasSubscribed = wx.getStorageSync('admin_order_subscribed');
-    if (hasSubscribed) return;
-    wx.showModal({
-      title: '新订单提醒',
-      content: '是否开启新订单提醒？开启后有人下单时可收到通知',
-      confirmText: '开启',
-      cancelText: '暂不',
-      success: (res) => {
-        if (res.confirm) {
-          wx.requestSubscribeMessage({
-            tmplIds: ['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'],
-            success: (res) => {
-              if (res.errMsg === 'requestSubscribeMessage:ok' || res['PPJGcyK4yaRO6FcJFJsrwXoico9heyOdsyBVwjt35-U'] === 'accept') {
-                wx.setStorageSync('admin_order_subscribed', true);
-              }
-            },
-            fail: (err) => { console.log('订阅授权失败:', err); }
-          });
-        }
-      }
+  // 静默补充订阅授权
+  renewSubscribe: function () {
+    wx.requestSubscribeMessage({
+      tmplIds: ['DhgaV9rp_Cd9Iwj9OrbHu5MCM-954nzKfInFHsVDpUg'],
+      success: (res) => { console.log('订阅授权结果:', res); },
+      fail: (err) => { console.log('订阅授权失败（可忽略）:', err); }
     });
   },
 
